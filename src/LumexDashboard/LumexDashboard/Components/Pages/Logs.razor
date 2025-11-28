@@ -1,0 +1,268 @@
+@page "/logs"
+@using LumexUI
+@using LumexUI.Common
+@rendermode InteractiveServer
+
+<PageTitle>Activity Logs</PageTitle>
+
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-default-900 dark:text-white">Activity Logs</h1>
+            <p class="text-default-500 mt-1">Monitor all system activities and events</p>
+        </div>
+        <div class="flex gap-2">
+            <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Refresh
+            </LumexButton>
+            <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Export
+            </LumexButton>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <LumexCard>
+            <LumexCardBody Class="p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-default-900 dark:text-white">2,847</p>
+                        <p class="text-sm text-default-500">Total Events</p>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <LumexCard>
+            <LumexCardBody Class="p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-default-900 dark:text-white">2,654</p>
+                        <p class="text-sm text-default-500">Successful</p>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <LumexCard>
+            <LumexCardBody Class="p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-default-900 dark:text-white">156</p>
+                        <p class="text-sm text-default-500">Warnings</p>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <LumexCard>
+            <LumexCardBody Class="p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-danger/10 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-default-900 dark:text-white">37</p>
+                        <p class="text-sm text-default-500">Errors</p>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </div>
+
+    <!-- Filters -->
+    <LumexCard>
+        <LumexCardBody Class="p-4">
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" @bind="_searchQuery" @bind:event="oninput" placeholder="Search logs..." class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <select @bind="_levelFilter" class="w-full sm:w-32 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                        <option value="all">All Levels</option>
+                        <option value="info">Info</option>
+                        <option value="success">Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                    </select>
+                    <select @bind="_categoryFilter" class="w-full sm:w-36 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                        <option value="all">All Categories</option>
+                        <option value="auth">Authentication</option>
+                        <option value="payment">Payment</option>
+                        <option value="user">User</option>
+                        <option value="system">System</option>
+                    </select>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Logs List -->
+    <LumexCard>
+        <LumexCardBody Class="p-0">
+            <div class="divide-y divide-default-200 dark:divide-default-700">
+                @foreach (var log in FilteredLogs)
+                {
+                    <div class="px-6 py-4 hover:bg-default-50 dark:hover:bg-default-800/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="@GetLevelIconClass(log.Level) w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                @if (log.Level == "success")
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                }
+                                else if (log.Level == "warning")
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                }
+                                else if (log.Level == "error")
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                                }
+                                else
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                }
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-sm font-semibold text-default-900 dark:text-white">@log.Action</span>
+                                    <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="@GetCategoryColor(log.Category)">@log.Category</LumexChip>
+                                </div>
+                                <p class="text-sm text-default-600 dark:text-default-400 mt-1">@log.Description</p>
+                                <div class="flex items-center gap-4 mt-2 text-xs text-default-500">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        @log.User
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                        </svg>
+                                        @log.IpAddress
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        @log.Timestamp
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between px-6 py-4 border-t border-default-200 dark:border-default-700">
+                <p class="text-sm text-default-500">Showing @((_currentPage - 1) * _pageSize + 1) to @Math.Min(_currentPage * _pageSize, _logs.Count) of @_logs.Count logs</p>
+                <div class="flex gap-2">
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage == 1)" OnClick="PreviousPage">Previous</LumexButton>
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage * _pageSize >= _logs.Count)" OnClick="NextPage">Next</LumexButton>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+</div>
+
+@code {
+    private string _searchQuery = "";
+    private string _levelFilter = "all";
+    private string _categoryFilter = "all";
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+
+    private List<LogEntry> _logs = new()
+    {
+        new("User Login", "Authentication", "info", "User successfully logged in to the system", "john.doe@email.com", "192.168.1.45", "Nov 28, 2024 11:30 AM"),
+        new("Payment Processed", "Payment", "success", "Payment of $1,250.00 processed successfully for order #12345", "System", "10.0.0.1", "Nov 28, 2024 11:25 AM"),
+        new("Failed Login Attempt", "Authentication", "warning", "Multiple failed login attempts detected from this IP", "unknown", "45.33.32.156", "Nov 28, 2024 11:20 AM"),
+        new("User Registration", "User", "success", "New user account created and verification email sent", "jane.smith@email.com", "192.168.1.102", "Nov 28, 2024 11:15 AM"),
+        new("Database Connection Error", "System", "error", "Failed to establish connection to primary database server", "System", "10.0.0.1", "Nov 28, 2024 11:10 AM"),
+        new("Password Changed", "User", "info", "User password was changed successfully", "mike.johnson@email.com", "192.168.1.78", "Nov 28, 2024 11:05 AM"),
+        new("Payment Refund", "Payment", "warning", "Refund initiated for order #12340 - Amount: $89.99", "System", "10.0.0.1", "Nov 28, 2024 11:00 AM"),
+        new("Server Health Check", "System", "success", "All systems operational - CPU: 45%, Memory: 62%", "System", "10.0.0.1", "Nov 28, 2024 10:55 AM"),
+        new("API Rate Limit", "System", "warning", "API rate limit reached for client application XYZ", "api-client-xyz", "203.0.113.50", "Nov 28, 2024 10:50 AM"),
+        new("User Logout", "Authentication", "info", "User session ended - Duration: 2h 34m", "sarah.wilson@email.com", "192.168.1.89", "Nov 28, 2024 10:45 AM"),
+        new("Permission Denied", "Authentication", "error", "Unauthorized access attempt to admin panel", "guest-user", "198.51.100.23", "Nov 28, 2024 10:40 AM"),
+        new("File Upload", "User", "success", "Document uploaded successfully - Size: 2.4 MB", "david.lee@email.com", "192.168.1.67", "Nov 28, 2024 10:35 AM")
+    };
+
+    private IEnumerable<LogEntry> FilteredLogs => _logs
+        .Where(l => string.IsNullOrEmpty(_searchQuery) ||
+                    l.Action.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    l.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    l.User.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
+        .Where(l => _levelFilter == "all" || l.Level == _levelFilter)
+        .Where(l => _categoryFilter == "all" || GetCategoryKey(l.Category) == _categoryFilter)
+        .Skip((_currentPage - 1) * _pageSize)
+        .Take(_pageSize);
+
+    private string GetCategoryKey(string category) => category switch
+    {
+        "Authentication" => "auth",
+        "Payment" => "payment",
+        "User" => "user",
+        "System" => "system",
+        _ => "other"
+    };
+
+    private string GetLevelIconClass(string level) => level switch
+    {
+        "success" => "bg-success/20 text-success",
+        "warning" => "bg-warning/20 text-warning",
+        "error" => "bg-danger/20 text-danger",
+        _ => "bg-primary/20 text-primary"
+    };
+
+    private ThemeColor GetCategoryColor(string category) => category switch
+    {
+        "Authentication" => ThemeColor.Primary,
+        "Payment" => ThemeColor.Success,
+        "User" => ThemeColor.Secondary,
+        "System" => ThemeColor.Warning,
+        _ => ThemeColor.Default
+    };
+
+    private void PreviousPage()
+    {
+        if (_currentPage > 1) _currentPage--;
+    }
+
+    private void NextPage()
+    {
+        if (_currentPage * _pageSize < _logs.Count) _currentPage++;
+    }
+
+    private record LogEntry(string Action, string Category, string Level, string Description, string User, string IpAddress, string Timestamp);
+}

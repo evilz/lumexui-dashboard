@@ -1,0 +1,215 @@
+@page "/payments"
+@using LumexUI
+@using LumexUI.Common
+@rendermode InteractiveServer
+
+<PageTitle>Payments</PageTitle>
+
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-default-900 dark:text-white">Payments</h1>
+            <p class="text-default-500 mt-1">Track and manage all transactions</p>
+        </div>
+        <div class="flex gap-2">
+            <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Export
+            </LumexButton>
+            <LumexButton Color="ThemeColor.Primary">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                New Payment
+            </LumexButton>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatsCard Title="Total Revenue" Value="$128,430" Change="+12.5%" IsPositive="true" IconBackgroundClass="bg-success/10">
+            <Icon>
+                <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+
+        <StatsCard Title="Pending" Value="$8,234" Change="-3.2%" IsPositive="false" IconBackgroundClass="bg-warning/10">
+            <Icon>
+                <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+
+        <StatsCard Title="Completed" Value="1,234" Change="+8.1%" IsPositive="true" IconBackgroundClass="bg-primary/10">
+            <Icon>
+                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+
+        <StatsCard Title="Failed" Value="23" Change="-15%" IsPositive="true" IconBackgroundClass="bg-danger/10">
+            <Icon>
+                <svg class="w-6 h-6 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+    </div>
+
+    <!-- Filters and Table -->
+    <LumexCard>
+        <LumexCardBody Class="p-4 border-b border-default-200 dark:border-default-700">
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" @bind="_searchQuery" @bind:event="oninput" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <select @bind="_statusFilter" class="w-full sm:w-36 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                        <option value="all">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                    </select>
+                    <select @bind="_methodFilter" class="w-full sm:w-36 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                        <option value="all">All Methods</option>
+                        <option value="card">Credit Card</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+            </div>
+        </LumexCardBody>
+        <LumexCardBody Class="p-0">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-default-50 dark:bg-default-800">
+                        <tr>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Transaction ID</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Customer</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Amount</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Method</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Status</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Date</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-default-200 dark:divide-default-700">
+                        @foreach (var payment in FilteredPayments)
+                        {
+                            <tr class="hover:bg-default-50 dark:hover:bg-default-800/50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <span class="text-sm font-mono text-default-900 dark:text-white">@payment.TransactionId</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <LumexAvatar Name="@payment.CustomerName" Size="Size.Small" />
+                                        <div>
+                                            <p class="text-sm font-medium text-default-900 dark:text-white">@payment.CustomerName</p>
+                                            <p class="text-xs text-default-500">@payment.CustomerEmail</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm font-semibold text-default-900 dark:text-white">@payment.Amount</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm text-default-600 dark:text-default-400">@payment.Method</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <LumexChip Size="Size.Small" Color="@GetStatusColor(payment.Status)" Variant="ChipVariant.Flat">@payment.Status</LumexChip>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-default-600 dark:text-default-400">@payment.Date</td>
+                                <td class="px-6 py-4">
+                                    <LumexButton Variant="Variant.Light" Size="Size.Small">View</LumexButton>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between px-6 py-4 border-t border-default-200 dark:border-default-700">
+                <p class="text-sm text-default-500">Showing @((_currentPage - 1) * _pageSize + 1) to @Math.Min(_currentPage * _pageSize, _payments.Count) of @_payments.Count transactions</p>
+                <div class="flex gap-2">
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage == 1)" OnClick="PreviousPage">Previous</LumexButton>
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage * _pageSize >= _payments.Count)" OnClick="NextPage">Next</LumexButton>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+</div>
+
+@code {
+    private string _searchQuery = "";
+    private string _statusFilter = "all";
+    private string _methodFilter = "all";
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+
+    private List<PaymentData> _payments = new()
+    {
+        new("TXN-2024001", "Emma Thompson", "emma.t@email.com", "$1,250.00", "Credit Card", "Completed", "Nov 28, 2024"),
+        new("TXN-2024002", "Liam Johnson", "liam.j@email.com", "$89.99", "PayPal", "Completed", "Nov 28, 2024"),
+        new("TXN-2024003", "Olivia Williams", "olivia.w@email.com", "$432.50", "Bank Transfer", "Pending", "Nov 27, 2024"),
+        new("TXN-2024004", "Noah Brown", "noah.b@email.com", "$67.00", "Credit Card", "Failed", "Nov 27, 2024"),
+        new("TXN-2024005", "Ava Jones", "ava.j@email.com", "$890.00", "Credit Card", "Completed", "Nov 26, 2024"),
+        new("TXN-2024006", "William Garcia", "william.g@email.com", "$234.99", "PayPal", "Refunded", "Nov 26, 2024"),
+        new("TXN-2024007", "Sophia Martinez", "sophia.m@email.com", "$1,567.00", "Bank Transfer", "Completed", "Nov 25, 2024"),
+        new("TXN-2024008", "James Rodriguez", "james.r@email.com", "$45.50", "Credit Card", "Pending", "Nov 25, 2024"),
+        new("TXN-2024009", "Isabella Wilson", "isabella.w@email.com", "$678.00", "PayPal", "Completed", "Nov 24, 2024"),
+        new("TXN-2024010", "Benjamin Moore", "ben.m@email.com", "$123.45", "Credit Card", "Completed", "Nov 24, 2024"),
+        new("TXN-2024011", "Mia Taylor", "mia.t@email.com", "$999.99", "Bank Transfer", "Pending", "Nov 23, 2024"),
+        new("TXN-2024012", "Lucas Anderson", "lucas.a@email.com", "$54.00", "PayPal", "Failed", "Nov 23, 2024")
+    };
+
+    private IEnumerable<PaymentData> FilteredPayments => _payments
+        .Where(p => string.IsNullOrEmpty(_searchQuery) ||
+                    p.TransactionId.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    p.CustomerName.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    p.CustomerEmail.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
+        .Where(p => _statusFilter == "all" || p.Status.Equals(_statusFilter, StringComparison.OrdinalIgnoreCase))
+        .Where(p => _methodFilter == "all" || GetMethodKey(p.Method) == _methodFilter)
+        .Skip((_currentPage - 1) * _pageSize)
+        .Take(_pageSize);
+
+    private string GetMethodKey(string method) => method switch
+    {
+        "Credit Card" => "card",
+        "Bank Transfer" => "bank",
+        "PayPal" => "paypal",
+        _ => "other"
+    };
+
+    private ThemeColor GetStatusColor(string status) => status switch
+    {
+        "Completed" => ThemeColor.Success,
+        "Pending" => ThemeColor.Warning,
+        "Failed" => ThemeColor.Danger,
+        "Refunded" => ThemeColor.Secondary,
+        _ => ThemeColor.Default
+    };
+
+    private void PreviousPage()
+    {
+        if (_currentPage > 1) _currentPage--;
+    }
+
+    private void NextPage()
+    {
+        if (_currentPage * _pageSize < _payments.Count) _currentPage++;
+    }
+
+    private record PaymentData(string TransactionId, string CustomerName, string CustomerEmail, string Amount, string Method, string Status, string Date);
+}

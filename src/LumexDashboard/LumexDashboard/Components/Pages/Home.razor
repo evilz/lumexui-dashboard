@@ -1,0 +1,251 @@
+@page "/"
+@using LumexUI
+@using LumexUI.Common
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard Overview</PageTitle>
+
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-default-900 dark:text-white">Dashboard Overview</h1>
+            <p class="text-default-500 mt-1">Welcome back! Here's what's happening with your business.</p>
+        </div>
+        <div class="flex gap-2">
+            <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Export
+            </LumexButton>
+            <LumexButton Color="ThemeColor.Primary">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                New Report
+            </LumexButton>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatsCard Title="Total Revenue" Value="$45,231.89" Change="+20.1%" IsPositive="true" IconBackgroundClass="bg-primary/10">
+            <Icon>
+                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+
+        <StatsCard Title="Active Users" Value="2,350" Change="+180.1%" IsPositive="true" IconBackgroundClass="bg-success/10">
+            <Icon>
+                <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+
+        <StatsCard Title="Transactions" Value="12,234" Change="+19%" IsPositive="true" IconBackgroundClass="bg-warning/10">
+            <Icon>
+                <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+
+        <StatsCard Title="Pending Orders" Value="573" Change="-4%" IsPositive="false" IconBackgroundClass="bg-danger/10">
+            <Icon>
+                <svg class="w-6 h-6 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </Icon>
+        </StatsCard>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Revenue Chart -->
+        <LumexCard>
+            <LumexCardBody Class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-default-900 dark:text-white">Revenue Overview</h3>
+                        <p class="text-sm text-default-500">Monthly revenue for the current year</p>
+                    </div>
+                    <select @bind="_selectedPeriod" class="px-3 py-1.5 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                        <option value="This Year">This Year</option>
+                        <option value="Last Year">Last Year</option>
+                    </select>
+                </div>
+                <div class="h-64 flex items-end gap-2">
+                    @foreach (var item in _revenueData)
+                    {
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-primary/20 rounded-t-md relative" style="height: @(item.Value * 2)px;">
+                                <div class="absolute inset-x-0 bottom-0 bg-primary rounded-t-md" style="height: @(item.Value * 0.7 * 2)px;"></div>
+                            </div>
+                            <span class="text-xs text-default-500">@item.Label</span>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- User Activity -->
+        <LumexCard>
+            <LumexCardBody Class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-default-900 dark:text-white">User Activity</h3>
+                        <p class="text-sm text-default-500">Active users by day of week</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    @foreach (var item in _activityData)
+                    {
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-default-600 dark:text-default-400">@item.Day</span>
+                                <span class="font-medium text-default-900 dark:text-white">@item.Users users</span>
+                            </div>
+                            <div class="h-2 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full @GetProgressColor(item.Color)" style="width: @item.Percentage%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </div>
+
+    <!-- Recent Activity & Top Products -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Recent Transactions -->
+        <div class="lg:col-span-2">
+            <LumexCard>
+                <LumexCardBody Class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-default-900 dark:text-white">Recent Transactions</h3>
+                        <LumexButton Variant="Variant.Light" Size="Size.Small">View All</LumexButton>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-default-200 dark:border-default-700">
+                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Customer</th>
+                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Transaction</th>
+                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Amount</th>
+                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var transaction in _recentTransactions)
+                                {
+                                    <tr class="border-b border-default-100 dark:border-default-800 last:border-0">
+                                        <td class="py-4">
+                                            <div class="flex items-center gap-3">
+                                                <LumexAvatar Name="@transaction.Customer" Size="Size.Small" />
+                                                <div>
+                                                    <p class="text-sm font-medium text-default-900 dark:text-white">@transaction.Customer</p>
+                                                    <p class="text-xs text-default-500">@transaction.Email</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 text-sm text-default-600 dark:text-default-400">@transaction.TransactionId</td>
+                                        <td class="py-4 text-sm font-medium text-default-900 dark:text-white">@transaction.Amount</td>
+                                        <td class="py-4">
+                                            <LumexChip Size="Size.Small" Color="@transaction.StatusColor" Variant="ChipVariant.Flat">@transaction.Status</LumexChip>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+        </div>
+
+        <!-- Top Products -->
+        <LumexCard>
+            <LumexCardBody Class="p-6">
+                <h3 class="text-lg font-semibold text-default-900 dark:text-white mb-6">Top Products</h3>
+                <div class="space-y-4">
+                    @foreach (var product in _topProducts)
+                    {
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-default-100 dark:bg-default-800 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-default-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-default-900 dark:text-white truncate">@product.Name</p>
+                                <p class="text-xs text-default-500">@product.Category</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-semibold text-default-900 dark:text-white">@product.Sales</p>
+                                <p class="text-xs text-success">@product.Growth</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </div>
+</div>
+
+@code {
+    private string _selectedPeriod = "This Year";
+
+    private List<ChartData> _revenueData = new()
+    {
+        new("Jan", 65), new("Feb", 59), new("Mar", 80), new("Apr", 81),
+        new("May", 56), new("Jun", 55), new("Jul", 72), new("Aug", 85),
+        new("Sep", 78), new("Oct", 92), new("Nov", 88), new("Dec", 95)
+    };
+
+    private List<ActivityData> _activityData = new()
+    {
+        new("Monday", 2400, 96, ThemeColor.Primary),
+        new("Tuesday", 2100, 84, ThemeColor.Success),
+        new("Wednesday", 1800, 72, ThemeColor.Warning),
+        new("Thursday", 2200, 88, ThemeColor.Secondary),
+        new("Friday", 1950, 78, ThemeColor.Primary),
+        new("Saturday", 1200, 48, ThemeColor.Default),
+        new("Sunday", 980, 39, ThemeColor.Default)
+    };
+
+    private List<TransactionData> _recentTransactions = new()
+    {
+        new("Olivia Martin", "olivia@email.com", "TRX-001234", "$1,999.00", "Completed", ThemeColor.Success),
+        new("Jackson Lee", "jackson@email.com", "TRX-001235", "$39.00", "Processing", ThemeColor.Warning),
+        new("Isabella Nguyen", "isabella@email.com", "TRX-001236", "$299.00", "Completed", ThemeColor.Success),
+        new("William Kim", "william@email.com", "TRX-001237", "$99.00", "Failed", ThemeColor.Danger),
+        new("Sofia Davis", "sofia@email.com", "TRX-001238", "$499.00", "Completed", ThemeColor.Success)
+    };
+
+    private List<ProductData> _topProducts = new()
+    {
+        new("Wireless Earbuds", "Electronics", "$24,500", "+12.5%"),
+        new("Smart Watch Pro", "Wearables", "$18,200", "+8.2%"),
+        new("Laptop Stand", "Accessories", "$12,800", "+15.3%"),
+        new("USB-C Hub", "Electronics", "$9,500", "+5.7%"),
+        new("Mechanical Keyboard", "Accessories", "$8,200", "+22.1%")
+    };
+
+    private record ChartData(string Label, int Value);
+    private record ActivityData(string Day, int Users, int Percentage, ThemeColor Color);
+    private record TransactionData(string Customer, string Email, string TransactionId, string Amount, string Status, ThemeColor StatusColor);
+    private record ProductData(string Name, string Category, string Sales, string Growth);
+
+    private string GetProgressColor(ThemeColor color) => color switch
+    {
+        ThemeColor.Primary => "bg-primary",
+        ThemeColor.Secondary => "bg-secondary",
+        ThemeColor.Success => "bg-success",
+        ThemeColor.Warning => "bg-warning",
+        ThemeColor.Danger => "bg-danger",
+        _ => "bg-default-400"
+    };
+}

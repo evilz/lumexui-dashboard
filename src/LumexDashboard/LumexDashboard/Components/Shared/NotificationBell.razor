@@ -1,0 +1,93 @@
+<div class="relative">
+    <button class="p-2 rounded-lg hover:bg-default-100 dark:hover:bg-default-800 transition-colors" 
+            @onclick="ToggleDropdown" 
+            title="Notifications">
+        <svg class="w-5 h-5 text-default-600 dark:text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
+        @if (_unreadCount > 0)
+        {
+            <span class="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-danger rounded-full">
+                @_unreadCount
+            </span>
+        }
+    </button>
+    
+    @if (_isOpen)
+    {
+        <div class="absolute right-0 mt-2 w-80 bg-white dark:bg-default-900 rounded-xl shadow-lg border border-default-200 dark:border-default-700 z-50">
+            <div class="border-b border-default-200 dark:border-default-700 px-4 py-3">
+                <h3 class="font-semibold text-default-900 dark:text-white">Notifications</h3>
+            </div>
+            <div class="max-h-80 overflow-y-auto">
+                @foreach (var notification in _notifications)
+                {
+                    <div class="px-4 py-3 hover:bg-default-100 dark:hover:bg-default-800 border-b border-default-100 dark:border-default-800 last:border-0 cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <div class="@GetIconClass(notification.Type) w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+                                @if (notification.Type == "success")
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                }
+                                else if (notification.Type == "warning")
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                }
+                                else if (notification.Type == "error")
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                }
+                                else
+                                {
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                }
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-default-900 dark:text-white">@notification.Title</p>
+                                <p class="text-xs text-default-500 mt-0.5">@notification.Message</p>
+                                <p class="text-xs text-default-400 mt-1">@notification.Time</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="border-t border-default-200 dark:border-default-700 px-4 py-2">
+                <a href="#" class="text-sm text-primary hover:underline">View all notifications</a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool _isOpen = false;
+    private int _unreadCount = 3;
+
+    private List<NotificationItem> _notifications = new()
+    {
+        new NotificationItem { Type = "success", Title = "Payment Received", Message = "You received a payment of $250.00", Time = "5 min ago" },
+        new NotificationItem { Type = "info", Title = "New User Registered", Message = "John Doe created an account", Time = "10 min ago" },
+        new NotificationItem { Type = "warning", Title = "Server Warning", Message = "CPU usage exceeded 80%", Time = "30 min ago" },
+        new NotificationItem { Type = "error", Title = "Payment Failed", Message = "Transaction #12345 was declined", Time = "1 hour ago" }
+    };
+
+    private void ToggleDropdown()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private string GetIconClass(string type) => type switch
+    {
+        "success" => "bg-success/20 text-success",
+        "warning" => "bg-warning/20 text-warning",
+        "error" => "bg-danger/20 text-danger",
+        _ => "bg-primary/20 text-primary"
+    };
+
+    private class NotificationItem
+    {
+        public string Type { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Message { get; set; } = "";
+        public string Time { get; set; } = "";
+    }
+}
