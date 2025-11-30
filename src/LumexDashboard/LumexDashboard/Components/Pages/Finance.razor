@@ -1,0 +1,530 @@
+@page "/finance"
+@rendermode InteractiveServer
+
+<PageTitle>Finance Dashboard</PageTitle>
+
+<div class="flex gap-6">
+    <!-- Main Content -->
+    <div class="flex-1 space-y-6">
+        <!-- Financial Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-default-500 mb-1">Total Income</p>
+                            <p class="text-2xl font-bold text-default-800 dark:text-default-100">$24,580</p>
+                            <div class="flex items-center gap-1 mt-2">
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">+12.5%</span>
+                                <span class="text-xs text-default-400">vs last month</span>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-default-500 mb-1">Total Expenses</p>
+                            <p class="text-2xl font-bold text-default-800 dark:text-default-100">$18,240</p>
+                            <div class="flex items-center gap-1 mt-2">
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-danger/10 text-danger font-medium">+8.2%</span>
+                                <span class="text-xs text-default-400">vs last month</span>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-danger/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-default-500 mb-1">Net Revenue</p>
+                            <p class="text-2xl font-bold text-default-800 dark:text-default-100">$6,340</p>
+                            <div class="flex items-center gap-1 mt-2">
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">+24.3%</span>
+                                <span class="text-xs text-default-400">vs last month</span>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+        </div>
+
+        <!-- Payment Cards Section -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-default-800 dark:text-default-100">My Cards</h2>
+                <LumexButton Variant="Variant.Light" Size="Size.Small">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Card
+                </LumexButton>
+            </div>
+            <div class="flex gap-4 overflow-x-auto pb-2">
+                @foreach (var card in _paymentCards)
+                {
+                    <div class="flex-shrink-0 w-72 h-44 rounded-2xl p-5 text-white relative overflow-hidden @card.Gradient">
+                        <!-- Card pattern overlay -->
+                        <div class="absolute inset-0 opacity-10">
+                            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <circle cx="80" cy="20" r="40" fill="white"/>
+                                <circle cx="90" cy="80" r="30" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="relative z-10 h-full flex flex-col justify-between">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-xs text-white/70">@card.Type</p>
+                                    <p class="text-lg font-semibold">@card.Bank</p>
+                                </div>
+                                @card.Logo
+                            </div>
+                            <div>
+                                <p class="text-lg tracking-widest font-mono mb-2">•••• •••• •••• @card.LastFour</p>
+                                <div class="flex justify-between text-sm">
+                                    <div>
+                                        <p class="text-xs text-white/70">Card Holder</p>
+                                        <p>@card.Holder</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-white/70">Expires</p>
+                                        <p>@card.Expiry</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Monthly Spending Chart -->
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-5">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-semibold text-default-800 dark:text-default-100">Monthly Statistics</h3>
+                            <p class="text-sm text-default-500">Income vs Expenses</p>
+                        </div>
+                        <LumexDropdown>
+                            <LumexDropdownTrigger>
+                                <LumexButton Variant="Variant.Flat" Size="Size.Small">
+                                    2025
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </LumexButton>
+                            </LumexDropdownTrigger>
+                            <LumexDropdownMenu AriaLabel="Select Year">
+                                <LumexDropdownItem Key="2025">2025</LumexDropdownItem>
+                                <LumexDropdownItem Key="2024">2024</LumexDropdownItem>
+                                <LumexDropdownItem Key="2023">2023</LumexDropdownItem>
+                            </LumexDropdownMenu>
+                        </LumexDropdown>
+                    </div>
+                    <!-- Bar Chart -->
+                    <div class="h-48 flex items-end justify-between gap-2">
+                        @foreach (var month in _monthlyData)
+                        {
+                            <div class="flex-1 flex flex-col items-center gap-1">
+                                <div class="w-full flex gap-1 justify-center items-end h-40">
+                                    <div class="w-3 bg-success rounded-t" style="height: @(month.Income / 300.0 * 100)%"></div>
+                                    <div class="w-3 bg-danger rounded-t" style="height: @(month.Expense / 300.0 * 100)%"></div>
+                                </div>
+                                <span class="text-xs text-default-400">@month.Month</span>
+                            </div>
+                        }
+                    </div>
+                    <!-- Legend -->
+                    <div class="flex items-center justify-center gap-6 mt-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-success"></div>
+                            <span class="text-sm text-default-500">Income</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-danger"></div>
+                            <span class="text-sm text-default-500">Expenses</span>
+                        </div>
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+
+            <!-- Category Chart -->
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-5">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-semibold text-default-800 dark:text-default-100">Spending by Category</h3>
+                            <p class="text-sm text-default-500">November 2025</p>
+                        </div>
+                        <LumexTabs Size="Size.Small" Color="ThemeColor.Primary" SelectedKey="@_categoryTab" SelectedKeyChanged="@((string key) => _categoryTab = key)">
+                            <LumexTab Key="expense" Title="Expense" />
+                            <LumexTab Key="income" Title="Income" />
+                        </LumexTabs>
+                    </div>
+                    
+                    <!-- Donut Chart Visualization -->
+                    <div class="flex items-center gap-6">
+                        <div class="relative w-36 h-36 flex-shrink-0">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                                @{
+                                    var categories = _categoryTab == "expense" ? _expenseCategories : _incomeCategories;
+                                    double offset = 0;
+                                }
+                                @foreach (var cat in categories)
+                                {
+                                    var dashArray = cat.Percentage * 2.51;
+                                    var dashOffset = -offset * 2.51;
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="@cat.Color" stroke-width="12"
+                                            stroke-dasharray="@dashArray 251" stroke-dashoffset="@dashOffset" />
+                                    offset += cat.Percentage;
+                                }
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-xl font-bold text-default-800 dark:text-default-100">
+                                        @(_categoryTab == "expense" ? "$18,240" : "$24,580")
+                                    </p>
+                                    <p class="text-xs text-default-500">Total</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 space-y-3">
+                            @foreach (var cat in (_categoryTab == "expense" ? _expenseCategories : _incomeCategories))
+                            {
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full" style="background-color: @cat.Color"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-sm text-default-700 dark:text-default-300 truncate">@cat.Name</span>
+                                            <span class="text-sm font-medium text-default-800 dark:text-default-100">@cat.Percentage%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full" style="width: @(cat.Percentage)%; background-color: @cat.Color"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+        </div>
+
+        <!-- Transactions & Subscriptions -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Transactions -->
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-default-800 dark:text-default-100">Recent Transactions</h3>
+                        <LumexButton Variant="Variant.Light" Size="Size.Small">See All</LumexButton>
+                    </div>
+                    <div class="space-y-4">
+                        @foreach (var tx in _transactions)
+                        {
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl @tx.IconBg flex items-center justify-center flex-shrink-0">
+                                    @tx.Icon
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-default-800 dark:text-default-100 truncate">@tx.Name</p>
+                                    <p class="text-sm text-default-500">@tx.Category • @tx.Date.ToString("MMM d")</p>
+                                </div>
+                                <p class="font-semibold @(tx.IsIncome ? "text-success" : "text-default-800 dark:text-default-100")">
+                                    @(tx.IsIncome ? "+" : "-")$@tx.Amount.ToString("N0")
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+
+            <!-- Active Subscriptions -->
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-default-800 dark:text-default-100">Active Subscriptions</h3>
+                        <LumexButton Variant="Variant.Light" Size="Size.Small">Manage</LumexButton>
+                    </div>
+                    <div class="space-y-4">
+                        @foreach (var sub in _subscriptions)
+                        {
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl @sub.IconBg flex items-center justify-center flex-shrink-0">
+                                    @sub.Icon
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-default-800 dark:text-default-100 truncate">@sub.Name</p>
+                                    <p class="text-sm text-default-500">Next billing: @sub.NextBilling.ToString("MMM d, yyyy")</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold text-default-800 dark:text-default-100">$@sub.Price</p>
+                                    <p class="text-xs text-default-400">/@sub.Cycle</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <aside class="w-80 flex-shrink-0 space-y-6 hidden xl:block">
+        <!-- User Profile Card -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-6 text-center">
+                <LumexAvatar Name="Jason Miller" Size="Size.Large" Class="w-20 h-20 mx-auto mb-4" />
+                <h3 class="text-lg font-semibold text-default-800 dark:text-default-100">Jason Miller</h3>
+                <p class="text-sm text-default-500 mb-4">Premium Member</p>
+                <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Success" Class="mb-4">
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Verified
+                </LumexChip>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Wallet Balance -->
+        <LumexCard Class="rounded-2xl overflow-hidden">
+            <div class="bg-gradient-to-br from-violet-600 to-indigo-700 p-6 text-white">
+                <p class="text-sm text-white/70 mb-1">Wallet Balance</p>
+                <p class="text-3xl font-bold mb-1">$12,450.80</p>
+                <p class="text-sm text-white/70">Available to spend</p>
+            </div>
+            <LumexCardBody Class="p-4">
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-default-100 dark:hover:bg-default-800 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs font-medium text-default-600 dark:text-default-400">Send</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-default-100 dark:hover:bg-default-800 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs font-medium text-default-600 dark:text-default-400">Receive</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-default-100 dark:hover:bg-default-800 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs font-medium text-default-600 dark:text-default-400">Top Up</span>
+                    </button>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Savings Goals -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-default-800 dark:text-default-100">Savings Goals</h3>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+                <div class="space-y-4">
+                    @foreach (var goal in _savingsGoals)
+                    {
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">@goal.Emoji</span>
+                                    <span class="text-sm font-medium text-default-800 dark:text-default-100">@goal.Name</span>
+                                </div>
+                                <span class="text-xs text-default-500">@goal.Progress%</span>
+                            </div>
+                            <div class="h-2 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden mb-1">
+                                <div class="h-full rounded-full @goal.BarColor" style="width: @(goal.Progress)%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-default-400">
+                                <span>$@goal.Current.ToString("N0")</span>
+                                <span>$@goal.Target.ToString("N0")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Upcoming Bills -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-default-800 dark:text-default-100">Upcoming Bills</h3>
+                    <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Warning">3 due</LumexChip>
+                </div>
+                <div class="space-y-3">
+                    @foreach (var bill in _upcomingBills)
+                    {
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-default-100 dark:bg-default-800">
+                            <div class="w-10 h-10 rounded-lg @bill.IconBg flex items-center justify-center flex-shrink-0">
+                                @bill.Icon
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-default-800 dark:text-default-100 truncate">@bill.Name</p>
+                                <p class="text-xs text-default-500">Due @bill.DueDate.ToString("MMM d")</p>
+                            </div>
+                            <p class="font-semibold text-default-800 dark:text-default-100">$@bill.Amount</p>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </aside>
+</div>
+
+@code {
+    private string _categoryTab = "expense";
+
+    private List<PaymentCard> _paymentCards = new()
+    {
+        new("Visa", "Chase Bank", "4532", "Jason Miller", "12/27", "bg-gradient-to-br from-blue-600 to-blue-800",
+            @<svg class="w-12 h-8" viewBox="0 0 48 32" fill="white">
+                <path d="M18.5 21.5h-3l1.9-11.5h3l-1.9 11.5zm13.2-11.2c-.6-.2-1.5-.5-2.7-.5-3 0-5.1 1.5-5.1 3.7 0 1.6 1.5 2.5 2.7 3.1 1.2.6 1.6 1 1.6 1.5 0 .8-1 1.2-1.9 1.2-1.2 0-1.9-.2-2.9-.6l-.4-.2-.4 2.5c.7.3 2.1.6 3.5.6 3.2 0 5.2-1.5 5.3-3.8 0-1.3-.8-2.2-2.5-3-1-.5-1.7-.9-1.7-1.4 0-.5.5-1 1.7-1 1 0 1.7.2 2.2.4l.3.1.4-2.4v-.2zm7.8-.3h-2.3c-.7 0-1.3.2-1.6.9l-4.5 10.6h3.2l.6-1.7h3.9l.4 1.7h2.8l-2.5-11.5zm-3.7 7.4l1.2-3.2.3-.9.2 1 .7 3.1h-2.4zM14 10l-3 7.8-.3-1.5c-.5-1.8-2.2-3.7-4.1-4.7l2.7 9.9h3.2l4.8-11.5H14z"/>
+            </svg>),
+        new("Mastercard", "Bank of America", "8741", "Jason Miller", "09/26", "bg-gradient-to-br from-gray-800 to-gray-900",
+            @<svg class="w-12 h-8" viewBox="0 0 48 32" fill="none">
+                <circle cx="18" cy="16" r="10" fill="#EB001B"/>
+                <circle cx="30" cy="16" r="10" fill="#F79E1B"/>
+                <path d="M24 8.5a10 10 0 000 15 10 10 0 000-15z" fill="#FF5F00"/>
+            </svg>)
+    };
+
+    private List<MonthlyData> _monthlyData = new()
+    {
+        new("Jan", 220, 180),
+        new("Feb", 250, 200),
+        new("Mar", 200, 160),
+        new("Apr", 280, 220),
+        new("May", 260, 210),
+        new("Jun", 300, 250)
+    };
+
+    private List<CategoryData> _expenseCategories = new()
+    {
+        new("Shopping", 35, "#8b5cf6"),
+        new("Food & Dining", 25, "#f59e0b"),
+        new("Transportation", 18, "#3b82f6"),
+        new("Entertainment", 12, "#ec4899"),
+        new("Bills & Utilities", 10, "#10b981")
+    };
+
+    private List<CategoryData> _incomeCategories = new()
+    {
+        new("Salary", 65, "#10b981"),
+        new("Freelance", 20, "#3b82f6"),
+        new("Investments", 10, "#8b5cf6"),
+        new("Other", 5, "#f59e0b")
+    };
+
+    private List<Transaction> _transactions = new()
+    {
+        new("Apple Store", "Shopping", 999, new DateTime(2025, 11, 28), false, "bg-default-100 dark:bg-default-800",
+            @<svg class="w-5 h-5 text-default-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83z"/>
+            </svg>),
+        new("Salary Deposit", "Income", 5200, new DateTime(2025, 11, 25), true, "bg-success/10",
+            @<svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>),
+        new("Uber Ride", "Transportation", 24, new DateTime(2025, 11, 24), false, "bg-default-100 dark:bg-default-800",
+            @<svg class="w-5 h-5 text-default-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>),
+        new("Netflix", "Entertainment", 15, new DateTime(2025, 11, 22), false, "bg-red-100 dark:bg-red-900/30",
+            @<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.913.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/>
+            </svg>),
+        new("Grocery Store", "Food & Dining", 156, new DateTime(2025, 11, 20), false, "bg-green-100 dark:bg-green-900/30",
+            @<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>)
+    };
+
+    private List<Subscription> _subscriptions = new()
+    {
+        new("Spotify Premium", 9.99m, "month", new DateTime(2025, 12, 15), "bg-green-100 dark:bg-green-900/30",
+            @<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+            </svg>),
+        new("Adobe Creative Cloud", 54.99m, "month", new DateTime(2025, 12, 8), "bg-red-100 dark:bg-red-900/30",
+            @<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13.966 22.624l-1.69-4.281H8.122l3.892-9.144 5.662 13.425H13.966zm8.033-16.405V22h-3.93l-5.478-13.782h3.803l3.605 9.59V6.219h2zm-21.998 0h7.422L.034 22h2.49l5.477-13.781H.001V6.219z"/>
+            </svg>),
+        new("iCloud Storage", 2.99m, "month", new DateTime(2025, 12, 1), "bg-blue-100 dark:bg-blue-900/30",
+            @<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+            </svg>),
+        new("GitHub Pro", 4.00m, "month", new DateTime(2025, 12, 20), "bg-gray-100 dark:bg-gray-800",
+            @<svg class="w-5 h-5 text-default-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>)
+    };
+
+    private List<SavingsGoal> _savingsGoals = new()
+    {
+        new("🏖️", "Vacation", 2400, 5000, 48, "bg-blue-500"),
+        new("🚗", "New Car", 8500, 25000, 34, "bg-amber-500"),
+        new("🏠", "House Down Payment", 15000, 50000, 30, "bg-violet-500")
+    };
+
+    private List<UpcomingBill> _upcomingBills = new()
+    {
+        new("Electricity Bill", 120, new DateTime(2025, 12, 5), "bg-amber-100 dark:bg-amber-900/30",
+            @<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>),
+        new("Internet", 79, new DateTime(2025, 12, 10), "bg-blue-100 dark:bg-blue-900/30",
+            @<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+            </svg>),
+        new("Rent", 1500, new DateTime(2025, 12, 1), "bg-rose-100 dark:bg-rose-900/30",
+            @<svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>)
+    };
+
+    private record PaymentCard(string Type, string Bank, string LastFour, string Holder, string Expiry, string Gradient, RenderFragment Logo);
+    private record MonthlyData(string Month, int Income, int Expense);
+    private record CategoryData(string Name, int Percentage, string Color);
+    private record Transaction(string Name, string Category, decimal Amount, DateTime Date, bool IsIncome, string IconBg, RenderFragment Icon);
+    private record Subscription(string Name, decimal Price, string Cycle, DateTime NextBilling, string IconBg, RenderFragment Icon);
+    private record SavingsGoal(string Emoji, string Name, decimal Current, decimal Target, int Progress, string BarColor);
+    private record UpcomingBill(string Name, decimal Amount, DateTime DueDate, string IconBg, RenderFragment Icon);
+}

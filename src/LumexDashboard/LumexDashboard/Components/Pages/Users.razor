@@ -30,18 +30,35 @@
                     </svg>
                     <input type="text" @bind="_searchQuery" @bind:event="oninput" placeholder="Search users..." class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-default-900 dark:text-white placeholder-default-400" />
                 </div>
-                <select @bind="_statusFilter" class="w-full md:w-40 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg focus:ring-2 focus:ring-primary text-default-900 dark:text-white">
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="pending">Pending</option>
-                </select>
-                <select @bind="_roleFilter" class="w-full md:w-40 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg focus:ring-2 focus:ring-primary text-default-900 dark:text-white">
-                    <option value="all">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="editor">Editor</option>
-                    <option value="viewer">Viewer</option>
-                </select>
+               
+                <LumexDropdown @bind-Value="_statusFilter" >
+                    <LumexDropdownTrigger>
+                        <LumexButton Variant="Variant.Outlined" >
+                            @GetStatusLabel(_statusFilter)
+                        </LumexButton>
+                    </LumexDropdownTrigger>
+                    <LumexDropdownMenu>
+                        <LumexDropdownItem Value="all">All Status</LumexDropdownItem>
+                        <LumexDropdownItem Value="active">Active</LumexDropdownItem>
+                        <LumexDropdownItem Value="inactive">Inactive</LumexDropdownItem>
+                        <LumexDropdownItem Value="pending">Pending</LumexDropdownItem>
+                    </LumexDropdownMenu>
+                </LumexDropdown>
+
+                <LumexDropdown @bind-Value="_roleFilter" >
+                    <LumexDropdownTrigger>
+                        <LumexButton Variant="Variant.Outlined" >
+                            @GetRoleLabel(_roleFilter)
+                        </LumexButton>
+                    </LumexDropdownTrigger>
+                    <LumexDropdownMenu>
+                        <LumexDropdownItem Value="all">All Roles</LumexDropdownItem>
+                        <LumexDropdownItem Value="admin">Admin</LumexDropdownItem>
+                        <LumexDropdownItem Value="editor">Editor</LumexDropdownItem>
+                        <LumexDropdownItem Value="viewer">Viewer</LumexDropdownItem>
+                    </LumexDropdownMenu>
+                </LumexDropdown>
+
             </div>
         </LumexCardBody>
     </LumexCard>
@@ -121,6 +138,24 @@
     private string _roleFilter = "all";
     private int _currentPage = 1;
     private int _pageSize = 10;
+    
+    private string GetStatusLabel(string value) =>
+        (value ?? "all").ToLowerInvariant() switch
+        {
+            "active" => "Active",
+            "inactive" => "Inactive",
+            "pending" => "Pending",
+            _ => "All Status"
+        };
+
+    private string GetRoleLabel(string value) =>
+        (value ?? "all").ToLowerInvariant() switch
+        {
+            "admin" => "Admin",
+            "editor" => "Editor",
+            "viewer" => "Viewer",
+            _ => "All Roles"
+        };
 
     private List<UserData> _users = new()
     {

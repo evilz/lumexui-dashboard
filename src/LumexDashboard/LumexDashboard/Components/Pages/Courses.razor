@@ -1,0 +1,356 @@
+@page "/courses"
+@rendermode InteractiveServer
+
+<PageTitle>Online Courses</PageTitle>
+
+<div class="flex gap-6 -m-4 lg:-m-6 p-4 lg:p-6 min-h-[calc(100vh-4rem)] bg-default-50 dark:bg-default-900/50">
+    <!-- Main Content -->
+    <div class="flex-1 space-y-6">
+        <!-- Header Banner -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-8 text-white">
+            <!-- Abstract shapes -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div class="absolute bottom-0 left-1/3 w-32 h-32 bg-white/10 rounded-full translate-y-1/2"></div>
+            <div class="absolute top-1/2 right-1/4 w-16 h-16 bg-white/20 rounded-full"></div>
+            
+            <div class="relative z-10 max-w-lg">
+                <h1 class="text-3xl font-bold mb-3">Sharpen Your Skills with Professional Online Courses</h1>
+                <p class="text-white/80 mb-6">Learn from industry experts and advance your career with our comprehensive courses.</p>
+                <LumexButton Color="ThemeColor.Default" Variant="Variant.Solid" Class="bg-white text-violet-700 hover:bg-white/90 font-semibold px-6">
+                    Join Now
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </LumexButton>
+            </div>
+        </div>
+
+        <!-- Course Progress Overview -->
+        <div class="space-y-4">
+            <h2 class="text-lg font-semibold text-default-800 dark:text-default-100">Course Progress</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach (var progress in _courseProgress)
+                {
+                    <LumexCard Class="rounded-2xl">
+                        <LumexCardBody Class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center @progress.BgColor">
+                                        @progress.Icon
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-default-800 dark:text-default-100">@progress.Category</h3>
+                                        <p class="text-sm text-default-500">@progress.Watched/@progress.Total watched</p>
+                                    </div>
+                                </div>
+                                <LumexDropdown>
+                                    <LumexDropdownTrigger>
+                                        <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="6" r="2"></circle>
+                                                <circle cx="12" cy="12" r="2"></circle>
+                                                <circle cx="12" cy="18" r="2"></circle>
+                                            </svg>
+                                        </LumexButton>
+                                    </LumexDropdownTrigger>
+                                    <LumexDropdownMenu AriaLabel="Actions">
+                                        <LumexDropdownItem Key="continue">Continue Learning</LumexDropdownItem>
+                                        <LumexDropdownItem Key="details">View Details</LumexDropdownItem>
+                                        <LumexDropdownItem Key="share">Share Progress</LumexDropdownItem>
+                                    </LumexDropdownMenu>
+                                </LumexDropdown>
+                            </div>
+                            <!-- Progress bar -->
+                            <div class="mt-4">
+                                <div class="h-2 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full @progress.ProgressColor" style="width: @(progress.Watched * 100 / progress.Total)%"></div>
+                                </div>
+                            </div>
+                        </LumexCardBody>
+                    </LumexCard>
+                }
+            </div>
+        </div>
+
+        <!-- Continue Watching Section -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-default-800 dark:text-default-100">Continue Watching</h2>
+                <div class="flex gap-2">
+                    <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true" OnClick="PreviousCourse" Disabled="@(_carouselIndex == 0)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true" OnClick="NextCourse" Disabled="@(_carouselIndex >= _continueWatching.Count - 3)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+            </div>
+            
+            <div class="overflow-hidden">
+                <div class="flex gap-4 transition-transform duration-300" style="transform: translateX(-@(_carouselIndex * 33.33)%)">
+                    @foreach (var course in _continueWatching)
+                    {
+                        <div class="min-w-[calc(33.33%-1rem)] flex-shrink-0">
+                            <LumexCard Class="rounded-2xl overflow-hidden h-full">
+                                <div class="relative h-40 bg-gradient-to-br @course.ThumbnailGradient">
+                                    <!-- Play button overlay -->
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
+                                            <svg class="w-5 h-5 text-default-800 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <!-- Category badge -->
+                                    <div class="absolute top-3 left-3">
+                                        <LumexChip Size="Size.Small" Variant="ChipVariant.Solid" Class="@course.BadgeClass">
+                                            @course.Category
+                                        </LumexChip>
+                                    </div>
+                                </div>
+                                <LumexCardBody Class="p-4 space-y-3">
+                                    <h3 class="font-semibold text-default-800 dark:text-default-100 line-clamp-2">@course.Title</h3>
+                                    <div class="flex items-center gap-2">
+                                        <LumexAvatar Name="@course.MentorName" Size="Size.Small" />
+                                        <span class="text-sm text-default-500">@course.MentorName</span>
+                                    </div>
+                                </LumexCardBody>
+                            </LumexCard>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Lessons Section -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-default-800 dark:text-default-100">Your Lessons</h2>
+                <LumexButton Variant="Variant.Light" Size="Size.Small">
+                    See all
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </LumexButton>
+            </div>
+            
+            <LumexCard Class="rounded-2xl">
+                <LumexCardBody Class="p-0 divide-y divide-default-200 dark:divide-default-700">
+                    @foreach (var lesson in _lessons)
+                    {
+                        <div class="flex items-center gap-4 p-4 hover:bg-default-100 dark:hover:bg-default-800 transition-colors cursor-pointer">
+                            <div class="flex-shrink-0 w-16 text-center">
+                                <p class="text-xs text-default-400 uppercase">@lesson.Date.ToString("MMM")</p>
+                                <p class="text-2xl font-bold text-default-800 dark:text-default-100">@lesson.Date.Day</p>
+                            </div>
+                            <LumexDivider Orientation="Orientation.Vertical" Class="h-12" />
+                            <div class="flex-1 min-w-0">
+                                <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="@lesson.ChipColor">
+                                    @lesson.Type
+                                </LumexChip>
+                                <h4 class="font-medium text-default-800 dark:text-default-100 mt-1 truncate">@lesson.Title</h4>
+                                <p class="text-sm text-default-500">by @lesson.Instructor</p>
+                            </div>
+                            <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </LumexButton>
+                        </div>
+                    }
+                </LumexCardBody>
+            </LumexCard>
+        </div>
+    </div>
+
+    <!-- Right Panel: User Statistics -->
+    <aside class="w-80 flex-shrink-0 space-y-6 hidden xl:block">
+        <!-- User Greeting Card -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-6 text-center">
+                <LumexAvatar Name="Jason Miller" Size="Size.Large" Class="w-20 h-20 mx-auto mb-4" />
+                <h3 class="text-xl font-semibold text-default-800 dark:text-default-100">
+                    Good Morning, Jason 🔥
+                </h3>
+                <p class="text-sm text-default-500 mt-2">
+                    Continue your learning to achieve your target!
+                </p>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Progress Chart -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-semibold text-default-800 dark:text-default-100">Your Progress</h3>
+                    <LumexDropdown>
+                        <LumexDropdownTrigger>
+                            <LumexButton Variant="Variant.Flat" Size="Size.Small">
+                                August
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </LumexButton>
+                        </LumexDropdownTrigger>
+                        <LumexDropdownMenu AriaLabel="Select Month">
+                            <LumexDropdownItem Key="july">July</LumexDropdownItem>
+                            <LumexDropdownItem Key="august">August</LumexDropdownItem>
+                            <LumexDropdownItem Key="september">September</LumexDropdownItem>
+                        </LumexDropdownMenu>
+                    </LumexDropdown>
+                </div>
+
+                <!-- Progress Circle -->
+                <div class="flex justify-center mb-6">
+                    <div class="relative w-32 h-32">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" class="text-default-200 dark:text-default-700"/>
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="170.8" class="text-violet-500"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <span class="text-2xl font-bold text-default-800 dark:text-default-100">32%</span>
+                                <p class="text-xs text-default-500">Complete</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="space-y-3">
+                    <div class="flex items-end justify-between gap-2 h-24">
+                        @foreach (var bar in _progressBars)
+                        {
+                            <div class="flex-1 flex flex-col items-center gap-2">
+                                <div class="w-full bg-default-200 dark:bg-default-700 rounded-t-lg relative" style="height: @(bar.Height)px">
+                                    <div class="absolute bottom-0 left-0 right-0 bg-violet-500 rounded-t-lg" style="height: @(bar.Progress)px"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="flex justify-between text-xs text-default-500">
+                        <span>1-10 Aug</span>
+                        <span>11-20 Aug</span>
+                        <span>21-30 Aug</span>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Mentor List -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-default-800 dark:text-default-100">Recommended Mentors</h3>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small">See All</LumexButton>
+                </div>
+                
+                <div class="space-y-4">
+                    @foreach (var mentor in _mentors)
+                    {
+                        <div class="flex items-center gap-3">
+                            <LumexAvatar Name="@mentor.Name" Size="Size.Medium" />
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-default-800 dark:text-default-100 truncate">@mentor.Name</h4>
+                                <p class="text-sm text-default-500">Mentor</p>
+                            </div>
+                            <LumexButton Variant="@(mentor.IsFollowing ? Variant.Solid : Variant.Outlined)" 
+                                         Color="ThemeColor.Primary" 
+                                         Size="Size.Small"
+                                         OnClick="@(() => ToggleFollow(mentor))">
+                                @(mentor.IsFollowing ? "Following" : "Follow")
+                            </LumexButton>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </aside>
+</div>
+
+@code {
+    private int _carouselIndex = 0;
+
+    private List<CourseProgressItem> _courseProgress = new()
+    {
+        new("UI/UX Design", 2, 8, "bg-pink-100 dark:bg-pink-900/30", "bg-pink-500",
+            @<svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+            </svg>),
+        new("Branding", 3, 8, "bg-amber-100 dark:bg-amber-900/30", "bg-amber-500",
+            @<svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>),
+        new("Front End", 6, 12, "bg-blue-100 dark:bg-blue-900/30", "bg-blue-500",
+            @<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            </svg>)
+    };
+
+    private List<ContinueWatchingItem> _continueWatching = new()
+    {
+        new("Beginner's Guide to Becoming a Professional Front-End Developer", "Front End", "Padhang Satrio", "from-blue-400 to-blue-600", "bg-blue-500 text-white"),
+        new("Optimizing User Experience with the Best UI/UX Design", "UI/UX Design", "Zakir Horizontal", "from-pink-400 to-purple-600", "bg-pink-500 text-white"),
+        new("Reviving and Refreshing Company Image Through Branding", "Branding", "Leonardo Samsul", "from-amber-400 to-orange-500", "bg-amber-500 text-white"),
+        new("Advanced CSS Techniques for Modern Web Development", "Front End", "Padhang Satrio", "from-cyan-400 to-blue-500", "bg-blue-500 text-white"),
+        new("Creating Memorable Brand Identities", "Branding", "Leonardo Samsul", "from-green-400 to-emerald-600", "bg-amber-500 text-white")
+    };
+
+    private List<LessonItem> _lessons = new()
+    {
+        new(new DateTime(2025, 8, 15), "UI/UX Design", "Understand Of UI/UX Design", "Padhang Satrio", ThemeColor.Secondary),
+        new(new DateTime(2025, 8, 18), "Front End", "Building Responsive Layouts", "Zakir Horizontal", ThemeColor.Primary),
+        new(new DateTime(2025, 8, 22), "Branding", "Color Psychology in Branding", "Leonardo Samsul", ThemeColor.Warning)
+    };
+
+    private List<ProgressBar> _progressBars = new()
+    {
+        new(80, 48),
+        new(80, 64),
+        new(80, 32)
+    };
+
+    private List<MentorItem> _mentors = new()
+    {
+        new("Padhang Satrio", false),
+        new("Zakir Horizontal", true),
+        new("Leonardo Samsul", false)
+    };
+
+    private void NextCourse()
+    {
+        if (_carouselIndex < _continueWatching.Count - 3)
+            _carouselIndex++;
+    }
+
+    private void PreviousCourse()
+    {
+        if (_carouselIndex > 0)
+            _carouselIndex--;
+    }
+
+    private void ToggleFollow(MentorItem mentor)
+    {
+        mentor.IsFollowing = !mentor.IsFollowing;
+    }
+
+    private record CourseProgressItem(string Category, int Watched, int Total, string BgColor, string ProgressColor, RenderFragment Icon);
+    private record ContinueWatchingItem(string Title, string Category, string MentorName, string ThumbnailGradient, string BadgeClass);
+    private record LessonItem(DateTime Date, string Type, string Title, string Instructor, ThemeColor ChipColor);
+    private record ProgressBar(int Height, int Progress);
+    private class MentorItem
+    {
+        public string Name { get; set; }
+        public bool IsFollowing { get; set; }
+        public MentorItem(string name, bool isFollowing)
+        {
+            Name = name;
+            IsFollowing = isFollowing;
+        }
+    }
+}

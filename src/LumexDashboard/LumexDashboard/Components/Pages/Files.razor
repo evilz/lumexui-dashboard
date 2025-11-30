@@ -1,0 +1,604 @@
+@page "/files"
+@rendermode InteractiveServer
+
+<PageTitle>File Manager</PageTitle>
+
+<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-default-200 dark:border-default-700 overflow-hidden bg-default-50 dark:bg-default-900">
+    <!-- Left Sidebar -->
+    <aside class="w-56 flex-shrink-0 border-r border-default-200 dark:border-default-700 flex flex-col bg-background">
+        <!-- Storage Info -->
+        <div class="p-4 border-b border-default-200 dark:border-default-700">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-default-800 dark:text-default-100">Cloud Storage</p>
+                    <p class="text-xs text-default-500">24.5 GB of 50 GB</p>
+                </div>
+            </div>
+            <div class="h-2 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+                <div class="h-full w-[49%] bg-primary rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 p-2 space-y-1 overflow-y-auto">
+            <p class="px-3 py-2 text-xs font-semibold text-default-400 uppercase tracking-wider">Browse</p>
+            @foreach (var item in _sidebarItems)
+            {
+                <button class="@GetSidebarItemClass(item.Key)" @onclick="@(() => SelectCategory(item.Key))">
+                    @item.Icon
+                    <span>@item.Label</span>
+                    @if (item.Count > 0)
+                    {
+                        <span class="ml-auto text-xs bg-default-200 dark:bg-default-700 px-2 py-0.5 rounded-full">@item.Count</span>
+                    }
+                </button>
+            }
+
+            <LumexDivider Class="my-3" />
+
+            <p class="px-3 py-2 text-xs font-semibold text-default-400 uppercase tracking-wider">Tags</p>
+            @foreach (var tag in _tags)
+            {
+                <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 transition-colors text-sm">
+                    <span class="w-3 h-3 rounded-full @tag.Color"></span>
+                    <span>@tag.Name</span>
+                </button>
+            }
+        </nav>
+
+        <!-- Settings -->
+        <div class="p-2 border-t border-default-200 dark:border-default-700">
+            <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 transition-colors text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span>Settings</span>
+            </button>
+            <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 transition-colors text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span>Trash</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <!-- Header -->
+        <header class="p-4 border-b border-default-200 dark:border-default-700 bg-background">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-xl font-semibold text-default-800 dark:text-default-100">@GetCategoryTitle()</h1>
+                    <p class="text-sm text-default-500">@_files.Count items</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <LumexTextbox @bind-Value="_searchQuery" 
+                                  Placeholder="Search files..." 
+                                  Type="InputType.Search"
+                                  Size="Size.Small"
+                                  Class="w-64"
+                                  Classes="_searchClasses" />
+                    <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true" OnClick="ToggleViewMode">
+                        @if (_viewMode == "grid")
+                        {
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                            </svg>
+                        }
+                    </LumexButton>
+                    <LumexButton Color="ThemeColor.Primary" Size="Size.Small">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Upload
+                    </LumexButton>
+                </div>
+            </div>
+
+            <!-- Quick Access Folders -->
+            <div class="flex gap-3 overflow-x-auto pb-2">
+                @foreach (var folder in _quickAccess)
+                {
+                    <button class="flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-xl bg-default-100 dark:bg-default-800 hover:bg-default-200 dark:hover:bg-default-700 transition-colors" @onclick="@(() => SelectQuickAccess(folder))">
+                        <div class="w-10 h-10 rounded-lg @folder.BgColor flex items-center justify-center">
+                            @folder.Icon
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm font-medium text-default-800 dark:text-default-100">@folder.Name</p>
+                            <p class="text-xs text-default-500">@folder.ItemCount items</p>
+                        </div>
+                    </button>
+                }
+            </div>
+        </header>
+
+        <!-- File List/Grid -->
+        <div class="flex-1 overflow-auto p-4">
+            @if (_viewMode == "list")
+            {
+                <LumexCard Class="rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-default-100 dark:bg-default-800">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">
+                                        <LumexCheckbox @bind-Value="_selectAll" />
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Shared</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Size</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Modified</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-default-200 dark:divide-default-700">
+                                @foreach (var file in _files)
+                                {
+                                    <tr class="@GetFileRowClass(file)" @onclick="@(() => SelectFile(file))">
+                                        <td class="px-4 py-3" @onclick:stopPropagation="true">
+                                            <LumexCheckbox @bind-Value="file.Selected" />
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-lg @file.IconBg flex items-center justify-center flex-shrink-0">
+                                                    @file.Icon
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="font-medium text-default-800 dark:text-default-100 truncate">@file.Name</p>
+                                                    <p class="text-xs text-default-500">@file.Type</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            @if (file.SharedWith.Any())
+                                            {
+                                                <div class="flex -space-x-2">
+                                                    @foreach (var person in file.SharedWith.Take(3))
+                                                    {
+                                                        <LumexAvatar Name="@person" Size="Size.Small" Class="ring-2 ring-background" />
+                                                    }
+                                                    @if (file.SharedWith.Count > 3)
+                                                    {
+                                                        <div class="w-8 h-8 rounded-full bg-default-200 dark:bg-default-700 flex items-center justify-center text-xs font-medium ring-2 ring-background">
+                                                            +@(file.SharedWith.Count - 3)
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-sm text-default-400">Only you</span>
+                                            }
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-default-600 dark:text-default-400">@file.Size</td>
+                                        <td class="px-4 py-3 text-sm text-default-600 dark:text-default-400">@file.Modified.ToString("MMM d, yyyy")</td>
+                                        <td class="px-4 py-3" @onclick:stopPropagation="true">
+                                            <LumexDropdown>
+                                                <LumexDropdownTrigger>
+                                                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                            <circle cx="12" cy="6" r="2"></circle>
+                                                            <circle cx="12" cy="12" r="2"></circle>
+                                                            <circle cx="12" cy="18" r="2"></circle>
+                                                        </svg>
+                                                    </LumexButton>
+                                                </LumexDropdownTrigger>
+                                                <LumexDropdownMenu AriaLabel="File actions">
+                                                    <LumexDropdownItem Key="open">Open</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="share">Share</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="download">Download</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="rename">Rename</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="delete" Class="text-danger">Delete</LumexDropdownItem>
+                                                </LumexDropdownMenu>
+                                            </LumexDropdown>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </LumexCard>
+            }
+            else
+            {
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    @foreach (var file in _files)
+                    {
+                        <LumexCard Class="@GetFileCardClass(file)" @onclick="@(() => SelectFile(file))">
+                            <LumexCardBody Class="p-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="w-12 h-12 rounded-xl @file.IconBg flex items-center justify-center">
+                                        @file.Icon
+                                    </div>
+                                    <LumexDropdown>
+                                        <LumexDropdownTrigger>
+                                            <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" @onclick:stopPropagation="true">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                    <circle cx="12" cy="6" r="2"></circle>
+                                                    <circle cx="12" cy="12" r="2"></circle>
+                                                    <circle cx="12" cy="18" r="2"></circle>
+                                                </svg>
+                                            </LumexButton>
+                                        </LumexDropdownTrigger>
+                                        <LumexDropdownMenu AriaLabel="File actions">
+                                            <LumexDropdownItem Key="open">Open</LumexDropdownItem>
+                                            <LumexDropdownItem Key="share">Share</LumexDropdownItem>
+                                            <LumexDropdownItem Key="download">Download</LumexDropdownItem>
+                                            <LumexDropdownItem Key="delete" Class="text-danger">Delete</LumexDropdownItem>
+                                        </LumexDropdownMenu>
+                                    </LumexDropdown>
+                                </div>
+                                <h3 class="font-medium text-default-800 dark:text-default-100 truncate mb-1">@file.Name</h3>
+                                <p class="text-xs text-default-500 mb-3">@file.Size • @file.Modified.ToString("MMM d")</p>
+                                @if (file.SharedWith.Any())
+                                {
+                                    <div class="flex -space-x-2">
+                                        @foreach (var person in file.SharedWith.Take(3))
+                                        {
+                                            <LumexAvatar Name="@person" Size="Size.Small" Class="ring-2 ring-background" />
+                                        }
+                                    </div>
+                                }
+                            </LumexCardBody>
+                        </LumexCard>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Right Info Panel -->
+    @if (_selectedFile != null)
+    {
+        <aside class="w-80 flex-shrink-0 border-l border-default-200 dark:border-default-700 bg-background overflow-y-auto">
+            <!-- File Preview -->
+            <div class="p-6 border-b border-default-200 dark:border-default-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-default-800 dark:text-default-100">Details</h2>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" OnClick="@(() => _selectedFile = null)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+                <div class="w-full h-40 rounded-xl @_selectedFile.IconBg flex items-center justify-center mb-4">
+                    <div class="scale-150">
+                        @_selectedFile.Icon
+                    </div>
+                </div>
+                <h3 class="font-semibold text-default-800 dark:text-default-100 text-center mb-1">@_selectedFile.Name</h3>
+                <p class="text-sm text-default-500 text-center">@_selectedFile.Type</p>
+            </div>
+
+            <!-- Metadata -->
+            <div class="p-6 border-b border-default-200 dark:border-default-700 space-y-4">
+                <h3 class="text-sm font-semibold text-default-800 dark:text-default-100">Information</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Size</span>
+                        <span class="text-sm font-medium text-default-800 dark:text-default-100">@_selectedFile.Size</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Created</span>
+                        <span class="text-sm font-medium text-default-800 dark:text-default-100">@_selectedFile.Created.ToString("MMM d, yyyy")</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Modified</span>
+                        <span class="text-sm font-medium text-default-800 dark:text-default-100">@_selectedFile.Modified.ToString("MMM d, yyyy")</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Location</span>
+                        <span class="text-sm font-medium text-default-800 dark:text-default-100 truncate ml-4">@_selectedFile.Location</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="p-6 border-b border-default-200 dark:border-default-700">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-default-800 dark:text-default-100">Tags</h3>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var tag in _selectedFile.Tags)
+                    {
+                        <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Primary" Class="cursor-pointer">
+                            @tag
+                        </LumexChip>
+                    }
+                </div>
+            </div>
+
+            <!-- Collaborators -->
+            <div class="p-6 border-b border-default-200 dark:border-default-700">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-default-800 dark:text-default-100">Shared with</h3>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add
+                    </LumexButton>
+                </div>
+                @if (_selectedFile.SharedWith.Any())
+                {
+                    <div class="space-y-3">
+                        @foreach (var person in _selectedFile.SharedWith)
+                        {
+                            <div class="flex items-center gap-3">
+                                <LumexAvatar Name="@person" Size="Size.Small" />
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-default-800 dark:text-default-100 truncate">@person</p>
+                                    <p class="text-xs text-default-500">Can edit</p>
+                                </div>
+                                <LumexDropdown>
+                                    <LumexDropdownTrigger>
+                                        <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="6" r="2"></circle>
+                                                <circle cx="12" cy="12" r="2"></circle>
+                                                <circle cx="12" cy="18" r="2"></circle>
+                                            </svg>
+                                        </LumexButton>
+                                    </LumexDropdownTrigger>
+                                    <LumexDropdownMenu AriaLabel="Permission">
+                                        <LumexDropdownItem Key="view">Can view</LumexDropdownItem>
+                                        <LumexDropdownItem Key="edit">Can edit</LumexDropdownItem>
+                                        <LumexDropdownItem Key="remove" Class="text-danger">Remove</LumexDropdownItem>
+                                    </LumexDropdownMenu>
+                                </LumexDropdown>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-sm text-default-500">Not shared with anyone</p>
+                }
+            </div>
+
+            <!-- Activity -->
+            <div class="p-6">
+                <h3 class="text-sm font-semibold text-default-800 dark:text-default-100 mb-3">Recent Activity</h3>
+                <div class="space-y-4">
+                    @foreach (var activity in _recentActivity)
+                    {
+                        <div class="flex gap-3">
+                            <LumexAvatar Name="@activity.User" Size="Size.Small" />
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-default-800 dark:text-default-100">
+                                    <span class="font-medium">@activity.User</span> @activity.Action
+                                </p>
+                                <p class="text-xs text-default-500">@activity.Time</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </aside>
+    }
+</div>
+
+@code {
+    private string _activeCategory = "all";
+    private string _searchQuery = string.Empty;
+    private string _viewMode = "list";
+    private bool _selectAll = false;
+    private FileItem? _selectedFile = null;
+
+    private InputFieldSlots _searchClasses = new()
+    {
+        InputWrapper = "bg-default-100 dark:bg-default-800"
+    };
+
+    private List<SidebarItem> _sidebarItems = new()
+    {
+        new("all", "All Files", 156, 
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>),
+        new("recent", "Recent", 24,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>),
+        new("starred", "Starred", 12,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>),
+        new("shared", "Shared", 8,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>),
+        new("documents", "Documents", 45,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>),
+        new("images", "Images", 38,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>),
+        new("videos", "Videos", 15,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>)
+    };
+
+    private List<TagItem> _tags = new()
+    {
+        new("Work", "bg-blue-500"),
+        new("Personal", "bg-green-500"),
+        new("Important", "bg-red-500"),
+        new("Archive", "bg-amber-500")
+    };
+
+    private List<QuickAccessFolder> _quickAccess = new()
+    {
+        new("Projects", 24, "bg-blue-100 dark:bg-blue-900/30",
+            @<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>),
+        new("Design Assets", 156, "bg-pink-100 dark:bg-pink-900/30",
+            @<svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>),
+        new("Documents", 89, "bg-amber-100 dark:bg-amber-900/30",
+            @<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>),
+        new("Downloads", 32, "bg-green-100 dark:bg-green-900/30",
+            @<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>)
+    };
+
+    private List<FileItem> _files = new()
+    {
+        new("Project Proposal.pdf", "PDF Document", "2.4 MB", new DateTime(2025, 11, 28), new DateTime(2025, 11, 15), "/Documents", 
+            new List<string> { "Alice Chen", "Bob Smith" }, new List<string> { "Work", "Important" }, "bg-red-100 dark:bg-red-900/30",
+            @<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>),
+        new("Dashboard Design.fig", "Figma File", "8.7 MB", new DateTime(2025, 11, 27), new DateTime(2025, 11, 10), "/Design Assets",
+            new List<string> { "Carol White", "David Lee", "Emma Wilson", "Frank Brown" }, new List<string> { "Work" }, "bg-purple-100 dark:bg-purple-900/30",
+            @<svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+            </svg>),
+        new("Meeting Notes.docx", "Word Document", "156 KB", new DateTime(2025, 11, 26), new DateTime(2025, 11, 26), "/Documents",
+            new List<string>(), new List<string> { "Work" }, "bg-blue-100 dark:bg-blue-900/30",
+            @<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>),
+        new("Brand Guidelines", "Folder", "24 items", new DateTime(2025, 11, 25), new DateTime(2025, 10, 1), "/Design Assets",
+            new List<string> { "Alice Chen" }, new List<string> { "Work", "Important" }, "bg-amber-100 dark:bg-amber-900/30",
+            @<svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>),
+        new("Product Demo.mp4", "Video", "245 MB", new DateTime(2025, 11, 24), new DateTime(2025, 11, 20), "/Videos",
+            new List<string> { "Bob Smith", "Carol White" }, new List<string> { "Work" }, "bg-pink-100 dark:bg-pink-900/30",
+            @<svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>),
+        new("Budget 2025.xlsx", "Excel Spreadsheet", "1.2 MB", new DateTime(2025, 11, 23), new DateTime(2025, 11, 1), "/Documents",
+            new List<string> { "David Lee" }, new List<string> { "Work", "Important" }, "bg-green-100 dark:bg-green-900/30",
+            @<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>),
+        new("Team Photo.jpg", "Image", "4.5 MB", new DateTime(2025, 11, 22), new DateTime(2025, 11, 22), "/Images",
+            new List<string>(), new List<string> { "Personal" }, "bg-cyan-100 dark:bg-cyan-900/30",
+            @<svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>),
+        new("Source Code", "Folder", "156 items", new DateTime(2025, 11, 21), new DateTime(2025, 9, 15), "/Projects",
+            new List<string> { "Emma Wilson", "Frank Brown" }, new List<string> { "Work" }, "bg-indigo-100 dark:bg-indigo-900/30",
+            @<svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>)
+    };
+
+    private List<ActivityItem> _recentActivity = new()
+    {
+        new("Alice Chen", "edited this file", "2 hours ago"),
+        new("You", "shared with Bob Smith", "Yesterday"),
+        new("Carol White", "commented", "2 days ago"),
+        new("You", "created this file", "Nov 15, 2025")
+    };
+
+    private void SelectCategory(string key)
+    {
+        _activeCategory = key;
+        _selectedFile = null;
+    }
+
+    private void SelectQuickAccess(QuickAccessFolder folder)
+    {
+        // Navigate to folder
+    }
+
+    private void SelectFile(FileItem file)
+    {
+        _selectedFile = file;
+    }
+
+    private void ToggleViewMode()
+    {
+        _viewMode = _viewMode == "grid" ? "list" : "grid";
+    }
+
+    private string GetSidebarItemClass(string key)
+    {
+        var baseClass = "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm";
+        return _activeCategory == key
+            ? $"{baseClass} bg-primary/10 text-primary font-medium"
+            : $"{baseClass} text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800";
+    }
+
+    private string GetCategoryTitle()
+    {
+        return _sidebarItems.FirstOrDefault(x => x.Key == _activeCategory)?.Label ?? "All Files";
+    }
+
+    private string GetFileRowClass(FileItem file)
+    {
+        var baseClass = "hover:bg-default-50 dark:hover:bg-default-800/50 cursor-pointer transition-colors";
+        return file == _selectedFile ? $"{baseClass} bg-primary/5" : baseClass;
+    }
+
+    private string GetFileCardClass(FileItem file)
+    {
+        var baseClass = "rounded-xl cursor-pointer transition-all hover:shadow-md";
+        return file == _selectedFile ? $"{baseClass} ring-2 ring-primary" : baseClass;
+    }
+
+    private record SidebarItem(string Key, string Label, int Count, RenderFragment Icon);
+    private record TagItem(string Name, string Color);
+    private record QuickAccessFolder(string Name, int ItemCount, string BgColor, RenderFragment Icon);
+    private record ActivityItem(string User, string Action, string Time);
+
+    private class FileItem
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Size { get; set; }
+        public DateTime Modified { get; set; }
+        public DateTime Created { get; set; }
+        public string Location { get; set; }
+        public List<string> SharedWith { get; set; }
+        public List<string> Tags { get; set; }
+        public string IconBg { get; set; }
+        public RenderFragment Icon { get; set; }
+        public bool Selected { get; set; }
+
+        public FileItem(string name, string type, string size, DateTime modified, DateTime created, string location,
+            List<string> sharedWith, List<string> tags, string iconBg, RenderFragment icon)
+        {
+            Name = name;
+            Type = type;
+            Size = size;
+            Modified = modified;
+            Created = created;
+            Location = location;
+            SharedWith = sharedWith;
+            Tags = tags;
+            IconBg = iconBg;
+            Icon = icon;
+            Selected = false;
+        }
+    }
+}

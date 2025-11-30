@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "../bin/lumexui/theme.css";
 
+@source "../bin/lumexui/*.cs"; /* styles */
+
 /* Custom dashboard styles */
 html, body {
     font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;

@@ -3,249 +3,569 @@
 @using LumexUI.Common
 @rendermode InteractiveServer
 
-<PageTitle>Dashboard Overview</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
-<div class="space-y-6">
-    <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-default-900 dark:text-white">Dashboard Overview</h1>
-            <p class="text-default-500 mt-1">Welcome back! Here's what's happening with your business.</p>
-        </div>
-        <div class="flex gap-2">
-            <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                </svg>
-                Export
-            </LumexButton>
-            <LumexButton Color="ThemeColor.Primary">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                New Report
-            </LumexButton>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard Title="Total Revenue" Value="$45,231.89" Change="+20.1%" IsPositive="true" IconBackgroundClass="bg-primary/10">
-            <Icon>
-                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </Icon>
-        </StatsCard>
-
-        <StatsCard Title="Active Users" Value="2,350" Change="+180.1%" IsPositive="true" IconBackgroundClass="bg-success/10">
-            <Icon>
-                <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-            </Icon>
-        </StatsCard>
-
-        <StatsCard Title="Transactions" Value="12,234" Change="+19%" IsPositive="true" IconBackgroundClass="bg-warning/10">
-            <Icon>
-                <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                </svg>
-            </Icon>
-        </StatsCard>
-
-        <StatsCard Title="Pending Orders" Value="573" Change="-4%" IsPositive="false" IconBackgroundClass="bg-danger/10">
-            <Icon>
-                <svg class="w-6 h-6 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </Icon>
-        </StatsCard>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Revenue Chart -->
-        <LumexCard>
-            <LumexCardBody Class="p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-lg font-semibold text-default-900 dark:text-white">Revenue Overview</h3>
-                        <p class="text-sm text-default-500">Monthly revenue for the current year</p>
+<div class="grid grid-cols-4 gap-4">
+    <!-- Move Goal Card -->
+    <LumexCard Class="row-span-4">
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-6">
+                <div class="flex justify-between">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-default-900 text-xl font-semibold">Move Goal</span>
+                        <span class="text-default-500 text-sm">Set a daily goal</span>
                     </div>
-                    <select @bind="_selectedPeriod" class="px-3 py-1.5 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
-                        <option value="This Year">This Year</option>
-                        <option value="Last Year">Last Year</option>
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small">Set Goal</LumexButton>
+                </div>
+                <!-- Chart placeholder for radial bar -->
+                <div class="flex justify-center items-center py-8">
+                    <div class="relative w-40 h-40">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="8" class="text-default-200 dark:text-default-700" />
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="@(282.7 * 0.62) 282.7" stroke-linecap="round" transform="rotate(-90 50 50)" class="text-primary" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-3xl font-bold text-default-900 dark:text-white">@_moveGoal</span>
+                            <span class="text-sm text-default-500">/ @_moveGoalMax cal</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center gap-2">
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" OnClick="DecreaseGoal">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                        </svg>
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" OnClick="IncreaseGoal">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Cookie Settings Card -->
+    <LumexCard>
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-default-900 text-lg font-semibold">Cookie Settings</span>
+                    <span class="text-default-500 text-sm">Manage your cookie preferences</span>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <span class="text-default-900 text-sm font-medium">Strictly Necessary</span>
+                            <span class="text-default-500 text-xs">Required for the site to function</span>
+                        </div>
+                        <LumexSwitch @bind-Value="_strictlyNecessary" Color="ThemeColor.Primary" Disabled="true" />
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <span class="text-default-900 text-sm font-medium">Functional Cookies</span>
+                            <span class="text-default-500 text-xs">Enable personalized features</span>
+                        </div>
+                        <LumexSwitch @bind-Value="_functionalCookies" Color="ThemeColor.Primary" />
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <span class="text-default-900 text-sm font-medium">Performance Cookies</span>
+                            <span class="text-default-500 text-xs">Help improve our website</span>
+                        </div>
+                        <LumexSwitch @bind-Value="_performanceCookies" Color="ThemeColor.Primary" />
+                    </div>
+                </div>
+                <LumexButton Color="ThemeColor.Primary" Class="w-full">Save Preferences</LumexButton>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Chat Card -->
+    <LumexCard>
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                    <LumexAvatar Name="Sofia Davis" />
+                    <div class="flex flex-col">
+                        <span class="text-default-900 font-medium">Sofia Davis</span>
+                        <span class="text-default-500 text-sm">m@example.com</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-start">
+                        <div class="bg-default-100 dark:bg-default-800 rounded-2xl rounded-bl-none px-4 py-2 max-w-[80%]">
+                            <p class="text-sm text-default-900 dark:text-white">Hi, how can I help you today?</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <div class="bg-primary text-white rounded-2xl rounded-br-none px-4 py-2 max-w-[80%]">
+                            <p class="text-sm">Hey, I'm having trouble with my account.</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-start">
+                        <div class="bg-default-100 dark:bg-default-800 rounded-2xl rounded-bl-none px-4 py-2 max-w-[80%]">
+                            <p class="text-sm text-default-900 dark:text-white">What seems to be the problem?</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <div class="bg-primary text-white rounded-2xl rounded-br-none px-4 py-2 max-w-[80%]">
+                            <p class="text-sm">I can't log in.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Type your message..." class="flex-1 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                    <LumexButton Color="ThemeColor.Primary" Size="Size.Small">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Subscriptions Card -->
+    <LumexCard Class="row-span-2">
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-default-900 text-lg font-semibold">Subscriptions</span>
+                    <span class="text-default-500 text-sm">Total subscribers growth</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-bold text-default-900 dark:text-white">+2,350</span>
+                    <span class="text-sm text-success font-medium">+180.1%</span>
+                </div>
+                <!-- Area chart placeholder -->
+                <div class="h-48 flex items-end gap-1">
+                    @foreach (var height in _subscriptionChartData)
+                    {
+                        <div class="flex-1 bg-primary/20 rounded-t transition-all hover:bg-primary/30" style="height: @(height)%;"></div>
+                    }
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Sign In Card -->
+    <LumexCard>
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1 text-center">
+                    <span class="text-default-900 text-xl font-semibold">Create an account</span>
+                    <span class="text-default-500 text-sm">Enter your email below to create your account</span>
+                </div>
+                <div class="flex gap-2">
+                    <LumexButton Variant="Variant.Outlined" Class="flex-1">
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Outlined" Class="flex-1">
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Google
+                    </LumexButton>
+                </div>
+                <div class="flex items-center gap-4">
+                    <LumexDivider Class="flex-1" />
+                    <span class="text-default-500 text-xs uppercase">Or continue with</span>
+                    <LumexDivider Class="flex-1" />
+                </div>
+                <div class="flex flex-col gap-3">
+                    <input type="email" placeholder="name@example.com" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                    <input type="password" placeholder="Password" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                    <LumexButton Color="ThemeColor.Primary" Class="w-full">Create account</LumexButton>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Payment Method Card -->
+    <LumexCard Class="row-span-2">
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-default-900 text-lg font-semibold">Payment Method</span>
+                    <span class="text-default-500 text-sm">Add a new payment method to your account</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="@GetPaymentMethodClass("card")" @onclick="@(() => _selectedPaymentMethod = "card")">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                        <span class="text-sm font-medium">Card</span>
+                    </button>
+                    <button class="@GetPaymentMethodClass("paypal")" @onclick="@(() => _selectedPaymentMethod = "paypal")">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
+                        </svg>
+                        <span class="text-sm font-medium">PayPal</span>
+                    </button>
+                    <button class="@GetPaymentMethodClass("apple")" @onclick="@(() => _selectedPaymentMethod = "apple")">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                        <span class="text-sm font-medium">Apple</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Name</label>
+                        <input type="text" @bind="_cardName" placeholder="First Last" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Card number</label>
+                        <input type="text" @bind="_cardNumber" placeholder="0000 0000 0000 0000" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="col-span-1">
+                            <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Expires</label>
+                            <select @bind="_cardExpiryMonth" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                                <option value="">Month</option>
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    <option value="@i">@i.ToString("D2")</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Year</label>
+                            <select @bind="_cardExpiryYear" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                                <option value="">Year</option>
+                                @for (int i = 2024; i <= 2034; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">CVC</label>
+                            <input type="text" @bind="_cardCvc" placeholder="CVC" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                        </div>
+                    </div>
+                </div>
+                <LumexButton Color="ThemeColor.Primary" Class="w-full">Continue</LumexButton>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Device Usage Card -->
+    <LumexCard>
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex justify-between items-start">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-default-900 text-lg font-semibold">Device Usage</span>
+                        <span class="text-default-500 text-sm">January - June 2024</span>
+                    </div>
+                    <select @bind="_devicePeriod" class="px-3 py-1.5 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                        <option>Last 6 months</option>
+                        <option>Last 3 months</option>
+                        <option>Last month</option>
                     </select>
                 </div>
-                <div class="h-64 flex items-end gap-2">
-                    @foreach (var item in _revenueData)
+                <!-- Donut chart placeholder -->
+                <div class="flex justify-center items-center py-4">
+                    <div class="relative w-32 h-32">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="20" stroke-dasharray="@(251.3 * 0.60) 251.3" stroke-dashoffset="0" class="text-primary" />
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="20" stroke-dasharray="@(251.3 * 0.25) 251.3" stroke-dashoffset="@(-251.3 * 0.60)" class="text-secondary" />
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="20" stroke-dasharray="@(251.3 * 0.15) 251.3" stroke-dashoffset="@(-251.3 * 0.85)" class="text-warning" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-primary"></div>
+                            <span class="text-sm text-default-700 dark:text-default-300">Desktop</span>
+                        </div>
+                        <span class="text-sm font-medium text-default-900 dark:text-white">60%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-secondary"></div>
+                            <span class="text-sm text-default-700 dark:text-default-300">Mobile</span>
+                        </div>
+                        <span class="text-sm font-medium text-default-900 dark:text-white">25%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-warning"></div>
+                            <span class="text-sm text-default-700 dark:text-default-300">Tablet</span>
+                        </div>
+                        <span class="text-sm font-medium text-default-900 dark:text-white">15%</span>
+                    </div>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Team Members Card -->
+    <LumexCard>
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-default-900 text-lg font-semibold">Team Members</span>
+                    <span class="text-default-500 text-sm">Invite your team members to collaborate</span>
+                </div>
+                <div class="flex flex-col gap-3">
+                    @foreach (var member in _teamMembers)
                     {
-                        <div class="flex-1 flex flex-col items-center gap-2">
-                            <div class="w-full bg-primary/20 rounded-t-md relative" style="height: @(item.Value * 2)px;">
-                                <div class="absolute inset-x-0 bottom-0 bg-primary rounded-t-md" style="height: @(item.Value * 0.7 * 2)px;"></div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <LumexAvatar Name="@member.Name" Size="Size.Small" />
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-default-900 dark:text-white">@member.Name</span>
+                                    <span class="text-xs text-default-500">@member.Email</span>
+                                </div>
                             </div>
-                            <span class="text-xs text-default-500">@item.Label</span>
+                            <select class="px-3 py-1 text-xs bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                                <option selected="@(member.Role == "Owner")">Owner</option>
+                                <option selected="@(member.Role == "Member")">Member</option>
+                                <option selected="@(member.Role == "Viewer")">Viewer</option>
+                            </select>
                         </div>
                     }
                 </div>
-            </LumexCardBody>
-        </LumexCard>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
 
-        <!-- User Activity -->
-        <LumexCard>
-            <LumexCardBody Class="p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-lg font-semibold text-default-900 dark:text-white">User Activity</h3>
-                        <p class="text-sm text-default-500">Active users by day of week</p>
-                    </div>
+    <!-- Share Document Card -->
+    <LumexCard>
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-default-900 text-lg font-semibold">Share this document</span>
+                    <span class="text-default-500 text-sm">Anyone with the link can view this document</span>
                 </div>
-                <div class="space-y-4">
-                    @foreach (var item in _activityData)
+                <div class="flex gap-2">
+                    <input type="text" value="https://example.com/link/to/document" readonly class="flex-1 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                    <LumexButton Color="ThemeColor.Primary" Size="Size.Small">Copy</LumexButton>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-sm font-medium text-default-900 dark:text-white">People with access</span>
+                </div>
+                <div class="flex flex-col gap-3">
+                    @foreach (var access in _documentAccess)
                     {
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-default-600 dark:text-default-400">@item.Day</span>
-                                <span class="font-medium text-default-900 dark:text-white">@item.Users users</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <LumexAvatar Name="@access.Name" Size="Size.Small" />
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-default-900 dark:text-white">@access.Name</span>
+                                    <span class="text-xs text-default-500">@access.Email</span>
+                                </div>
                             </div>
-                            <div class="h-2 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full @GetProgressColor(item.Color)" style="width: @item.Percentage%"></div>
-                            </div>
+                            <select class="px-3 py-1 text-xs bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                                <option selected="@(access.Permission == "Can edit")">Can edit</option>
+                                <option selected="@(access.Permission == "Can view")">Can view</option>
+                            </select>
                         </div>
                     }
                 </div>
-            </LumexCardBody>
-        </LumexCard>
-    </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
 
-    <!-- Recent Activity & Top Products -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Recent Transactions -->
-        <div class="lg:col-span-2">
-            <LumexCard>
-                <LumexCardBody Class="p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-semibold text-default-900 dark:text-white">Recent Transactions</h3>
-                        <LumexButton Variant="Variant.Light" Size="Size.Small">View All</LumexButton>
+    <!-- Users Table Card -->
+    <LumexCard Class="sm:col-span-2 lg:col-span-3">
+        <LumexCardBody Class="p-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-default-900 text-lg font-semibold">Users</span>
+                        <span class="text-default-500 text-sm">Manage your team members and their roles</span>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-default-200 dark:border-default-700">
-                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Customer</th>
-                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Transaction</th>
-                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Amount</th>
-                                    <th class="text-left text-sm font-medium text-default-500 pb-3">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var transaction in _recentTransactions)
-                                {
-                                    <tr class="border-b border-default-100 dark:border-default-800 last:border-0">
-                                        <td class="py-4">
-                                            <div class="flex items-center gap-3">
-                                                <LumexAvatar Name="@transaction.Customer" Size="Size.Small" />
-                                                <div>
-                                                    <p class="text-sm font-medium text-default-900 dark:text-white">@transaction.Customer</p>
-                                                    <p class="text-xs text-default-500">@transaction.Email</p>
-                                                </div>
+                    <div class="flex gap-2">
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" @bind="_userSearchQuery" @bind:event="oninput" placeholder="Search users..." class="pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                        </div>
+                        <select @bind="_roleFilter" class="px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                            <option value="all">All roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="member">Member</option>
+                            <option value="viewer">Viewer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-default-200 dark:border-default-700">
+                                <th class="text-left py-3 px-4">
+                                    <LumexCheckbox @bind-Value="_selectAllUsers" />
+                                </th>
+                                <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider py-3 px-4">User</th>
+                                <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider py-3 px-4">Role</th>
+                                <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider py-3 px-4">Status</th>
+                                <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider py-3 px-4">Last Active</th>
+                                <th class="text-right text-xs font-semibold text-default-500 uppercase tracking-wider py-3 px-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in FilteredUsers)
+                            {
+                                <tr class="border-b border-default-100 dark:border-default-800 hover:bg-default-50 dark:hover:bg-default-800/50 transition-colors">
+                                    <td class="py-3 px-4">
+                                        <LumexCheckbox @bind-Value="user.Selected" />
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <LumexAvatar Name="@user.Name" Size="Size.Small" />
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-medium text-default-900 dark:text-white">@user.Name</span>
+                                                <span class="text-xs text-default-500">@user.Email</span>
                                             </div>
-                                        </td>
-                                        <td class="py-4 text-sm text-default-600 dark:text-default-400">@transaction.TransactionId</td>
-                                        <td class="py-4 text-sm font-medium text-default-900 dark:text-white">@transaction.Amount</td>
-                                        <td class="py-4">
-                                            <LumexChip Size="Size.Small" Color="@transaction.StatusColor" Variant="ChipVariant.Flat">@transaction.Status</LumexChip>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </LumexCardBody>
-            </LumexCard>
-        </div>
-
-        <!-- Top Products -->
-        <LumexCard>
-            <LumexCardBody Class="p-6">
-                <h3 class="text-lg font-semibold text-default-900 dark:text-white mb-6">Top Products</h3>
-                <div class="space-y-4">
-                    @foreach (var product in _topProducts)
-                    {
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-default-100 dark:bg-default-800 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-default-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-default-900 dark:text-white truncate">@product.Name</p>
-                                <p class="text-xs text-default-500">@product.Category</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-semibold text-default-900 dark:text-white">@product.Sales</p>
-                                <p class="text-xs text-success">@product.Growth</p>
-                            </div>
-                        </div>
-                    }
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span class="text-sm text-default-700 dark:text-default-300">@user.Role</span>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <LumexChip Size="Size.Small" Color="@GetStatusColor(user.Status)" Variant="ChipVariant.Flat">@user.Status</LumexChip>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span class="text-sm text-default-500">@user.LastActive</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right">
+                                        <LumexButton Variant="Variant.Light" Size="Size.Small">Edit</LumexButton>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            </LumexCardBody>
-        </LumexCard>
-    </div>
+                <div class="flex items-center justify-between pt-4 border-t border-default-200 dark:border-default-700">
+                    <span class="text-sm text-default-500">Showing @FilteredUsers.Count() of @_users.Count users</span>
+                    <div class="flex gap-2">
+                        <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="true">Previous</LumexButton>
+                        <LumexButton Variant="Variant.Outlined" Size="Size.Small">Next</LumexButton>
+                    </div>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
 </div>
 
 @code {
-    private string _selectedPeriod = "This Year";
+    // Move Goal
+    private int _moveGoal = 350;
+    private int _moveGoalMax = 562;
 
-    private List<ChartData> _revenueData = new()
+    // Cookie Settings
+    private bool _strictlyNecessary = true;
+    private bool _functionalCookies = false;
+    private bool _performanceCookies = true;
+
+    // Subscription chart data (heights in percentage)
+    private int[] _subscriptionChartData = { 30, 45, 35, 50, 40, 60, 55, 70, 65, 80, 75, 90 };
+
+    // Payment Method
+    private string _selectedPaymentMethod = "card";
+    private string _cardName = "";
+    private string _cardNumber = "";
+    private string _cardExpiryMonth = "";
+    private string _cardExpiryYear = "";
+    private string _cardCvc = "";
+
+    // Device Usage
+    private string _devicePeriod = "Last 6 months";
+
+    // Team Members
+    private List<TeamMember> _teamMembers = new()
     {
-        new("Jan", 65), new("Feb", 59), new("Mar", 80), new("Apr", 81),
-        new("May", 56), new("Jun", 55), new("Jul", 72), new("Aug", 85),
-        new("Sep", 78), new("Oct", 92), new("Nov", 88), new("Dec", 95)
+        new("Sofia Davis", "m@example.com", "Owner"),
+        new("Jackson Lee", "p@example.com", "Member"),
+        new("Isabella Nguyen", "i@example.com", "Member")
     };
 
-    private List<ActivityData> _activityData = new()
+    // Document Access
+    private List<DocumentAccess> _documentAccess = new()
     {
-        new("Monday", 2400, 96, ThemeColor.Primary),
-        new("Tuesday", 2100, 84, ThemeColor.Success),
-        new("Wednesday", 1800, 72, ThemeColor.Warning),
-        new("Thursday", 2200, 88, ThemeColor.Secondary),
-        new("Friday", 1950, 78, ThemeColor.Primary),
-        new("Saturday", 1200, 48, ThemeColor.Default),
-        new("Sunday", 980, 39, ThemeColor.Default)
+        new("Olivia Martin", "m@example.com", "Can edit"),
+        new("Isabella Nguyen", "i@example.com", "Can view"),
+        new("Sofia Davis", "s@example.com", "Can view")
     };
 
-    private List<TransactionData> _recentTransactions = new()
+    // Users Table
+    private string _userSearchQuery = "";
+    private string _roleFilter = "all";
+    private bool _selectAllUsers = false;
+
+    private List<UserData> _users = new()
     {
-        new("Olivia Martin", "olivia@email.com", "TRX-001234", "$1,999.00", "Completed", ThemeColor.Success),
-        new("Jackson Lee", "jackson@email.com", "TRX-001235", "$39.00", "Processing", ThemeColor.Warning),
-        new("Isabella Nguyen", "isabella@email.com", "TRX-001236", "$299.00", "Completed", ThemeColor.Success),
-        new("William Kim", "william@email.com", "TRX-001237", "$99.00", "Failed", ThemeColor.Danger),
-        new("Sofia Davis", "sofia@email.com", "TRX-001238", "$499.00", "Completed", ThemeColor.Success)
+        new("Olivia Martin", "olivia@example.com", "Admin", "Active", "2 min ago"),
+        new("Jackson Lee", "jackson@example.com", "Member", "Active", "5 min ago"),
+        new("Isabella Nguyen", "isabella@example.com", "Member", "Inactive", "1 hour ago"),
+        new("William Kim", "william@example.com", "Viewer", "Active", "30 min ago"),
+        new("Sofia Davis", "sofia@example.com", "Admin", "Active", "Just now")
     };
 
-    private List<ProductData> _topProducts = new()
+    private IEnumerable<UserData> FilteredUsers => _users
+        .Where(u => string.IsNullOrEmpty(_userSearchQuery) ||
+                    u.Name.Contains(_userSearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(_userSearchQuery, StringComparison.OrdinalIgnoreCase))
+        .Where(u => _roleFilter == "all" || u.Role.Equals(_roleFilter, StringComparison.OrdinalIgnoreCase));
+
+    private void DecreaseGoal()
     {
-        new("Wireless Earbuds", "Electronics", "$24,500", "+12.5%"),
-        new("Smart Watch Pro", "Wearables", "$18,200", "+8.2%"),
-        new("Laptop Stand", "Accessories", "$12,800", "+15.3%"),
-        new("USB-C Hub", "Electronics", "$9,500", "+5.7%"),
-        new("Mechanical Keyboard", "Accessories", "$8,200", "+22.1%")
+        if (_moveGoal > 100) _moveGoal -= 50;
+    }
+
+    private void IncreaseGoal()
+    {
+        if (_moveGoal < _moveGoalMax) _moveGoal += 50;
+    }
+
+    private string GetPaymentMethodClass(string method)
+    {
+        var baseClass = "flex-1 flex flex-col items-center gap-2 p-4 border rounded-lg transition-colors";
+        return _selectedPaymentMethod == method
+            ? $"{baseClass} border-primary bg-primary/5 text-primary"
+            : $"{baseClass} border-default-200 dark:border-default-700 text-default-600 dark:text-default-400 hover:border-primary hover:text-primary";
+    }
+
+    private ThemeColor GetStatusColor(string status) => status switch
+    {
+        "Active" => ThemeColor.Success,
+        "Inactive" => ThemeColor.Warning,
+        _ => ThemeColor.Default
     };
 
-    private record ChartData(string Label, int Value);
-    private record ActivityData(string Day, int Users, int Percentage, ThemeColor Color);
-    private record TransactionData(string Customer, string Email, string TransactionId, string Amount, string Status, ThemeColor StatusColor);
-    private record ProductData(string Name, string Category, string Sales, string Growth);
+    private record TeamMember(string Name, string Email, string Role);
+    private record DocumentAccess(string Name, string Email, string Permission);
 
-    private string GetProgressColor(ThemeColor color) => color switch
+    private class UserData
     {
-        ThemeColor.Primary => "bg-primary",
-        ThemeColor.Secondary => "bg-secondary",
-        ThemeColor.Success => "bg-success",
-        ThemeColor.Warning => "bg-warning",
-        ThemeColor.Danger => "bg-danger",
-        _ => "bg-default-400"
-    };
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
+        public string Status { get; set; }
+        public string LastActive { get; set; }
+        public bool Selected { get; set; }
+
+        public UserData(string name, string email, string role, string status, string lastActive)
+        {
+            Name = name;
+            Email = email;
+            Role = role;
+            Status = status;
+            LastActive = lastActive;
+            Selected = false;
+        }
+    }
 }

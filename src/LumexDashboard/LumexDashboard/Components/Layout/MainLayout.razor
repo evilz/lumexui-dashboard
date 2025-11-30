@@ -41,34 +41,43 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden">
         <!-- Top Bar -->
-        <header class="bg-default-50 dark:bg-default-900 border-b border-default-200 dark:border-default-800 px-4 lg:px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <!-- Mobile Menu Toggle -->
-                    <button class="lg:hidden p-2 rounded-lg hover:bg-default-100 dark:hover:bg-default-800" @onclick="ToggleSidebar">
-                        <svg class="w-6 h-6 text-default-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                    
-                    <!-- Search -->
-                    <div class="hidden sm:block relative">
-                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <LumexNavbar Bordered="@true"
+                     Sticky="@true"
+                     Classes="@_navbarClasses">
+            <LumexNavbarContent>
+                <!-- Mobile Menu Toggle -->
+                <button class="lg:hidden p-2 rounded-lg hover:bg-default-100 dark:hover:bg-default-800" @onclick="ToggleSidebar">
+                    <svg class="w-6 h-6 text-default-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                
+                <!-- Search -->
+                <LumexTextbox Type="@InputType.Search"
+                              Size="@Size.Small"
+                              Placeholder="Type to search..."
+                              Classes="@_inputClasses"
+                              Class="hidden sm:flex">
+                    <StartContent>
+                        <svg class="w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
-                        <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border-0 rounded-lg focus:ring-2 focus:ring-primary text-default-900 dark:text-white placeholder-default-400" />
-                    </div>
-                </div>
+                    </StartContent>
+                </LumexTextbox>
+            </LumexNavbarContent>
 
-                <div class="flex items-center gap-2">
-                    <!-- Notifications -->
+            <LumexNavbarContent Align="@Align.End">
+                <!-- Notifications -->
+                <LumexNavbarItem>
                     <NotificationBell />
-                    
-                    <!-- Theme Toggle -->
+                </LumexNavbarItem>
+                
+                <!-- Theme Toggle -->
+                <LumexNavbarItem>
                     <ThemeToggle />
-                </div>
-            </div>
-        </header>
+                </LumexNavbarItem>
+            </LumexNavbarContent>
+        </LumexNavbar>
 
         <!-- Page Content -->
         <main class="flex-1 overflow-y-auto bg-default-100 dark:bg-default-950 p-4 lg:p-6">
@@ -85,6 +94,18 @@
 
 @code {
     private bool _sidebarOpen = false;
+
+    private NavbarSlots _navbarClasses = new()
+    {
+        Base = "border-b-2 border-default-100 bg-default-50 dark:bg-default-900",
+        Content = "gap-3"
+    };
+
+    private InputFieldSlots _inputClasses = new()
+    {
+        Base = "max-w-full sm:max-w-[16rem] h-8",
+        Input = "text-tiny"
+    };
 
     private void ToggleSidebar()
     {

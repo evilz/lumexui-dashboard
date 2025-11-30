@@ -1,0 +1,417 @@
+@page "/mailbox"
+@using LumexUI
+@using LumexUI.Common
+@rendermode InteractiveServer
+
+<PageTitle>Mailbox</PageTitle>
+
+<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-default-200 dark:border-default-700 overflow-hidden bg-default-50 dark:bg-default-900">
+    <!-- Sidebar -->
+    <aside class="w-56 flex-shrink-0 border-r border-default-200 dark:border-default-700 flex flex-col">
+        <!-- Account Selector -->
+        <div class="p-2 border-b border-default-200 dark:border-default-700">
+            <LumexDropdown>
+                <LumexDropdownTrigger>
+                    <LumexButton Variant="Variant.Light" Class="w-full justify-between">
+                        <div class="flex items-center gap-2">
+                            <LumexAvatar Name="@_selectedAccount" Size="Size.Small" />
+                            <span class="text-small">@_selectedAccount</span>
+                        </div>
+                        <svg class="w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                        </svg>
+                    </LumexButton>
+                </LumexDropdownTrigger>
+                <LumexDropdownMenu AriaLabel="Select account">
+                    <LumexDropdownItem Key="alicia" OnClick="@(() => _selectedAccount = "Alicia Koch")">
+                        <div class="flex items-center gap-2">
+                            <LumexAvatar Name="Alicia Koch" Size="Size.Small" />
+                            <div class="flex flex-col">
+                                <span class="text-small">Alicia Koch</span>
+                                <span class="text-tiny text-default-400">alicia@example.com</span>
+                            </div>
+                        </div>
+                    </LumexDropdownItem>
+                    <LumexDropdownItem Key="john" OnClick="@(() => _selectedAccount = "John Doe")">
+                        <div class="flex items-center gap-2">
+                            <LumexAvatar Name="John Doe" Size="Size.Small" />
+                            <div class="flex flex-col">
+                                <span class="text-small">John Doe</span>
+                                <span class="text-tiny text-default-400">john@example.com</span>
+                            </div>
+                        </div>
+                    </LumexDropdownItem>
+                    <LumexDropdownItem Key="jane" OnClick="@(() => _selectedAccount = "Jane Smith")">
+                        <div class="flex items-center gap-2">
+                            <LumexAvatar Name="Jane Smith" Size="Size.Small" />
+                            <div class="flex flex-col">
+                                <span class="text-small">Jane Smith</span>
+                                <span class="text-tiny text-default-400">jane@example.com</span>
+                            </div>
+                        </div>
+                    </LumexDropdownItem>
+                </LumexDropdownMenu>
+            </LumexDropdown>
+        </div>
+
+        <!-- Main Navigation -->
+        <nav class="p-2 space-y-1">
+            @foreach (var item in _mainNavItems)
+            {
+                <button class="@GetNavItemClass(item.Key)" @onclick="@(() => SelectFolder(item.Key))">
+                    @item.Icon
+                    <span>@item.Label</span>
+                    @if (item.Count > 0)
+                    {
+                        <span class="@GetBadgeClass(item.Key)">@item.Count</span>
+                    }
+                </button>
+            }
+        </nav>
+
+        <LumexDivider />
+
+        <!-- Categories -->
+        <nav class="p-2 space-y-1">
+            @foreach (var item in _categoryItems)
+            {
+                <button class="@GetNavItemClass(item.Key)" @onclick="@(() => SelectFolder(item.Key))">
+                    @item.Icon
+                    <span>@item.Label</span>
+                    @if (item.Count > 0)
+                    {
+                        <span class="ml-auto text-xs text-default-500">@item.Count</span>
+                    }
+                </button>
+            }
+        </nav>
+    </aside>
+
+    <!-- Email List -->
+    <div class="w-80 flex-shrink-0 border-r border-default-200 dark:border-default-700 flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-default-200 dark:border-default-700">
+            <h1 class="text-xl font-bold text-default-900 dark:text-white">@GetFolderTitle()</h1>
+            <div class="flex gap-1 bg-default-100 dark:bg-default-800 rounded-lg p-1">
+                <button class="@GetTabClass("all")" @onclick="@(() => _selectedTab = "all")">All mail</button>
+                <button class="@GetTabClass("unread")" @onclick="@(() => _selectedTab = "unread")">Unread</button>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="p-4 border-b border-default-200 dark:border-default-700">
+            <div class="relative">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" @bind="_searchQuery" placeholder="Search" class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+            </div>
+        </div>
+
+        <!-- Email List -->
+        <div class="flex-1 overflow-y-auto">
+            <div class="p-2 space-y-2">
+                @foreach (var email in FilteredEmails)
+                {
+                    <button class="@GetEmailItemClass(email)" @onclick="@(() => SelectEmail(email))">
+                        <div class="flex flex-col gap-1 w-full">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold text-default-900 dark:text-white text-sm">@email.SenderName</span>
+                                    @if (!email.IsRead)
+                                    {
+                                        <span class="w-2 h-2 rounded-full bg-primary"></span>
+                                    }
+                                </div>
+                                <span class="text-xs text-default-500">@email.TimeAgo</span>
+                            </div>
+                            <div class="text-xs font-medium text-default-700 dark:text-default-300 text-left">@email.Subject</div>
+                            <div class="text-xs text-default-500 line-clamp-2 text-left">@email.Preview</div>
+                            <div class="flex items-center gap-1 mt-1">
+                                @foreach (var tag in email.Tags)
+                                {
+                                    <LumexChip Size="Size.Small" Color="@GetTagColor(tag)" Variant="ChipVariant.Flat" Class="text-xs">@tag</LumexChip>
+                                }
+                            </div>
+                        </div>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Content -->
+    <div class="flex-1 flex flex-col">
+        @if (_selectedEmail != null)
+        {
+            <!-- Toolbar -->
+            <div class="flex items-center justify-between p-2 border-b border-default-200 dark:border-default-700">
+                <div class="flex items-center gap-1">
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect width="20" height="5" x="2" y="3" rx="1"></rect>
+                            <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path>
+                            <path d="M10 12h4"></path>
+                        </svg>
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect width="20" height="5" x="2" y="3" rx="1"></rect>
+                            <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path>
+                            <path d="m9.5 17 5-5"></path>
+                            <path d="m9.5 12 5 5"></path>
+                        </svg>
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                            <line x1="10" x2="10" y1="11" y2="17"></line>
+                            <line x1="14" x2="14" y1="11" y2="17"></line>
+                        </svg>
+                    </LumexButton>
+                    <LumexDivider Orientation="Orientation.Vertical" Class="h-6 mx-1" />
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </LumexButton>
+                </div>
+                <div class="flex items-center gap-1">
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <polyline points="9 17 4 12 9 7"></polyline>
+                            <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
+                        </svg>
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <polyline points="7 17 2 12 7 7"></polyline>
+                            <polyline points="12 17 7 12 12 7"></polyline>
+                            <path d="M22 18v-2a4 4 0 0 0-4-4H7"></path>
+                        </svg>
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <polyline points="15 17 20 12 15 7"></polyline>
+                            <path d="M4 18v-2a4 4 0 0 1 4-4h12"></path>
+                        </svg>
+                    </LumexButton>
+                    <LumexDivider Orientation="Orientation.Vertical" Class="h-6 mx-1" />
+                    <LumexDropdown>
+                        <LumexDropdownTrigger>
+                            <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="12" cy="5" r="1"></circle>
+                                    <circle cx="12" cy="19" r="1"></circle>
+                                </svg>
+                            </LumexButton>
+                        </LumexDropdownTrigger>
+                        <LumexDropdownMenu AriaLabel="More options">
+                            <LumexDropdownItem>Mark as unread</LumexDropdownItem>
+                            <LumexDropdownItem>Star thread</LumexDropdownItem>
+                            <LumexDropdownItem>Add label</LumexDropdownItem>
+                            <LumexDropdownItem>Mute thread</LumexDropdownItem>
+                        </LumexDropdownMenu>
+                    </LumexDropdown>
+                </div>
+            </div>
+
+            <!-- Email Header -->
+            <div class="flex items-start p-4 border-b border-default-200 dark:border-default-700">
+                <div class="flex items-start gap-4">
+                    <LumexAvatar Name="@_selectedEmail.SenderName" />
+                    <div class="space-y-1">
+                        <div class="font-semibold text-default-900 dark:text-white">@_selectedEmail.SenderName</div>
+                        <div class="text-xs text-default-700 dark:text-default-300">@_selectedEmail.Subject</div>
+                        <div class="text-xs text-default-500">
+                            <span class="font-medium">Reply-To:</span> @_selectedEmail.Email
+                        </div>
+                    </div>
+                </div>
+                <div class="ml-auto text-xs text-default-500">@_selectedEmail.Date</div>
+            </div>
+
+            <!-- Email Body -->
+            <div class="flex-1 p-4 overflow-y-auto">
+                <div class="text-sm text-default-700 dark:text-default-300 whitespace-pre-wrap">@_selectedEmail.Body</div>
+            </div>
+
+            <LumexDivider />
+
+            <!-- Reply -->
+            <div class="p-4">
+                <div class="space-y-4">
+                    <textarea @bind="_replyText" placeholder="Reply @_selectedEmail.SenderName..." rows="4" class="w-full px-4 py-3 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400 resize-none"></textarea>
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 text-xs text-default-600 dark:text-default-400">
+                            <LumexSwitch @bind-Value="_muteThread" Size="Size.Small" />
+                            Mute this thread
+                        </label>
+                        <LumexButton Color="ThemeColor.Primary" Size="Size.Small">Send</LumexButton>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- No Email Selected -->
+            <div class="flex-1 flex items-center justify-center">
+                <div class="text-center">
+                    <svg class="w-16 h-16 mx-auto text-default-300 dark:text-default-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <p class="text-default-500">Select an email to read</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string _selectedAccount = "alicia";
+    private string _selectedFolder = "inbox";
+    private string _selectedTab = "all";
+    private string _searchQuery = "";
+    private string _replyText = "";
+    private bool _muteThread = false;
+    private EmailItem? _selectedEmail;
+
+    private List<NavItem> _mainNavItems = new()
+    {
+        new("inbox", "Inbox", 128, CreateInboxIcon()),
+        new("drafts", "Drafts", 9, CreateDraftsIcon()),
+        new("sent", "Sent", 0, CreateSentIcon()),
+        new("junk", "Junk", 23, CreateJunkIcon()),
+        new("trash", "Trash", 0, CreateTrashIcon()),
+        new("archive", "Archive", 0, CreateArchiveIcon())
+    };
+
+    private List<NavItem> _categoryItems = new()
+    {
+        new("social", "Social", 972, CreateSocialIcon()),
+        new("updates", "Updates", 342, CreateUpdatesIcon()),
+        new("forums", "Forums", 128, CreateForumsIcon()),
+        new("shopping", "Shopping", 8, CreateShoppingIcon()),
+        new("promotions", "Promotions", 21, CreatePromotionsIcon())
+    };
+
+    private List<EmailItem> _emails = new()
+    {
+        new("William Smith", "williamsmith@example.com", "Meeting Tomorrow", 
+            "Hi, let's have a meeting tomorrow to discuss the project. I've been reviewing the project details and have some ideas I'd like to share. It's crucial that we align on our next steps to ensure the project's success.\n\nPlease come prepared with any questions or insights you may have. Looking forward to our meeting!\n\nBest regards, William",
+            "Hi, let's have a meeting tomorrow to discuss the project. I've been reviewing the project details and have some ideas I'd like to share...",
+            "Oct 22, 2023, 9:00:00 AM", "2 hours ago", new[] { "meeting", "work", "important" }, false),
+        new("Alice Smith", "alicesmith@example.com", "Re: Project Update",
+            "Thank you for the project update. It looks great! I've gone through the report, and the progress is impressive. The team has done a fantastic job, and I appreciate the hard work everyone has put in.\n\nI have a few minor suggestions that I'll include in the attached document.\n\nLet's discuss these during our next meeting.",
+            "Thank you for the project update. It looks great! I've gone through the report, and the progress is impressive...",
+            "Oct 22, 2023, 8:30:00 AM", "3 hours ago", new[] { "work", "important" }, true),
+        new("Bob Johnson", "bob.johnson@example.com", "Weekend Plans",
+            "Any plans for the weekend? I was thinking of going hiking in the nearby mountains. It's been a while since we had some outdoor fun.\n\nIf you're interested, let me know, and we can plan the details. It'll be a great way to unwind and enjoy nature.\n\nLooking forward to your response!\n\nBest, Bob",
+            "Any plans for the weekend? I was thinking of going hiking in the nearby mountains. It's been a while since we had some outdoor fun...",
+            "Oct 21, 2023, 5:00:00 PM", "1 day ago", new[] { "personal" }, true),
+        new("Emily Davis", "emily.davis@example.com", "Re: Question about Budget",
+            "I have a question about the budget for the upcoming project. It seems like there's a discrepancy in the allocation of resources.\n\nI've reviewed the budget report and identified a few areas where we might be able to optimize our spending without compromising the project's quality.\n\nI've attached a detailed analysis for your review.",
+            "I have a question about the budget for the upcoming project. It seems like there's a discrepancy in the allocation of resources...",
+            "Oct 21, 2023, 2:00:00 PM", "1 day ago", new[] { "work", "budget" }, false),
+        new("Michael Wilson", "m.wilson@example.com", "Important Announcement",
+            "I have an important announcement to make during our team meeting. It pertains to a strategic shift in our approach to the upcoming product launch. We've received valuable feedback from our beta testers, and I believe it's time to make some adjustments to better meet our customers' needs.\n\nThis change will be discussed in detail during our call.",
+            "I have an important announcement to make during our team meeting. It pertains to a strategic shift in our approach to the upcoming product launch...",
+            "Oct 20, 2023, 11:00:00 AM", "2 days ago", new[] { "meeting", "work", "important" }, false),
+        new("Sarah Brown", "sarah.brown@example.com", "Re: Feedback on Proposal",
+            "Thank you for your feedback on the proposal. It looks great! I'm pleased to hear that you found it promising. The team worked diligently to address all the key points you raised, and I believe we now have a strong foundation for the project.\n\nI've attached the revised proposal for your review.\n\nPlease let me know if you have any additional comments.",
+            "Thank you for your feedback on the proposal. It looks great! I'm pleased to hear that you found it promising...",
+            "Oct 19, 2023, 4:00:00 PM", "3 days ago", new[] { "work" }, true),
+        new("David Lee", "david.lee@example.com", "New Project Idea",
+            "I have an exciting new project idea to discuss with you. It involves expanding our services to target a niche market that has shown considerable growth in recent months.\n\nI've prepared a detailed proposal outlining the potential benefits and the strategy for execution.\n\nThis project has the potential to significantly increase our revenue.",
+            "I have an exciting new project idea to discuss with you. It involves expanding our services to target a niche market...",
+            "Oct 18, 2023, 10:00:00 AM", "4 days ago", new[] { "meeting", "work", "important" }, false),
+        new("Olivia Wilson", "olivia.w@example.com", "Vacation Plans",
+            "Let's plan our vacation for next month. What do you think? I've been thinking of visiting a tropical paradise, and I've put together some destination options.\n\nI believe it's time for us to unwind and recharge. Please take a look at the options and let me know your preferences.\n\nWe can start making reservations soon.",
+            "Let's plan our vacation for next month. What do you think? I've been thinking of visiting a tropical paradise...",
+            "Oct 17, 2023, 3:00:00 PM", "5 days ago", new[] { "personal" }, true)
+    };
+
+    private IEnumerable<EmailItem> FilteredEmails => _emails
+        .Where(e => _selectedTab == "all" || !e.IsRead)
+        .Where(e => string.IsNullOrEmpty(_searchQuery) ||
+                    e.SenderName.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    e.Subject.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    e.Preview.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase));
+
+    private void SelectFolder(string folder) => _selectedFolder = folder;
+    private void SelectEmail(EmailItem email) => _selectedEmail = email;
+
+    private string GetFolderTitle() => _selectedFolder switch
+    {
+        "inbox" => "Inbox",
+        "drafts" => "Drafts",
+        "sent" => "Sent",
+        "junk" => "Junk",
+        "trash" => "Trash",
+        "archive" => "Archive",
+        "social" => "Social",
+        "updates" => "Updates",
+        "forums" => "Forums",
+        "shopping" => "Shopping",
+        "promotions" => "Promotions",
+        _ => "Inbox"
+    };
+
+    private string GetNavItemClass(string key)
+    {
+        var baseClass = "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors";
+        return _selectedFolder == key
+            ? $"{baseClass} bg-primary text-white"
+            : $"{baseClass} text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800";
+    }
+
+    private string GetBadgeClass(string key) => _selectedFolder == key
+        ? "ml-auto text-xs text-white/80"
+        : "ml-auto text-xs text-default-500";
+
+    private string GetTabClass(string tab)
+    {
+        var baseClass = "px-3 py-1 text-sm font-medium rounded-md transition-colors";
+        return _selectedTab == tab
+            ? $"{baseClass} bg-white dark:bg-default-700 text-default-900 dark:text-white shadow-sm"
+            : $"{baseClass} text-default-600 dark:text-default-400";
+    }
+
+    private string GetEmailItemClass(EmailItem email)
+    {
+        var baseClass = "w-full flex flex-col items-start gap-2 rounded-lg border border-default-200 dark:border-default-700 p-3 text-left text-sm transition-all hover:bg-default-100 dark:hover:bg-default-800";
+        return _selectedEmail == email
+            ? $"{baseClass} bg-default-100 dark:bg-default-800"
+            : baseClass;
+    }
+
+    private ThemeColor GetTagColor(string tag) => tag switch
+    {
+        "work" => ThemeColor.Primary,
+        "important" => ThemeColor.Warning,
+        "meeting" => ThemeColor.Secondary,
+        "personal" => ThemeColor.Default,
+        "budget" => ThemeColor.Success,
+        _ => ThemeColor.Default
+    };
+
+    // Icon render fragments
+    private static RenderFragment CreateInboxIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>;
+    private static RenderFragment CreateDraftsIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path></svg>;
+    private static RenderFragment CreateSentIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>;
+    private static RenderFragment CreateJunkIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="m9.5 17 5-5"></path><path d="m9.5 12 5 5"></path></svg>;
+    private static RenderFragment CreateTrashIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line></svg>;
+    private static RenderFragment CreateArchiveIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>;
+    private static RenderFragment CreateSocialIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M18 21a8 8 0 0 0-16 0"></path><circle cx="10" cy="8" r="5"></circle><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path></svg>;
+    private static RenderFragment CreateUpdatesIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>;
+    private static RenderFragment CreateForumsIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path></svg>;
+    private static RenderFragment CreateShoppingIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>;
+    private static RenderFragment CreatePromotionsIcon() => @<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>;
+
+    private record NavItem(string Key, string Label, int Count, RenderFragment Icon);
+    private record EmailItem(string SenderName, string Email, string Subject, string Body, string Preview, string Date, string TimeAgo, string[] Tags, bool IsRead);
+}
