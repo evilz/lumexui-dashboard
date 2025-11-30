@@ -6,7 +6,7 @@
 /* Custom dashboard styles */
 html, body {
     font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    @apply bg-default-100 dark:bg-default-900;
+    @apply bg-background text-foreground;
 }
 
 /* Blazor error boundary */

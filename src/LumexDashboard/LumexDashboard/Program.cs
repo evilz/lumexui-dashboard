@@ -1,5 +1,6 @@
 using LumexDashboard.Client.Pages;
 using LumexDashboard.Components;
+using LumexDashboard.Services;
 using LumexUI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddRazorComponents()
 
 // Add LumexUI services
 builder.Services.AddLumexServices();
+
+// Add app state service
+builder.Services.AddScoped<AppStateService>();
 
 var app = builder.Build();
 
@@ -24,9 +28,9 @@ else
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 

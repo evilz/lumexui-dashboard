@@ -1,0 +1,201 @@
+@using Microsoft.AspNetCore.Components.Web
+@inject IJSRuntime JS
+@inject LumexDashboard.Services.AppStateService AppState
+
+<div class="relative">
+    <!-- Theme Settings Button -->
+    <LumexButton Variant="@Variant.Light"
+                 Radius="@Radius.Full"
+                 Size="@Size.Small"
+                 Class="min-w-unit-8 h-8 px-2"
+                 OnClick="@(() => _isOpen = !_isOpen)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+    </LumexButton>
+</div>
+
+<!-- Dropdown Panel (fixed position to avoid z-index issues) -->
+@if (_isOpen)
+{
+    <!-- Backdrop to close -->
+    <div class="fixed inset-0 z-[100]" @onclick="@(() => _isOpen = false)"></div>
+    
+    <div class="fixed right-4 top-16 w-72 z-[101]">
+        <LumexCard Class="shadow-2xl border border-divider">
+            <div class="p-4 space-y-4">
+                <!-- Theme Mode Section -->
+                <div>
+                    <h4 class="text-sm font-semibold text-foreground mb-3">Theme Mode</h4>
+                    <div class="flex gap-2">
+                        @foreach (var mode in _themeModes)
+                        {
+                            <button @onclick="@(() => SetThemeMode(mode.Value))"
+                                    class="@GetModeButtonClass(mode.Value)">
+                                @mode.Icon
+                                <span class="text-xs">@mode.Label</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <LumexDivider />
+
+                <!-- Theme Colors Section -->
+                <div>
+                    <h4 class="text-sm font-semibold text-foreground mb-3">Primary Color</h4>
+                    <div class="grid grid-cols-5 gap-2">
+                        @foreach (var color in _themeColors)
+                        {
+                            <button @onclick="@(() => SetThemeColor(color.Value))"
+                                    class="@GetColorButtonClass(color.Value)"
+                                    style="background-color: @color.Hex"
+                                    title="@color.Label">
+                                @if (_currentColor == color.Value)
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                }
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <LumexDivider />
+
+                <!-- Radius Section -->
+                <div>
+                    <h4 class="text-sm font-semibold text-foreground mb-3">Border Radius</h4>
+                    <div class="flex gap-2">
+                        @foreach (var radius in _radiusOptions)
+                        {
+                            <button @onclick="@(() => SetRadius(radius.Value))"
+                                    class="@GetRadiusButtonClass(radius.Value)">
+                                <div class="w-4 h-4 border-2 border-current @radius.Preview"></div>
+                                <span class="text-xs">@radius.Label</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </LumexCard>
+    </div>
+}
+
+@code {
+    private bool _isOpen = false;
+    private string _currentMode = "light";
+    private string _currentColor = "blue";
+    private string _currentRadius = "md";
+
+    private record ThemeMode(string Value, string Label, RenderFragment Icon);
+    private record ThemeColor(string Value, string Label, string Hex);
+    private record RadiusOption(string Value, string Label, string Preview);
+
+    private List<ThemeMode> _themeModes = new()
+    {
+        new("light", "Light", @<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" /></svg>),
+        new("dark", "Dark", @<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>)
+    };
+
+    private List<ThemeColor> _themeColors = new()
+    {
+        new("blue", "Blue", "#006FEE"),
+        new("purple", "Purple", "#9353D3"),
+        new("green", "Green", "#17C964"),
+        new("red", "Red", "#F31260"),
+        new("pink", "Pink", "#FF4ECD"),
+        new("yellow", "Yellow", "#F5A524"),
+        new("cyan", "Cyan", "#06B7DB"),
+        new("zinc", "Zinc", "#71717A"),
+        new("orange", "Orange", "#F97316"),
+        new("teal", "Teal", "#14B8A6")
+    };
+
+    private List<RadiusOption> _radiusOptions = new()
+    {
+        new("none", "None", "rounded-none"),
+        new("sm", "Small", "rounded-sm"),
+        new("md", "Medium", "rounded-md"),
+        new("lg", "Large", "rounded-lg")
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _currentMode = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeMode') || 'light'");
+            _currentColor = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeColor') || 'blue'");
+            _currentRadius = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeRadius') || 'md'");
+            StateHasChanged();
+        }
+    }
+
+    private async Task SetThemeMode(string mode)
+    {
+        _currentMode = mode;
+        await JS.InvokeVoidAsync("eval", $@"
+            localStorage.setItem('themeMode', '{mode}');
+            const html = document.documentElement;
+            html.classList.remove('light', 'dark');
+            html.classList.add('{mode}');
+        ");
+    }
+
+    private async Task SetThemeColor(string color)
+    {
+        _currentColor = color;
+        var colorData = _themeColors.First(c => c.Value == color);
+        await JS.InvokeVoidAsync("eval", $@"
+            localStorage.setItem('themeColor', '{color}');
+            document.documentElement.style.setProperty('--lumex-primary', '{colorData.Hex}');
+            document.documentElement.style.setProperty('--lumex-primary-foreground', '#ffffff');
+        ");
+    }
+
+    private async Task SetRadius(string radius)
+    {
+        _currentRadius = radius;
+        var (small, medium, large) = radius switch
+        {
+            "none" => ("0px", "0px", "0px"),
+            "sm" => ("0.125rem", "0.25rem", "0.375rem"),
+            "md" => ("0.25rem", "0.5rem", "0.75rem"),
+            "lg" => ("0.5rem", "0.75rem", "1rem"),
+            "full" => ("9999px", "9999px", "9999px"),
+            _ => ("0.25rem", "0.5rem", "0.75rem")
+        };
+        await JS.InvokeVoidAsync("eval", $@"
+            localStorage.setItem('themeRadius', '{radius}');
+            document.documentElement.style.setProperty('--lumex-radius-small', '{small}');
+            document.documentElement.style.setProperty('--lumex-radius-medium', '{medium}');
+            document.documentElement.style.setProperty('--lumex-radius-large', '{large}');
+        ");
+    }
+
+    private string GetModeButtonClass(string mode)
+    {
+        var baseClass = "flex-1 flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200";
+        return _currentMode == mode
+            ? $"{baseClass} bg-primary text-primary-foreground"
+            : $"{baseClass} bg-default-100 hover:bg-default-200 text-default-600";
+    }
+
+    private string GetColorButtonClass(string color)
+    {
+        var baseClass = "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200";
+        return _currentColor == color
+            ? $"{baseClass} ring-2 ring-offset-2 ring-offset-background ring-primary scale-110"
+            : $"{baseClass} hover:scale-110";
+    }
+
+    private string GetRadiusButtonClass(string radius)
+    {
+        var baseClass = "flex-1 flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200";
+        return _currentRadius == radius
+            ? $"{baseClass} bg-primary text-primary-foreground"
+            : $"{baseClass} bg-default-100 hover:bg-default-200 text-default-600";
+    }
+}

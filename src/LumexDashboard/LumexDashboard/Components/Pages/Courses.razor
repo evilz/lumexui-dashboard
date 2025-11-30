@@ -1,9 +1,8 @@
 @page "/courses"
-@rendermode InteractiveServer
 
 <PageTitle>Online Courses</PageTitle>
 
-<div class="flex gap-6 -m-4 lg:-m-6 p-4 lg:p-6 min-h-[calc(100vh-4rem)] bg-default-50 dark:bg-default-900/50">
+<div class="flex flex-col xl:flex-row gap-6 -m-4 lg:-m-6 p-4 lg:p-6 min-h-[calc(100vh-4rem)] bg-default-50">
     <!-- Main Content -->
     <div class="flex-1 space-y-6">
         <!-- Header Banner -->
@@ -27,7 +26,7 @@
 
         <!-- Course Progress Overview -->
         <div class="space-y-4">
-            <h2 class="text-lg font-semibold text-default-800 dark:text-default-100">Course Progress</h2>
+            <h2 class="text-lg font-semibold text-foreground">Course Progress</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach (var progress in _courseProgress)
                 {
@@ -39,7 +38,7 @@
                                         @progress.Icon
                                     </div>
                                     <div>
-                                        <h3 class="font-semibold text-default-800 dark:text-default-100">@progress.Category</h3>
+                                        <h3 class="font-semibold text-foreground">@progress.Category</h3>
                                         <p class="text-sm text-default-500">@progress.Watched/@progress.Total watched</p>
                                     </div>
                                 </div>
@@ -62,7 +61,7 @@
                             </div>
                             <!-- Progress bar -->
                             <div class="mt-4">
-                                <div class="h-2 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+                                <div class="h-2 bg-default-200 rounded-full overflow-hidden">
                                     <div class="h-full rounded-full @progress.ProgressColor" style="width: @(progress.Watched * 100 / progress.Total)%"></div>
                                 </div>
                             </div>
@@ -75,7 +74,7 @@
         <!-- Continue Watching Section -->
         <div class="space-y-4">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-default-800 dark:text-default-100">Continue Watching</h2>
+                <h2 class="text-lg font-semibold text-foreground">Continue Watching</h2>
                 <div class="flex gap-2">
                     <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true" OnClick="PreviousCourse" Disabled="@(_carouselIndex == 0)">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +93,7 @@
                 <div class="flex gap-4 transition-transform duration-300" style="transform: translateX(-@(_carouselIndex * 33.33)%)">
                     @foreach (var course in _continueWatching)
                     {
-                        <div class="min-w-[calc(33.33%-1rem)] flex-shrink-0">
+                        <div class="min-w-[calc(100%-1rem)] sm:min-w-[calc(50%-1rem)] lg:min-w-[calc(33.33%-1rem)] flex-shrink-0">
                             <LumexCard Class="rounded-2xl overflow-hidden h-full">
                                 <div class="relative h-40 bg-gradient-to-br @course.ThumbnailGradient">
                                     <!-- Play button overlay -->
@@ -113,7 +112,7 @@
                                     </div>
                                 </div>
                                 <LumexCardBody Class="p-4 space-y-3">
-                                    <h3 class="font-semibold text-default-800 dark:text-default-100 line-clamp-2">@course.Title</h3>
+                                    <h3 class="font-semibold text-foreground line-clamp-2">@course.Title</h3>
                                     <div class="flex items-center gap-2">
                                         <LumexAvatar Name="@course.MentorName" Size="Size.Small" />
                                         <span class="text-sm text-default-500">@course.MentorName</span>
@@ -129,7 +128,7 @@
         <!-- Your Lessons Section -->
         <div class="space-y-4">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-default-800 dark:text-default-100">Your Lessons</h2>
+                <h2 class="text-lg font-semibold text-foreground">Your Lessons</h2>
                 <LumexButton Variant="Variant.Light" Size="Size.Small">
                     See all
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,20 +138,20 @@
             </div>
             
             <LumexCard Class="rounded-2xl">
-                <LumexCardBody Class="p-0 divide-y divide-default-200 dark:divide-default-700">
+                <LumexCardBody Class="p-0 divide-y divide-divider">
                     @foreach (var lesson in _lessons)
                     {
-                        <div class="flex items-center gap-4 p-4 hover:bg-default-100 dark:hover:bg-default-800 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-4 p-4 hover:bg-default-100 transition-colors cursor-pointer">
                             <div class="flex-shrink-0 w-16 text-center">
                                 <p class="text-xs text-default-400 uppercase">@lesson.Date.ToString("MMM")</p>
-                                <p class="text-2xl font-bold text-default-800 dark:text-default-100">@lesson.Date.Day</p>
+                                <p class="text-2xl font-bold text-foreground">@lesson.Date.Day</p>
                             </div>
                             <LumexDivider Orientation="Orientation.Vertical" Class="h-12" />
                             <div class="flex-1 min-w-0">
                                 <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="@lesson.ChipColor">
                                     @lesson.Type
                                 </LumexChip>
-                                <h4 class="font-medium text-default-800 dark:text-default-100 mt-1 truncate">@lesson.Title</h4>
+                                <h4 class="font-medium text-foreground mt-1 truncate">@lesson.Title</h4>
                                 <p class="text-sm text-default-500">by @lesson.Instructor</p>
                             </div>
                             <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true">
@@ -169,12 +168,12 @@
     </div>
 
     <!-- Right Panel: User Statistics -->
-    <aside class="w-80 flex-shrink-0 space-y-6 hidden xl:block">
+    <aside class="w-full xl:w-80 flex-shrink-0 space-y-6 hidden xl:block">
         <!-- User Greeting Card -->
         <LumexCard Class="rounded-2xl">
             <LumexCardBody Class="p-6 text-center">
                 <LumexAvatar Name="Jason Miller" Size="Size.Large" Class="w-20 h-20 mx-auto mb-4" />
-                <h3 class="text-xl font-semibold text-default-800 dark:text-default-100">
+                <h3 class="text-xl font-semibold text-foreground">
                     Good Morning, Jason 🔥
                 </h3>
                 <p class="text-sm text-default-500 mt-2">
@@ -187,7 +186,7 @@
         <LumexCard Class="rounded-2xl">
             <LumexCardBody Class="p-6">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-semibold text-default-800 dark:text-default-100">Your Progress</h3>
+                    <h3 class="font-semibold text-foreground">Your Progress</h3>
                     <LumexDropdown>
                         <LumexDropdownTrigger>
                             <LumexButton Variant="Variant.Flat" Size="Size.Small">
@@ -209,12 +208,12 @@
                 <div class="flex justify-center mb-6">
                     <div class="relative w-32 h-32">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" class="text-default-200 dark:text-default-700"/>
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" class="text-default-200"/>
                             <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="170.8" class="text-violet-500"/>
                         </svg>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="text-center">
-                                <span class="text-2xl font-bold text-default-800 dark:text-default-100">32%</span>
+                                <span class="text-2xl font-bold text-foreground">32%</span>
                                 <p class="text-xs text-default-500">Complete</p>
                             </div>
                         </div>
@@ -227,7 +226,7 @@
                         @foreach (var bar in _progressBars)
                         {
                             <div class="flex-1 flex flex-col items-center gap-2">
-                                <div class="w-full bg-default-200 dark:bg-default-700 rounded-t-lg relative" style="height: @(bar.Height)px">
+                                <div class="w-full bg-default-200 rounded-t-lg relative" style="height: @(bar.Height)px">
                                     <div class="absolute bottom-0 left-0 right-0 bg-violet-500 rounded-t-lg" style="height: @(bar.Progress)px"></div>
                                 </div>
                             </div>
@@ -246,7 +245,7 @@
         <LumexCard Class="rounded-2xl">
             <LumexCardBody Class="p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-default-800 dark:text-default-100">Recommended Mentors</h3>
+                    <h3 class="font-semibold text-foreground">Recommended Mentors</h3>
                     <LumexButton Variant="Variant.Light" Size="Size.Small">See All</LumexButton>
                 </div>
                 
@@ -256,7 +255,7 @@
                         <div class="flex items-center gap-3">
                             <LumexAvatar Name="@mentor.Name" Size="Size.Medium" />
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-medium text-default-800 dark:text-default-100 truncate">@mentor.Name</h4>
+                                <h4 class="font-medium text-foreground truncate">@mentor.Name</h4>
                                 <p class="text-sm text-default-500">Mentor</p>
                             </div>
                             <LumexButton Variant="@(mentor.IsFollowing ? Variant.Solid : Variant.Outlined)" 
@@ -278,15 +277,15 @@
 
     private List<CourseProgressItem> _courseProgress = new()
     {
-        new("UI/UX Design", 2, 8, "bg-pink-100 dark:bg-pink-900/30", "bg-pink-500",
+        new("UI/UX Design", 2, 8, "bg-pink-100", "bg-pink-500",
             @<svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
             </svg>),
-        new("Branding", 3, 8, "bg-amber-100 dark:bg-amber-900/30", "bg-amber-500",
+        new("Branding", 3, 8, "bg-amber-100", "bg-amber-500",
             @<svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
             </svg>),
-        new("Front End", 6, 12, "bg-blue-100 dark:bg-blue-900/30", "bg-blue-500",
+        new("Front End", 6, 12, "bg-blue-100", "bg-blue-500",
             @<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
             </svg>)

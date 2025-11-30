@@ -1,15 +1,35 @@
 @page "/mailbox"
 @using LumexUI
 @using LumexUI.Common
-@rendermode InteractiveServer
 
 <PageTitle>Mailbox</PageTitle>
 
-<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-default-200 dark:border-default-700 overflow-hidden bg-default-50 dark:bg-default-900">
+<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-divider overflow-hidden bg-default-50">
+    <!-- Mobile Navigation Toggle -->
+    <button class="lg:hidden fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center" @onclick="() => _showMobileSidebar = !_showMobileSidebar">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+        </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    @if (_showMobileSidebar)
+    {
+        <div class="lg:hidden fixed inset-0 bg-black/50 z-40" @onclick="() => _showMobileSidebar = false"></div>
+    }
+
     <!-- Sidebar -->
-    <aside class="w-56 flex-shrink-0 border-r border-default-200 dark:border-default-700 flex flex-col">
+    <aside class="@GetSidebarClass()">
+        <!-- Close button for mobile -->
+        <div class="lg:hidden flex justify-end p-2">
+            <button class="p-2 rounded-lg hover:bg-default-100" @onclick="() => _showMobileSidebar = false">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
         <!-- Account Selector -->
-        <div class="p-2 border-b border-default-200 dark:border-default-700">
+        <div class="p-2 border-b border-divider">
             <LumexDropdown>
                 <LumexDropdownTrigger>
                     <LumexButton Variant="Variant.Light" Class="w-full justify-between">
@@ -88,23 +108,33 @@
     </aside>
 
     <!-- Email List -->
-    <div class="w-80 flex-shrink-0 border-r border-default-200 dark:border-default-700 flex flex-col">
+    <div class="@GetEmailListClass()">
+        <!-- Back button for mobile when email is selected -->
+        <div class="md:hidden p-2 border-b border-divider @(_showMobileEmailList ? "hidden" : "")">
+            <button class="flex items-center gap-2 text-sm text-default-600" @onclick="() => _showMobileEmailList = true">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to list
+            </button>
+        </div>
+
         <!-- Header -->
-        <div class="flex items-center justify-between p-4 border-b border-default-200 dark:border-default-700">
-            <h1 class="text-xl font-bold text-default-900 dark:text-white">@GetFolderTitle()</h1>
-            <div class="flex gap-1 bg-default-100 dark:bg-default-800 rounded-lg p-1">
+        <div class="flex items-center justify-between p-4 border-b border-divider">
+            <h1 class="text-xl font-bold text-foreground">@GetFolderTitle()</h1>
+            <div class="hidden sm:flex gap-1 bg-default-100 rounded-lg p-1">
                 <button class="@GetTabClass("all")" @onclick="@(() => _selectedTab = "all")">All mail</button>
                 <button class="@GetTabClass("unread")" @onclick="@(() => _selectedTab = "unread")">Unread</button>
             </div>
         </div>
 
         <!-- Search -->
-        <div class="p-4 border-b border-default-200 dark:border-default-700">
+        <div class="p-4 border-b border-divider">
             <div class="relative">
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <input type="text" @bind="_searchQuery" placeholder="Search" class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                <input type="text" @bind="_searchQuery" placeholder="Search" class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground placeholder-default-400" />
             </div>
         </div>
 
@@ -117,7 +147,7 @@
                         <div class="flex flex-col gap-1 w-full">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-semibold text-default-900 dark:text-white text-sm">@email.SenderName</span>
+                                    <span class="font-semibold text-foreground text-sm">@email.SenderName</span>
                                     @if (!email.IsRead)
                                     {
                                         <span class="w-2 h-2 rounded-full bg-primary"></span>
@@ -125,7 +155,7 @@
                                 </div>
                                 <span class="text-xs text-default-500">@email.TimeAgo</span>
                             </div>
-                            <div class="text-xs font-medium text-default-700 dark:text-default-300 text-left">@email.Subject</div>
+                            <div class="text-xs font-medium text-default-700 text-left">@email.Subject</div>
                             <div class="text-xs text-default-500 line-clamp-2 text-left">@email.Preview</div>
                             <div class="flex items-center gap-1 mt-1">
                                 @foreach (var tag in email.Tags)
@@ -141,11 +171,11 @@
     </div>
 
     <!-- Email Content -->
-    <div class="flex-1 flex flex-col">
+    <div class="@GetEmailContentClass()">
         @if (_selectedEmail != null)
         {
             <!-- Toolbar -->
-            <div class="flex items-center justify-between p-2 border-b border-default-200 dark:border-default-700">
+            <div class="flex items-center justify-between p-2 border-b border-divider">
                 <div class="flex items-center gap-1">
                     <LumexButton Variant="Variant.Light" Size="Size.Small" Class="w-9 h-9 p-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,12 +251,12 @@
             </div>
 
             <!-- Email Header -->
-            <div class="flex items-start p-4 border-b border-default-200 dark:border-default-700">
+            <div class="flex items-start p-4 border-b border-divider">
                 <div class="flex items-start gap-4">
                     <LumexAvatar Name="@_selectedEmail.SenderName" />
                     <div class="space-y-1">
-                        <div class="font-semibold text-default-900 dark:text-white">@_selectedEmail.SenderName</div>
-                        <div class="text-xs text-default-700 dark:text-default-300">@_selectedEmail.Subject</div>
+                        <div class="font-semibold text-foreground">@_selectedEmail.SenderName</div>
+                        <div class="text-xs text-default-700">@_selectedEmail.Subject</div>
                         <div class="text-xs text-default-500">
                             <span class="font-medium">Reply-To:</span> @_selectedEmail.Email
                         </div>
@@ -237,7 +267,7 @@
 
             <!-- Email Body -->
             <div class="flex-1 p-4 overflow-y-auto">
-                <div class="text-sm text-default-700 dark:text-default-300 whitespace-pre-wrap">@_selectedEmail.Body</div>
+                <div class="text-sm text-default-700 whitespace-pre-wrap">@_selectedEmail.Body</div>
             </div>
 
             <LumexDivider />
@@ -245,9 +275,9 @@
             <!-- Reply -->
             <div class="p-4">
                 <div class="space-y-4">
-                    <textarea @bind="_replyText" placeholder="Reply @_selectedEmail.SenderName..." rows="4" class="w-full px-4 py-3 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400 resize-none"></textarea>
+                    <textarea @bind="_replyText" placeholder="Reply @_selectedEmail.SenderName..." rows="4" class="w-full px-4 py-3 text-sm bg-default-100 border border-divider rounded-lg text-foreground placeholder-default-400 resize-none"></textarea>
                     <div class="flex items-center justify-between">
-                        <label class="flex items-center gap-2 text-xs text-default-600 dark:text-default-400">
+                        <label class="flex items-center gap-2 text-xs text-default-500">
                             <LumexSwitch @bind-Value="_muteThread" Size="Size.Small" />
                             Mute this thread
                         </label>
@@ -261,7 +291,7 @@
             <!-- No Email Selected -->
             <div class="flex-1 flex items-center justify-center">
                 <div class="text-center">
-                    <svg class="w-16 h-16 mx-auto text-default-300 dark:text-default-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-16 h-16 mx-auto text-default-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
                     <p class="text-default-500">Select an email to read</p>
@@ -278,6 +308,8 @@
     private string _searchQuery = "";
     private string _replyText = "";
     private bool _muteThread = false;
+    private bool _showMobileSidebar = false;
+    private bool _showMobileEmailList = true;
     private EmailItem? _selectedEmail;
 
     private List<NavItem> _mainNavItems = new()
@@ -343,7 +375,26 @@
                     e.Preview.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase));
 
     private void SelectFolder(string folder) => _selectedFolder = folder;
-    private void SelectEmail(EmailItem email) => _selectedEmail = email;
+    private void SelectEmail(EmailItem email) 
+    {
+        _selectedEmail = email;
+        _showMobileEmailList = false;
+    }
+
+    private string GetSidebarClass() =>
+        _showMobileSidebar
+            ? "fixed lg:relative inset-y-0 left-0 z-50 w-56 flex-shrink-0 border-r border-divider flex flex-col bg-default-50 transform translate-x-0 transition-transform duration-300"
+            : "fixed lg:relative inset-y-0 left-0 z-50 w-56 flex-shrink-0 border-r border-divider flex flex-col bg-default-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300";
+
+    private string GetEmailListClass() =>
+        _showMobileEmailList || _selectedEmail == null
+            ? "w-full md:w-80 flex-shrink-0 border-r border-divider flex flex-col"
+            : "hidden md:flex w-80 flex-shrink-0 border-r border-divider flex-col";
+
+    private string GetEmailContentClass() =>
+        !_showMobileEmailList && _selectedEmail != null
+            ? "flex-1 flex flex-col"
+            : "hidden md:flex flex-1 flex-col";
 
     private string GetFolderTitle() => _selectedFolder switch
     {
@@ -366,7 +417,7 @@
         var baseClass = "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors";
         return _selectedFolder == key
             ? $"{baseClass} bg-primary text-white"
-            : $"{baseClass} text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800";
+            : $"{baseClass} text-default-500 hover:bg-default-100";
     }
 
     private string GetBadgeClass(string key) => _selectedFolder == key
@@ -377,15 +428,15 @@
     {
         var baseClass = "px-3 py-1 text-sm font-medium rounded-md transition-colors";
         return _selectedTab == tab
-            ? $"{baseClass} bg-white dark:bg-default-700 text-default-900 dark:text-white shadow-sm"
-            : $"{baseClass} text-default-600 dark:text-default-400";
+            ? $"{baseClass} bg-white text-foreground shadow-sm"
+            : $"{baseClass} text-default-500";
     }
 
     private string GetEmailItemClass(EmailItem email)
     {
-        var baseClass = "w-full flex flex-col items-start gap-2 rounded-lg border border-default-200 dark:border-default-700 p-3 text-left text-sm transition-all hover:bg-default-100 dark:hover:bg-default-800";
+        var baseClass = "w-full flex flex-col items-start gap-2 rounded-lg border border-divider p-3 text-left text-sm transition-all hover:bg-default-100";
         return _selectedEmail == email
-            ? $"{baseClass} bg-default-100 dark:bg-default-800"
+            ? $"{baseClass} bg-default-100"
             : baseClass;
     }
 
