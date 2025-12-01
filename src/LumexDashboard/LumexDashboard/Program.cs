@@ -1,6 +1,6 @@
 using LumexDashboard.Client.Pages;
+using LumexDashboard.Client.Services;
 using LumexDashboard.Components;
-using LumexDashboard.Services;
 using LumexUI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

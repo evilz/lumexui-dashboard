@@ -1,5 +1,5 @@
 @inject IJSRuntime JS
-@inject LumexDashboard.Services.AppStateService AppState
+@inject AppStateService AppState
 @implements IDisposable
 
 <div class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm">
@@ -49,17 +49,9 @@
         AppState.OnToast += HandleToast;
     }
 
-    private void HandleToast(LumexDashboard.Services.ToastMessage message)
+    private void HandleToast(ToastMessage message)
     {
-        var type = message.Type switch
-        {
-            LumexDashboard.Services.ToastType.Success => ToastType.Success,
-            LumexDashboard.Services.ToastType.Error => ToastType.Error,
-            LumexDashboard.Services.ToastType.Warning => ToastType.Warning,
-            _ => ToastType.Info
-        };
-        
-        var toast = new ToastItem(++_toastCounter, message.Title, message.Message, type);
+        var toast = new ToastItem(++_toastCounter, message.Title, message.Message, message.Type);
         _toasts.Add(toast);
         
         InvokeAsync(StateHasChanged);
@@ -121,6 +113,5 @@
         AppState.OnToast -= HandleToast;
     }
 
-    public enum ToastType { Info, Success, Warning, Error }
     private record ToastItem(int Id, string Title, string Message, ToastType Type);
 }
