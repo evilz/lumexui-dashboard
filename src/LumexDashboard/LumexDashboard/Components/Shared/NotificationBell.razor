@@ -1,8 +1,8 @@
 <div class="relative">
-    <button class="p-2 rounded-lg hover:bg-default-100 dark:hover:bg-default-800 transition-colors" 
+    <button class="p-2 rounded-lg hover:bg-default-100 transition-colors" 
             @onclick="ToggleDropdown" 
             title="Notifications">
-        <svg class="w-5 h-5 text-default-600 dark:text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-default-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
         </svg>
         @if (_unreadCount > 0)
@@ -15,14 +15,14 @@
     
     @if (_isOpen)
     {
-        <div class="absolute right-0 mt-2 w-80 bg-white dark:bg-default-900 rounded-xl shadow-lg border border-default-200 dark:border-default-700 z-50">
-            <div class="border-b border-default-200 dark:border-default-700 px-4 py-3">
-                <h3 class="font-semibold text-default-900 dark:text-white">Notifications</h3>
+        <div class="absolute right-0 mt-2 w-80 bg-background rounded-xl shadow-lg border border-divider z-50">
+            <div class="border-b border-divider px-4 py-3">
+                <h3 class="font-semibold text-foreground">Notifications</h3>
             </div>
             <div class="max-h-80 overflow-y-auto">
                 @foreach (var notification in _notifications)
                 {
-                    <div class="px-4 py-3 hover:bg-default-100 dark:hover:bg-default-800 border-b border-default-100 dark:border-default-800 last:border-0 cursor-pointer">
+                    <div class="px-4 py-3 hover:bg-default-100 border-b border-default-100 last:border-0 cursor-pointer">
                         <div class="flex items-start gap-3">
                             <div class="@GetIconClass(notification.Type) w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
                                 @if (notification.Type == "success")
@@ -43,7 +43,7 @@
                                 }
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-default-900 dark:text-white">@notification.Title</p>
+                                <p class="text-sm font-medium text-foreground">@notification.Title</p>
                                 <p class="text-xs text-default-500 mt-0.5">@notification.Message</p>
                                 <p class="text-xs text-default-400 mt-1">@notification.Time</p>
                             </div>
@@ -51,7 +51,7 @@
                     </div>
                 }
             </div>
-            <div class="border-t border-default-200 dark:border-default-700 px-4 py-2">
+            <div class="border-t border-divider px-4 py-2">
                 <a href="#" class="text-sm text-primary hover:underline">View all notifications</a>
             </div>
         </div>

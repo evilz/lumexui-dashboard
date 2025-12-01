@@ -1,13 +1,25 @@
 @page "/files"
-@rendermode InteractiveServer
 
 <PageTitle>File Manager</PageTitle>
 
-<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-default-200 dark:border-default-700 overflow-hidden bg-default-50 dark:bg-default-900">
+<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-divider overflow-hidden bg-default-50">
+    <!-- Mobile Sidebar Toggle -->
+    <button class="lg:hidden fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center" @onclick="() => _sidebarOpen = !_sidebarOpen">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+        </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    @if (_sidebarOpen)
+    {
+        <div class="lg:hidden fixed inset-0 bg-black/50 z-40" @onclick="() => _sidebarOpen = false"></div>
+    }
+
     <!-- Left Sidebar -->
-    <aside class="w-56 flex-shrink-0 border-r border-default-200 dark:border-default-700 flex flex-col bg-background">
+    <aside class="@GetSidebarPanelClass()">
         <!-- Storage Info -->
-        <div class="p-4 border-b border-default-200 dark:border-default-700">
+        <div class="p-4 border-b border-divider">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                     <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,11 +27,11 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-default-800 dark:text-default-100">Cloud Storage</p>
+                    <p class="text-sm font-medium text-foreground">Cloud Storage</p>
                     <p class="text-xs text-default-500">24.5 GB of 50 GB</p>
                 </div>
             </div>
-            <div class="h-2 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+            <div class="h-2 bg-default-200 rounded-full overflow-hidden">
                 <div class="h-full w-[49%] bg-primary rounded-full"></div>
             </div>
         </div>
@@ -34,7 +46,7 @@
                     <span>@item.Label</span>
                     @if (item.Count > 0)
                     {
-                        <span class="ml-auto text-xs bg-default-200 dark:bg-default-700 px-2 py-0.5 rounded-full">@item.Count</span>
+                        <span class="ml-auto text-xs bg-default-200 px-2 py-0.5 rounded-full">@item.Count</span>
                     }
                 </button>
             }
@@ -44,7 +56,7 @@
             <p class="px-3 py-2 text-xs font-semibold text-default-400 uppercase tracking-wider">Tags</p>
             @foreach (var tag in _tags)
             {
-                <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 transition-colors text-sm">
+                <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-500 hover:bg-default-100 transition-colors text-sm">
                     <span class="w-3 h-3 rounded-full @tag.Color"></span>
                     <span>@tag.Name</span>
                 </button>
@@ -52,15 +64,15 @@
         </nav>
 
         <!-- Settings -->
-        <div class="p-2 border-t border-default-200 dark:border-default-700">
-            <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 transition-colors text-sm">
+        <div class="p-2 border-t border-divider">
+            <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-500 hover:bg-default-100 transition-colors text-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
                 <span>Settings</span>
             </button>
-            <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 transition-colors text-sm">
+            <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-default-500 hover:bg-default-100 transition-colors text-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                 </svg>
@@ -72,10 +84,10 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col min-w-0">
         <!-- Header -->
-        <header class="p-4 border-b border-default-200 dark:border-default-700 bg-background">
+        <header class="p-4 border-b border-divider bg-background">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h1 class="text-xl font-semibold text-default-800 dark:text-default-100">@GetCategoryTitle()</h1>
+                    <h1 class="text-xl font-semibold text-foreground">@GetCategoryTitle()</h1>
                     <p class="text-sm text-default-500">@_files.Count items</p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -112,12 +124,12 @@
             <div class="flex gap-3 overflow-x-auto pb-2">
                 @foreach (var folder in _quickAccess)
                 {
-                    <button class="flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-xl bg-default-100 dark:bg-default-800 hover:bg-default-200 dark:hover:bg-default-700 transition-colors" @onclick="@(() => SelectQuickAccess(folder))">
+                    <button class="flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-xl bg-default-100 hover:bg-default-200 transition-colors" @onclick="@(() => SelectQuickAccess(folder))">
                         <div class="w-10 h-10 rounded-lg @folder.BgColor flex items-center justify-center">
                             @folder.Icon
                         </div>
                         <div class="text-left">
-                            <p class="text-sm font-medium text-default-800 dark:text-default-100">@folder.Name</p>
+                            <p class="text-sm font-medium text-foreground">@folder.Name</p>
                             <p class="text-xs text-default-500">@folder.ItemCount items</p>
                         </div>
                     </button>
@@ -132,19 +144,19 @@
                 <LumexCard Class="rounded-xl overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full">
-                            <thead class="bg-default-100 dark:bg-default-800">
+                            <thead class="bg-default-100">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">
                                         <LumexCheckbox @bind-Value="_selectAll" />
                                     </th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Name</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Shared</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Size</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider">Modified</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-600 dark:text-default-400 uppercase tracking-wider"></th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Shared</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Size</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Modified</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider"></th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-default-200 dark:divide-default-700">
+                            <tbody class="divide-y divide-divider">
                                 @foreach (var file in _files)
                                 {
                                     <tr class="@GetFileRowClass(file)" @onclick="@(() => SelectFile(file))">
@@ -157,7 +169,7 @@
                                                     @file.Icon
                                                 </div>
                                                 <div class="min-w-0">
-                                                    <p class="font-medium text-default-800 dark:text-default-100 truncate">@file.Name</p>
+                                                    <p class="font-medium text-foreground truncate">@file.Name</p>
                                                     <p class="text-xs text-default-500">@file.Type</p>
                                                 </div>
                                             </div>
@@ -172,7 +184,7 @@
                                                     }
                                                     @if (file.SharedWith.Count > 3)
                                                     {
-                                                        <div class="w-8 h-8 rounded-full bg-default-200 dark:bg-default-700 flex items-center justify-center text-xs font-medium ring-2 ring-background">
+                                                        <div class="w-8 h-8 rounded-full bg-default-200 flex items-center justify-center text-xs font-medium ring-2 ring-background">
                                                             +@(file.SharedWith.Count - 3)
                                                         </div>
                                                     }
@@ -183,8 +195,8 @@
                                                 <span class="text-sm text-default-400">Only you</span>
                                             }
                                         </td>
-                                        <td class="px-4 py-3 text-sm text-default-600 dark:text-default-400">@file.Size</td>
-                                        <td class="px-4 py-3 text-sm text-default-600 dark:text-default-400">@file.Modified.ToString("MMM d, yyyy")</td>
+                                        <td class="px-4 py-3 text-sm text-default-500">@file.Size</td>
+                                        <td class="px-4 py-3 text-sm text-default-500">@file.Modified.ToString("MMM d, yyyy")</td>
                                         <td class="px-4 py-3" @onclick:stopPropagation="true">
                                             <LumexDropdown>
                                                 <LumexDropdownTrigger>
@@ -241,7 +253,7 @@
                                         </LumexDropdownMenu>
                                     </LumexDropdown>
                                 </div>
-                                <h3 class="font-medium text-default-800 dark:text-default-100 truncate mb-1">@file.Name</h3>
+                                <h3 class="font-medium text-foreground truncate mb-1">@file.Name</h3>
                                 <p class="text-xs text-default-500 mb-3">@file.Size • @file.Modified.ToString("MMM d")</p>
                                 @if (file.SharedWith.Any())
                                 {
@@ -263,11 +275,11 @@
     <!-- Right Info Panel -->
     @if (_selectedFile != null)
     {
-        <aside class="w-80 flex-shrink-0 border-l border-default-200 dark:border-default-700 bg-background overflow-y-auto">
+        <aside class="w-80 flex-shrink-0 border-l border-divider bg-background overflow-y-auto">
             <!-- File Preview -->
-            <div class="p-6 border-b border-default-200 dark:border-default-700">
+            <div class="p-6 border-b border-divider">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="font-semibold text-default-800 dark:text-default-100">Details</h2>
+                    <h2 class="font-semibold text-foreground">Details</h2>
                     <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" OnClick="@(() => _selectedFile = null)">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -279,37 +291,37 @@
                         @_selectedFile.Icon
                     </div>
                 </div>
-                <h3 class="font-semibold text-default-800 dark:text-default-100 text-center mb-1">@_selectedFile.Name</h3>
+                <h3 class="font-semibold text-foreground text-center mb-1">@_selectedFile.Name</h3>
                 <p class="text-sm text-default-500 text-center">@_selectedFile.Type</p>
             </div>
 
             <!-- Metadata -->
-            <div class="p-6 border-b border-default-200 dark:border-default-700 space-y-4">
-                <h3 class="text-sm font-semibold text-default-800 dark:text-default-100">Information</h3>
+            <div class="p-6 border-b border-divider space-y-4">
+                <h3 class="text-sm font-semibold text-foreground">Information</h3>
                 <div class="space-y-3">
                     <div class="flex justify-between">
                         <span class="text-sm text-default-500">Size</span>
-                        <span class="text-sm font-medium text-default-800 dark:text-default-100">@_selectedFile.Size</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedFile.Size</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-default-500">Created</span>
-                        <span class="text-sm font-medium text-default-800 dark:text-default-100">@_selectedFile.Created.ToString("MMM d, yyyy")</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedFile.Created.ToString("MMM d, yyyy")</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-default-500">Modified</span>
-                        <span class="text-sm font-medium text-default-800 dark:text-default-100">@_selectedFile.Modified.ToString("MMM d, yyyy")</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedFile.Modified.ToString("MMM d, yyyy")</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-sm text-default-500">Location</span>
-                        <span class="text-sm font-medium text-default-800 dark:text-default-100 truncate ml-4">@_selectedFile.Location</span>
+                        <span class="text-sm font-medium text-foreground truncate ml-4">@_selectedFile.Location</span>
                     </div>
                 </div>
             </div>
 
             <!-- Tags -->
-            <div class="p-6 border-b border-default-200 dark:border-default-700">
+            <div class="p-6 border-b border-divider">
                 <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-semibold text-default-800 dark:text-default-100">Tags</h3>
+                    <h3 class="text-sm font-semibold text-foreground">Tags</h3>
                     <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -327,9 +339,9 @@
             </div>
 
             <!-- Collaborators -->
-            <div class="p-6 border-b border-default-200 dark:border-default-700">
+            <div class="p-6 border-b border-divider">
                 <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-semibold text-default-800 dark:text-default-100">Shared with</h3>
+                    <h3 class="text-sm font-semibold text-foreground">Shared with</h3>
                     <LumexButton Variant="Variant.Light" Size="Size.Small">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -345,7 +357,7 @@
                             <div class="flex items-center gap-3">
                                 <LumexAvatar Name="@person" Size="Size.Small" />
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-default-800 dark:text-default-100 truncate">@person</p>
+                                    <p class="text-sm font-medium text-foreground truncate">@person</p>
                                     <p class="text-xs text-default-500">Can edit</p>
                                 </div>
                                 <LumexDropdown>
@@ -376,14 +388,14 @@
 
             <!-- Activity -->
             <div class="p-6">
-                <h3 class="text-sm font-semibold text-default-800 dark:text-default-100 mb-3">Recent Activity</h3>
+                <h3 class="text-sm font-semibold text-foreground mb-3">Recent Activity</h3>
                 <div class="space-y-4">
                     @foreach (var activity in _recentActivity)
                     {
                         <div class="flex gap-3">
                             <LumexAvatar Name="@activity.User" Size="Size.Small" />
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm text-default-800 dark:text-default-100">
+                                <p class="text-sm text-foreground">
                                     <span class="font-medium">@activity.User</span> @activity.Action
                                 </p>
                                 <p class="text-xs text-default-500">@activity.Time</p>
@@ -401,11 +413,12 @@
     private string _searchQuery = string.Empty;
     private string _viewMode = "list";
     private bool _selectAll = false;
+    private bool _sidebarOpen = false;
     private FileItem? _selectedFile = null;
 
     private InputFieldSlots _searchClasses = new()
     {
-        InputWrapper = "bg-default-100 dark:bg-default-800"
+        InputWrapper = "bg-default-100"
     };
 
     private List<SidebarItem> _sidebarItems = new()
@@ -450,19 +463,19 @@
 
     private List<QuickAccessFolder> _quickAccess = new()
     {
-        new("Projects", 24, "bg-blue-100 dark:bg-blue-900/30",
+        new("Projects", 24, "bg-blue-100",
             @<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
             </svg>),
-        new("Design Assets", 156, "bg-pink-100 dark:bg-pink-900/30",
+        new("Design Assets", 156, "bg-pink-100",
             @<svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>),
-        new("Documents", 89, "bg-amber-100 dark:bg-amber-900/30",
+        new("Documents", 89, "bg-amber-100",
             @<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>),
-        new("Downloads", 32, "bg-green-100 dark:bg-green-900/30",
+        new("Downloads", 32, "bg-green-100",
             @<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
             </svg>)
@@ -471,42 +484,42 @@
     private List<FileItem> _files = new()
     {
         new("Project Proposal.pdf", "PDF Document", "2.4 MB", new DateTime(2025, 11, 28), new DateTime(2025, 11, 15), "/Documents", 
-            new List<string> { "Alice Chen", "Bob Smith" }, new List<string> { "Work", "Important" }, "bg-red-100 dark:bg-red-900/30",
+            new List<string> { "Alice Chen", "Bob Smith" }, new List<string> { "Work", "Important" }, "bg-red-100",
             @<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
             </svg>),
         new("Dashboard Design.fig", "Figma File", "8.7 MB", new DateTime(2025, 11, 27), new DateTime(2025, 11, 10), "/Design Assets",
-            new List<string> { "Carol White", "David Lee", "Emma Wilson", "Frank Brown" }, new List<string> { "Work" }, "bg-purple-100 dark:bg-purple-900/30",
+            new List<string> { "Carol White", "David Lee", "Emma Wilson", "Frank Brown" }, new List<string> { "Work" }, "bg-purple-100",
             @<svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
             </svg>),
         new("Meeting Notes.docx", "Word Document", "156 KB", new DateTime(2025, 11, 26), new DateTime(2025, 11, 26), "/Documents",
-            new List<string>(), new List<string> { "Work" }, "bg-blue-100 dark:bg-blue-900/30",
+            new List<string>(), new List<string> { "Work" }, "bg-blue-100",
             @<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>),
         new("Brand Guidelines", "Folder", "24 items", new DateTime(2025, 11, 25), new DateTime(2025, 10, 1), "/Design Assets",
-            new List<string> { "Alice Chen" }, new List<string> { "Work", "Important" }, "bg-amber-100 dark:bg-amber-900/30",
+            new List<string> { "Alice Chen" }, new List<string> { "Work", "Important" }, "bg-amber-100",
             @<svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
             </svg>),
         new("Product Demo.mp4", "Video", "245 MB", new DateTime(2025, 11, 24), new DateTime(2025, 11, 20), "/Videos",
-            new List<string> { "Bob Smith", "Carol White" }, new List<string> { "Work" }, "bg-pink-100 dark:bg-pink-900/30",
+            new List<string> { "Bob Smith", "Carol White" }, new List<string> { "Work" }, "bg-pink-100",
             @<svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
             </svg>),
         new("Budget 2025.xlsx", "Excel Spreadsheet", "1.2 MB", new DateTime(2025, 11, 23), new DateTime(2025, 11, 1), "/Documents",
-            new List<string> { "David Lee" }, new List<string> { "Work", "Important" }, "bg-green-100 dark:bg-green-900/30",
+            new List<string> { "David Lee" }, new List<string> { "Work", "Important" }, "bg-green-100",
             @<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>),
         new("Team Photo.jpg", "Image", "4.5 MB", new DateTime(2025, 11, 22), new DateTime(2025, 11, 22), "/Images",
-            new List<string>(), new List<string> { "Personal" }, "bg-cyan-100 dark:bg-cyan-900/30",
+            new List<string>(), new List<string> { "Personal" }, "bg-cyan-100",
             @<svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>),
         new("Source Code", "Folder", "156 items", new DateTime(2025, 11, 21), new DateTime(2025, 9, 15), "/Projects",
-            new List<string> { "Emma Wilson", "Frank Brown" }, new List<string> { "Work" }, "bg-indigo-100 dark:bg-indigo-900/30",
+            new List<string> { "Emma Wilson", "Frank Brown" }, new List<string> { "Work" }, "bg-indigo-100",
             @<svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
             </svg>)
@@ -546,8 +559,13 @@
         var baseClass = "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm";
         return _activeCategory == key
             ? $"{baseClass} bg-primary/10 text-primary font-medium"
-            : $"{baseClass} text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800";
+            : $"{baseClass} text-default-500 hover:bg-default-100";
     }
+
+    private string GetSidebarPanelClass() =>
+        _sidebarOpen
+            ? "fixed lg:relative inset-y-0 left-0 z-50 w-56 flex-shrink-0 border-r border-divider flex flex-col bg-background transform translate-x-0 transition-transform duration-300"
+            : "fixed lg:relative inset-y-0 left-0 z-50 w-56 flex-shrink-0 border-r border-divider flex flex-col bg-background transform -translate-x-full lg:translate-x-0 transition-transform duration-300";
 
     private string GetCategoryTitle()
     {
@@ -556,7 +574,7 @@
 
     private string GetFileRowClass(FileItem file)
     {
-        var baseClass = "hover:bg-default-50 dark:hover:bg-default-800/50 cursor-pointer transition-colors";
+        var baseClass = "hover:bg-default-50 cursor-pointer transition-colors";
         return file == _selectedFile ? $"{baseClass} bg-primary/5" : baseClass;
     }
 

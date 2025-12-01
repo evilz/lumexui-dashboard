@@ -1,13 +1,12 @@
 @page "/music"
 @using LumexUI
 @using LumexUI.Common
-@rendermode InteractiveServer
 
 <PageTitle>Music</PageTitle>
 
 <div class="flex flex-col h-full -m-4 lg:-m-6">
-    <!-- Menu Bar -->
-    <div class="flex items-center gap-1 px-4 py-2 border-b border-default-200 dark:border-default-700 bg-default-50 dark:bg-default-900">
+    <!-- Menu Bar (hidden on mobile) -->
+    <div class="hidden md:flex items-center gap-1 px-4 py-2 border-b border-divider bg-default-50">
         <LumexDropdown>
             <LumexDropdownTrigger>
                 <LumexButton Variant="Variant.Light" Size="Size.Small" Class="font-semibold">Music</LumexButton>
@@ -76,8 +75,21 @@
 
     <!-- Main Content Area -->
     <div class="flex flex-1 overflow-hidden">
+        <!-- Mobile Sidebar Toggle -->
+        <button class="md:hidden fixed bottom-24 left-4 z-50 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center" @onclick="() => _sidebarOpen = !_sidebarOpen">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <!-- Mobile Sidebar Overlay -->
+        @if (_sidebarOpen)
+        {
+            <div class="md:hidden fixed inset-0 bg-black/50 z-40" @onclick="() => _sidebarOpen = false"></div>
+        }
+
         <!-- Sidebar -->
-        <aside class="w-64 flex-shrink-0 border-r border-default-200 dark:border-default-700 bg-default-50 dark:bg-default-900 overflow-y-auto">
+        <aside class="@GetSidebarClass()">
             <div class="p-4 space-y-6">
                 <!-- Discover Section -->
                 <div>
@@ -161,7 +173,7 @@
         </aside>
 
         <!-- Content Area -->
-        <div class="flex-1 overflow-y-auto p-6 bg-default-100 dark:bg-default-950">
+        <div class="flex-1 overflow-y-auto p-6 bg-default-100">
             <div class="flex justify-end mb-4">
                 <LumexButton Color="ThemeColor.Primary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,7 +189,7 @@
                     <div class="mt-6">
                         <!-- Listen Now Section -->
                         <div class="mb-8">
-                            <h3 class="text-2xl font-bold text-default-900 dark:text-white mb-1">Listen Now</h3>
+                            <h3 class="text-2xl font-bold text-foreground mb-1">Listen Now</h3>
                             <p class="text-default-500 mb-4">Top picks for you. Updated daily.</p>
                             <LumexDivider Class="mb-6" />
 
@@ -190,7 +202,7 @@
                                                 <img src="@album.ImageUrl" alt="@album.AlbumName" class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
                                             </div>
                                             <LumexCardBody Class="p-3">
-                                                <p class="text-sm font-medium text-default-900 dark:text-white truncate">@album.AlbumName</p>
+                                                <p class="text-sm font-medium text-foreground truncate">@album.AlbumName</p>
                                                 <p class="text-xs text-default-500 truncate">@album.ArtistName</p>
                                             </LumexCardBody>
                                         </LumexCard>
@@ -201,7 +213,7 @@
 
                         <!-- Made for You Section -->
                         <div>
-                            <h3 class="text-2xl font-bold text-default-900 dark:text-white mb-1">Made for You</h3>
+                            <h3 class="text-2xl font-bold text-foreground mb-1">Made for You</h3>
                             <p class="text-default-500 mb-4">Your personal playlists. Updated daily.</p>
                             <LumexDivider Class="mb-6" />
 
@@ -214,7 +226,7 @@
                                                 <img src="@album.ImageUrl" alt="@album.AlbumName" class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
                                             </div>
                                             <LumexCardBody Class="p-3">
-                                                <p class="text-sm font-medium text-default-900 dark:text-white truncate">@album.AlbumName</p>
+                                                <p class="text-sm font-medium text-foreground truncate">@album.AlbumName</p>
                                                 <p class="text-xs text-default-500 truncate">@album.ArtistName</p>
                                             </LumexCardBody>
                                         </LumexCard>
@@ -227,16 +239,16 @@
 
                 <LumexTab Key="podcasts" Title="Podcasts">
                     <div class="mt-6">
-                        <h3 class="text-2xl font-bold text-default-900 dark:text-white mb-1">New Episodes</h3>
+                        <h3 class="text-2xl font-bold text-foreground mb-1">New Episodes</h3>
                         <p class="text-default-500 mb-4">Your favorite podcasts. Updated daily.</p>
                         <LumexDivider Class="mb-6" />
 
-                        <LumexCard Class="border-2 border-dashed border-default-300 dark:border-default-600">
+                        <LumexCard Class="border-2 border-dashed border-default-300">
                             <LumexCardBody Class="flex flex-col items-center justify-center py-16">
                                 <svg class="w-12 h-12 text-default-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
                                 </svg>
-                                <h4 class="text-lg font-semibold text-default-900 dark:text-white mb-2">No episodes added</h4>
+                                <h4 class="text-lg font-semibold text-foreground mb-2">No episodes added</h4>
                                 <p class="text-default-500 mb-4">You have not added any podcasts. Add one below.</p>
                                 <LumexButton Color="ThemeColor.Primary">Add Podcast</LumexButton>
                             </LumexCardBody>
@@ -254,16 +266,16 @@
     </div>
 
     <!-- Player Bar -->
-    <div class="flex items-center justify-between px-4 py-3 border-t border-default-200 dark:border-default-700 bg-default-50 dark:bg-default-900">
+    <div class="flex flex-col sm:flex-row items-center justify-between px-4 py-3 gap-3 border-t border-divider bg-default-50">
         <!-- Now Playing -->
-        <div class="flex items-center gap-3 w-1/4">
+        <div class="flex items-center gap-3 w-full sm:w-1/4">
             @if (_currentSong != null)
             {
                 <div class="w-12 h-12 rounded-lg overflow-hidden">
                     <img src="@_currentSong.ImageUrl" alt="@_currentSong.AlbumName" class="w-full h-full object-cover" />
                 </div>
                 <div class="min-w-0">
-                    <p class="text-sm font-medium text-default-900 dark:text-white truncate">@_currentSong.AlbumName</p>
+                    <p class="text-sm font-medium text-foreground truncate">@_currentSong.AlbumName</p>
                     <p class="text-xs text-default-500 truncate">@_currentSong.ArtistName</p>
                 </div>
                 <LumexButton Variant="Variant.Light" Size="Size.Small" Class="ml-2">
@@ -275,7 +287,7 @@
         </div>
 
         <!-- Controls -->
-        <div class="flex flex-col items-center gap-2 w-2/4">
+        <div class="flex flex-col items-center gap-2 w-full sm:w-2/4 order-first sm:order-none">
             <div class="flex items-center gap-4">
                 <LumexButton Variant="Variant.Light" Size="Size.Small" OnClick="ToggleShuffle">
                     <svg class="w-5 h-5 @(_isShuffled ? "text-primary" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,7 +326,7 @@
             </div>
             <div class="flex items-center gap-2 w-full max-w-md">
                 <span class="text-xs text-default-500 w-10 text-right">@FormatTime(_currentTime)</span>
-                <div class="flex-1 h-1 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+                <div class="flex-1 h-1 bg-default-200 rounded-full overflow-hidden">
                     <div class="h-full bg-primary rounded-full" style="width: @((_currentTime / _duration) * 100)%"></div>
                 </div>
                 <span class="text-xs text-default-500 w-10">@FormatTime(_duration)</span>
@@ -322,7 +334,7 @@
         </div>
 
         <!-- Volume -->
-        <div class="flex items-center gap-2 w-1/4 justify-end">
+        <div class="hidden sm:flex items-center gap-2 w-1/4 justify-end">
             <LumexButton Variant="Variant.Light" Size="Size.Small">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
@@ -343,7 +355,7 @@
                     </svg>
                 }
             </LumexButton>
-            <div class="w-24 h-1 bg-default-200 dark:bg-default-700 rounded-full overflow-hidden">
+            <div class="w-24 h-1 bg-default-200 rounded-full overflow-hidden">
                 <div class="h-full bg-default-500 rounded-full" style="width: @(_isMuted ? 0 : _volume)%"></div>
             </div>
         </div>
@@ -357,6 +369,7 @@
     private bool _isShuffled = false;
     private bool _isLiked = false;
     private bool _isMuted = false;
+    private bool _sidebarOpen = false;
     private int _volume = 75;
     private double _currentTime = 73;
     private double _duration = 234;
@@ -427,6 +440,11 @@
         _activeSection == section 
             ? "w-full justify-start gap-3 bg-primary/10 text-primary" 
             : "w-full justify-start gap-3";
+
+    private string GetSidebarClass() =>
+        _sidebarOpen
+            ? "fixed md:relative inset-y-0 left-0 z-50 w-64 flex-shrink-0 border-r border-divider bg-default-50 overflow-y-auto transform translate-x-0 transition-transform duration-300"
+            : "fixed md:relative inset-y-0 left-0 z-50 w-64 flex-shrink-0 border-r border-divider bg-default-50 overflow-y-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300";
 
     private string FormatTime(double seconds)
     {

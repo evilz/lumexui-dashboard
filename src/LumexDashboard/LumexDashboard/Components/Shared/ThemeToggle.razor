@@ -1,44 +1,57 @@
 @inject IJSRuntime JS
 
-<button class="p-2 rounded-lg hover:bg-default-100 dark:hover:bg-default-800 transition-colors" 
-        @onclick="ToggleTheme" 
-        title="@(_isDark ? "Switch to light mode" : "Switch to dark mode")">
-    @if (_isDark)
-    {
-        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-    }
-    else
-    {
-        <svg class="w-5 h-5 text-default-600" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-        </svg>
-    }
-</button>
+<div class="relative">
+    <button class="p-2 rounded-lg hover:bg-default-100 transition-colors flex items-center gap-1" 
+            @onclick="ToggleTheme" 
+            title="@GetTooltip()">
+        @if (_isDarkMode)
+        {
+            <!-- Sun icon - click to switch to light -->
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+        }
+        else
+        {
+            <!-- Moon icon - click to switch to dark -->
+            <svg class="w-5 h-5 text-default-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+            </svg>
+        }
+    </button>
+</div>
 
 @code {
-    private bool _isDark = false;
+    private bool _isDarkMode = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _isDark = await JS.InvokeAsync<bool>("eval", "document.documentElement.classList.contains('dark')");
+            var storedMode = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeMode') || 'light'");
+            _isDarkMode = storedMode == "dark";
+            await ApplyTheme();
             StateHasChanged();
         }
     }
 
+    private string GetTooltip() => _isDarkMode ? "Switch to light mode" : "Switch to dark mode";
+
     private async Task ToggleTheme()
     {
-        _isDark = !_isDark;
-        if (_isDark)
-        {
-            await JS.InvokeVoidAsync("eval", "document.documentElement.classList.add('dark')");
-        }
-        else
-        {
-            await JS.InvokeVoidAsync("eval", "document.documentElement.classList.remove('dark')");
-        }
+        _isDarkMode = !_isDarkMode;
+        var mode = _isDarkMode ? "dark" : "light";
+        await JS.InvokeVoidAsync("eval", $"localStorage.setItem('themeMode', '{mode}')");
+        await ApplyTheme();
+    }
+
+    private async Task ApplyTheme()
+    {
+        var mode = _isDarkMode ? "dark" : "light";
+        await JS.InvokeVoidAsync("eval", $@"
+            const html = document.documentElement;
+            html.classList.remove('light', 'dark');
+            html.classList.add('{mode}');
+        ");
     }
 }

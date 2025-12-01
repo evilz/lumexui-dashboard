@@ -1,7 +1,6 @@
 @page "/logs"
 @using LumexUI
 @using LumexUI.Common
-@rendermode InteractiveServer
 
 <PageTitle>Activity Logs</PageTitle>
 
@@ -9,7 +8,7 @@
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-default-900 dark:text-white">Activity Logs</h1>
+            <h1 class="text-2xl font-bold text-foreground">Activity Logs</h1>
             <p class="text-default-500 mt-1">Monitor all system activities and events</p>
         </div>
         <div class="flex gap-2">
@@ -39,7 +38,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-default-900 dark:text-white">2,847</p>
+                        <p class="text-2xl font-bold text-foreground">2,847</p>
                         <p class="text-sm text-default-500">Total Events</p>
                     </div>
                 </div>
@@ -55,7 +54,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-default-900 dark:text-white">2,654</p>
+                        <p class="text-2xl font-bold text-foreground">2,654</p>
                         <p class="text-sm text-default-500">Successful</p>
                     </div>
                 </div>
@@ -71,7 +70,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-default-900 dark:text-white">156</p>
+                        <p class="text-2xl font-bold text-foreground">156</p>
                         <p class="text-sm text-default-500">Warnings</p>
                     </div>
                 </div>
@@ -87,7 +86,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-default-900 dark:text-white">37</p>
+                        <p class="text-2xl font-bold text-foreground">37</p>
                         <p class="text-sm text-default-500">Errors</p>
                     </div>
                 </div>
@@ -103,17 +102,17 @@
                     <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    <input type="text" @bind="_searchQuery" @bind:event="oninput" placeholder="Search logs..." class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white placeholder-default-400" />
+                    <input type="text" @bind="_searchQuery" @bind:event="oninput" placeholder="Search logs..." class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground placeholder-default-400" />
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <select @bind="_levelFilter" class="w-full sm:w-32 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                    <select @bind="_levelFilter" class="w-full sm:w-32 px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground">
                         <option value="all">All Levels</option>
                         <option value="info">Info</option>
                         <option value="success">Success</option>
                         <option value="warning">Warning</option>
                         <option value="error">Error</option>
                     </select>
-                    <select @bind="_categoryFilter" class="w-full sm:w-36 px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white">
+                    <select @bind="_categoryFilter" class="w-full sm:w-36 px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground">
                         <option value="all">All Categories</option>
                         <option value="auth">Authentication</option>
                         <option value="payment">Payment</option>
@@ -128,10 +127,10 @@
     <!-- Logs List -->
     <LumexCard>
         <LumexCardBody Class="p-0">
-            <div class="divide-y divide-default-200 dark:divide-default-700">
+            <div class="divide-y divide-divider">
                 @foreach (var log in FilteredLogs)
                 {
-                    <div class="px-6 py-4 hover:bg-default-50 dark:hover:bg-default-800/50 transition-colors">
+                    <div class="px-6 py-4 hover:bg-default-50 transition-colors">
                         <div class="flex items-start gap-4">
                             <div class="@GetLevelIconClass(log.Level) w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                                 @if (log.Level == "success")
@@ -153,10 +152,10 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-sm font-semibold text-default-900 dark:text-white">@log.Action</span>
+                                    <span class="text-sm font-semibold text-foreground">@log.Action</span>
                                     <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="@GetCategoryColor(log.Category)">@log.Category</LumexChip>
                                 </div>
-                                <p class="text-sm text-default-600 dark:text-default-400 mt-1">@log.Description</p>
+                                <p class="text-sm text-default-500 mt-1">@log.Description</p>
                                 <div class="flex items-center gap-4 mt-2 text-xs text-default-500">
                                     <span class="flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,7 +183,7 @@
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-between px-6 py-4 border-t border-default-200 dark:border-default-700">
+            <div class="flex items-center justify-between px-6 py-4 border-t border-divider">
                 <p class="text-sm text-default-500">Showing @((_currentPage - 1) * _pageSize + 1) to @Math.Min(_currentPage * _pageSize, _logs.Count) of @_logs.Count logs</p>
                 <div class="flex gap-2">
                     <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage == 1)" OnClick="PreviousPage">Previous</LumexButton>

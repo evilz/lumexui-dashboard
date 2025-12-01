@@ -1,14 +1,13 @@
 @page "/settings"
 @using LumexUI
 @using LumexUI.Common
-@rendermode InteractiveServer
 
 <PageTitle>Settings</PageTitle>
 
 <div class="space-y-6">
     <!-- Page Header -->
     <div>
-        <h1 class="text-2xl font-bold text-default-900 dark:text-white">Settings</h1>
+        <h1 class="text-2xl font-bold text-foreground">Settings</h1>
         <p class="text-default-500 mt-1">Manage your account and application preferences</p>
     </div>
 
@@ -55,7 +54,7 @@
                 <!-- Profile Settings -->
                 <LumexCard>
                     <LumexCardBody Class="p-6">
-                        <h2 class="text-lg font-semibold text-default-900 dark:text-white mb-6">Profile Information</h2>
+                        <h2 class="text-lg font-semibold text-foreground mb-6">Profile Information</h2>
                         
                         <div class="flex items-center gap-6 mb-8">
                             <LumexAvatar Name="@_profileData.FullName" Size="Size.Large" Class="w-20 h-20 text-2xl" />
@@ -67,28 +66,28 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">First Name</label>
-                                <input type="text" @bind="_profileData.FirstName" placeholder="Enter first name" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                                <label class="block text-sm font-medium text-default-700 mb-2">First Name</label>
+                                <input type="text" @bind="_profileData.FirstName" placeholder="Enter first name" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Last Name</label>
-                                <input type="text" @bind="_profileData.LastName" placeholder="Enter last name" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                                <label class="block text-sm font-medium text-default-700 mb-2">Last Name</label>
+                                <input type="text" @bind="_profileData.LastName" placeholder="Enter last name" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Email Address</label>
-                                <input type="email" @bind="_profileData.Email" placeholder="Enter email" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                                <label class="block text-sm font-medium text-default-700 mb-2">Email Address</label>
+                                <input type="email" @bind="_profileData.Email" placeholder="Enter email" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Phone Number</label>
-                                <input type="tel" @bind="_profileData.Phone" placeholder="Enter phone number" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                                <label class="block text-sm font-medium text-default-700 mb-2">Phone Number</label>
+                                <input type="tel" @bind="_profileData.Phone" placeholder="Enter phone number" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Bio</label>
-                                <textarea @bind="_profileData.Bio" placeholder="Write a short bio..." rows="3" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white"></textarea>
+                                <label class="block text-sm font-medium text-default-700 mb-2">Bio</label>
+                                <textarea @bind="_profileData.Bio" placeholder="Write a short bio..." rows="3" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground"></textarea>
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-default-200 dark:border-default-700">
+                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-divider">
                             <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">Cancel</LumexButton>
                             <LumexButton Color="ThemeColor.Primary">Save Changes</LumexButton>
                         </div>
@@ -100,24 +99,24 @@
                 <!-- Security Settings -->
                 <LumexCard>
                     <LumexCardBody Class="p-6">
-                        <h2 class="text-lg font-semibold text-default-900 dark:text-white mb-6">Change Password</h2>
+                        <h2 class="text-lg font-semibold text-foreground mb-6">Change Password</h2>
                         
                         <div class="space-y-4 max-w-md">
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Current Password</label>
-                                <input type="password" @bind="_securityData.CurrentPassword" placeholder="Enter current password" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                                <label class="block text-sm font-medium text-default-700 mb-2">Current Password</label>
+                                <input type="password" @bind="_securityData.CurrentPassword" placeholder="Enter current password" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">New Password</label>
-                                <input type="password" @bind="_securityData.NewPassword" placeholder="Enter new password" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                                <label class="block text-sm font-medium text-default-700 mb-2">New Password</label>
+                                <input type="password" @bind="_securityData.NewPassword" placeholder="Enter new password" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-2">Confirm New Password</label>
-                                <input type="password" @bind="_securityData.ConfirmPassword" placeholder="Confirm new password" class="w-full px-4 py-2 text-sm bg-default-100 dark:bg-default-800 border border-default-200 dark:border-default-700 rounded-lg text-default-900 dark:text-white" />
+                                <label class="block text-sm font-medium text-default-700 mb-2">Confirm New Password</label>
+                                <input type="password" @bind="_securityData.ConfirmPassword" placeholder="Confirm new password" class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-default-200 dark:border-default-700">
+                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-divider">
                             <LumexButton Color="ThemeColor.Primary">Update Password</LumexButton>
                         </div>
                     </LumexCardBody>
@@ -125,10 +124,10 @@
 
                 <LumexCard>
                     <LumexCardBody Class="p-6">
-                        <h2 class="text-lg font-semibold text-default-900 dark:text-white mb-4">Two-Factor Authentication</h2>
+                        <h2 class="text-lg font-semibold text-foreground mb-4">Two-Factor Authentication</h2>
                         <p class="text-sm text-default-500 mb-4">Add an extra layer of security to your account</p>
                         
-                        <div class="flex items-center justify-between p-4 bg-default-100 dark:bg-default-800 rounded-lg">
+                        <div class="flex items-center justify-between p-4 bg-default-100 rounded-lg">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-success/20 rounded-full flex items-center justify-center">
                                     <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +135,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-default-900 dark:text-white">Authenticator App</p>
+                                    <p class="text-sm font-medium text-foreground">Authenticator App</p>
                                     <p class="text-xs text-default-500">Use an authenticator app to generate codes</p>
                                 </div>
                             </div>
@@ -150,17 +149,17 @@
                 <!-- Notification Settings -->
                 <LumexCard>
                     <LumexCardBody Class="p-6">
-                        <h2 class="text-lg font-semibold text-default-900 dark:text-white mb-6">Notification Preferences</h2>
+                        <h2 class="text-lg font-semibold text-foreground mb-6">Notification Preferences</h2>
                         
                         <div class="space-y-6">
                             <div>
-                                <h3 class="text-sm font-semibold text-default-900 dark:text-white mb-4">Email Notifications</h3>
+                                <h3 class="text-sm font-semibold text-foreground mb-4">Email Notifications</h3>
                                 <div class="space-y-3">
                                     @foreach (var setting in _notificationSettings.Where(s => s.Category == EmailCategory))
                                     {
-                                        <div class="flex items-center justify-between p-3 bg-default-50 dark:bg-default-800/50 rounded-lg">
+                                        <div class="flex items-center justify-between p-3 bg-default-50 rounded-lg">
                                             <div>
-                                                <p class="text-sm font-medium text-default-900 dark:text-white">@setting.Title</p>
+                                                <p class="text-sm font-medium text-foreground">@setting.Title</p>
                                                 <p class="text-xs text-default-500">@setting.Description</p>
                                             </div>
                                             <LumexSwitch @bind-Value="setting.Enabled" Color="ThemeColor.Primary" />
@@ -170,13 +169,13 @@
                             </div>
 
                             <div>
-                                <h3 class="text-sm font-semibold text-default-900 dark:text-white mb-4">Push Notifications</h3>
+                                <h3 class="text-sm font-semibold text-foreground mb-4">Push Notifications</h3>
                                 <div class="space-y-3">
                                     @foreach (var setting in _notificationSettings.Where(s => s.Category == PushCategory))
                                     {
-                                        <div class="flex items-center justify-between p-3 bg-default-50 dark:bg-default-800/50 rounded-lg">
+                                        <div class="flex items-center justify-between p-3 bg-default-50 rounded-lg">
                                             <div>
-                                                <p class="text-sm font-medium text-default-900 dark:text-white">@setting.Title</p>
+                                                <p class="text-sm font-medium text-foreground">@setting.Title</p>
                                                 <p class="text-xs text-default-500">@setting.Description</p>
                                             </div>
                                             <LumexSwitch @bind-Value="setting.Enabled" Color="ThemeColor.Primary" />
@@ -186,7 +185,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-default-200 dark:border-default-700">
+                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-divider">
                             <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">Reset to Default</LumexButton>
                             <LumexButton Color="ThemeColor.Primary">Save Preferences</LumexButton>
                         </div>
@@ -198,11 +197,11 @@
                 <!-- Appearance Settings -->
                 <LumexCard>
                     <LumexCardBody Class="p-6">
-                        <h2 class="text-lg font-semibold text-default-900 dark:text-white mb-6">Appearance</h2>
+                        <h2 class="text-lg font-semibold text-foreground mb-6">Appearance</h2>
                         
                         <div class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-3">Theme</label>
+                                <label class="block text-sm font-medium text-default-700 mb-3">Theme</label>
                                 <div class="grid grid-cols-3 gap-4">
                                     <button class="@(_appearanceData.Theme == LightTheme ? "ring-2 ring-primary" : "") p-4 bg-white border border-default-200 rounded-xl flex flex-col items-center gap-2"
                                             @onclick="@(() => _appearanceData.Theme = LightTheme)">
@@ -223,7 +222,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-default-700 dark:text-default-300 mb-3">Accent Color</label>
+                                <label class="block text-sm font-medium text-default-700 mb-3">Accent Color</label>
                                 <div class="flex gap-3">
                                     <button class="@(_appearanceData.AccentColor == PrimaryColor ? "ring-2 ring-offset-2" : "") w-8 h-8 rounded-full bg-primary"
                                             @onclick="@(() => _appearanceData.AccentColor = PrimaryColor)"></button>
@@ -240,14 +239,14 @@
 
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm font-medium text-default-900 dark:text-white">Compact Mode</p>
+                                    <p class="text-sm font-medium text-foreground">Compact Mode</p>
                                     <p class="text-xs text-default-500">Reduce spacing for a more compact layout</p>
                                 </div>
                                 <LumexSwitch @bind-Value="_appearanceData.CompactMode" Color="ThemeColor.Primary" />
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-default-200 dark:border-default-700">
+                        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-divider">
                             <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Default">Reset to Default</LumexButton>
                             <LumexButton Color="ThemeColor.Primary">Save Changes</LumexButton>
                         </div>
@@ -261,7 +260,7 @@
                     <LumexCardBody Class="p-6">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <h2 class="text-lg font-semibold text-default-900 dark:text-white">Current Plan</h2>
+                                <h2 class="text-lg font-semibold text-foreground">Current Plan</h2>
                                 <p class="text-sm text-default-500">You are currently on the Pro plan</p>
                             </div>
                             <LumexChip Color="ThemeColor.Primary" Variant="ChipVariant.Flat">Pro Plan</LumexChip>
@@ -270,21 +269,21 @@
                         <div class="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-2xl font-bold text-default-900 dark:text-white">$29<span class="text-sm font-normal text-default-500">/month</span></p>
+                                    <p class="text-2xl font-bold text-foreground">$29<span class="text-sm font-normal text-default-500">/month</span></p>
                                     <p class="text-sm text-default-500 mt-1">Billed monthly · Next billing date: Dec 28, 2024</p>
                                 </div>
                                 <LumexButton Variant="Variant.Outlined" Color="ThemeColor.Primary">Upgrade Plan</LumexButton>
                             </div>
                         </div>
 
-                        <h3 class="text-sm font-semibold text-default-900 dark:text-white mb-4">Payment Method</h3>
-                        <div class="flex items-center justify-between p-4 bg-default-50 dark:bg-default-800/50 rounded-lg mb-4">
+                        <h3 class="text-sm font-semibold text-foreground mb-4">Payment Method</h3>
+                        <div class="flex items-center justify-between p-4 bg-default-50 rounded-lg mb-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-6 bg-default-200 dark:bg-default-700 rounded flex items-center justify-center text-xs font-bold">
+                                <div class="w-10 h-6 bg-default-200 rounded flex items-center justify-center text-xs font-bold">
                                     VISA
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-default-900 dark:text-white">Visa ending in 4242</p>
+                                    <p class="text-sm font-medium text-foreground">Visa ending in 4242</p>
                                     <p class="text-xs text-default-500">Expires 12/2026</p>
                                 </div>
                             </div>
@@ -297,11 +296,11 @@
 
                 <LumexCard>
                     <LumexCardBody Class="p-6">
-                        <h2 class="text-lg font-semibold text-default-900 dark:text-white mb-4">Billing History</h2>
+                        <h2 class="text-lg font-semibold text-foreground mb-4">Billing History</h2>
                         <div class="overflow-x-auto">
                             <table class="w-full">
                                 <thead>
-                                    <tr class="border-b border-default-200 dark:border-default-700">
+                                    <tr class="border-b border-divider">
                                         <th class="text-left text-xs font-semibold text-default-500 pb-3">Date</th>
                                         <th class="text-left text-xs font-semibold text-default-500 pb-3">Description</th>
                                         <th class="text-left text-xs font-semibold text-default-500 pb-3">Amount</th>
@@ -312,10 +311,10 @@
                                 <tbody>
                                     @foreach (var invoice in _billingHistory)
                                     {
-                                        <tr class="border-b border-default-100 dark:border-default-800 last:border-0">
-                                            <td class="py-3 text-sm text-default-600 dark:text-default-400">@invoice.Date</td>
-                                            <td class="py-3 text-sm text-default-900 dark:text-white">@invoice.Description</td>
-                                            <td class="py-3 text-sm font-medium text-default-900 dark:text-white">@invoice.Amount</td>
+                                        <tr class="border-b border-default-100 last:border-0">
+                                            <td class="py-3 text-sm text-default-500">@invoice.Date</td>
+                                            <td class="py-3 text-sm text-foreground">@invoice.Description</td>
+                                            <td class="py-3 text-sm font-medium text-foreground">@invoice.Amount</td>
                                             <td class="py-3">
                                                 <LumexChip Size="Size.Small" Color="ThemeColor.Success" Variant="ChipVariant.Flat">@invoice.Status</LumexChip>
                                             </td>
@@ -404,7 +403,7 @@
     private string GetNavClass(string sectionId) =>
         _activeSection == sectionId
             ? "bg-primary/10 text-primary"
-            : "text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800";
+            : "text-default-500 hover:bg-default-100";
     
     private class ProfileData
     {

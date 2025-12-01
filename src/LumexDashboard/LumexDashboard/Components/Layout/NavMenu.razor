@@ -1,87 +1,129 @@
-﻿<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="" Match="NavLinkMatch.All">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+﻿@{
+    var itemClass = Collapsed 
+        ? "flex items-center justify-center w-10 h-10 mx-auto rounded-lg text-default-500 hover:bg-default-100 hover:text-foreground transition-colors"
+        : "flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-500 hover:bg-default-100 hover:text-foreground transition-colors";
+}
+
+<NavLink class="@itemClass" href="" Match="NavLinkMatch.All" title="Overview">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
     </svg>
-    <span class="font-medium">Overview</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Overview</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="users">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="users" title="Users">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
     </svg>
-    <span class="font-medium">Users</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Users</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="payments">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="payments" title="Payments">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
     </svg>
-    <span class="font-medium">Payments</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Payments</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="files">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="files" title="Files">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
     </svg>
-    <span class="font-medium">Files</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Files</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="finance">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="finance" title="Finance">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
     </svg>
-    <span class="font-medium">Finance</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Finance</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="logs">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="logs" title="Logs">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
     </svg>
-    <span class="font-medium">Logs</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Logs</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="music">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="music" title="Music">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
     </svg>
-    <span class="font-medium">Music</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Music</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="mailbox">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="mailbox" title="Mailbox">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
     </svg>
-    <span class="font-medium">Mailbox</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Mailbox</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="courses">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="courses" title="Courses">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
     </svg>
-    <span class="font-medium">Courses</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Courses</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="tasks">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="tasks" title="Tasks">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
     </svg>
-    <span class="font-medium">Tasks</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Tasks</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="streaming">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="streaming" title="Streaming">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
     </svg>
-    <span class="font-medium">Streaming</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Streaming</span>
+    }
 </NavLink>
 
-<NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-default-600 dark:text-default-400 hover:bg-default-100 dark:hover:bg-default-800 hover:text-default-900 dark:hover:text-white transition-colors" href="settings">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<NavLink class="@itemClass" href="settings" title="Settings">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
     </svg>
-    <span class="font-medium">Settings</span>
+    @if (!Collapsed)
+    {
+        <span class="font-medium">Settings</span>
+    }
 </NavLink>
 
 <style>
@@ -90,3 +132,8 @@
         color: rgb(var(--lumex-primary));
     }
 </style>
+
+@code {
+    [Parameter]
+    public bool Collapsed { get; set; } = false;
+}
