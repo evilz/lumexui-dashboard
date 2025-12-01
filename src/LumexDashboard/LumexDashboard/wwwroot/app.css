@@ -1,7 +1,7 @@
 @import "tailwindcss";
-@import "../bin/lumexui/theme.css";
+@import "../../LumexDashboard.Client/bin/lumexui/theme.css";
 
-@source "../bin/lumexui/*.cs"; /* styles */
+@source "../../LumexDashboard.Client/bin/lumexui/*.cs"; /* styles */
 
 /* Custom dashboard styles */
 html, body {
