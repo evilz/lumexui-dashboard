@@ -1,4 +1,6 @@
 @inject IJSRuntime JS
+@inject LumexDashboard.Services.AppStateService AppState
+@implements IDisposable
 
 <div class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm">
     @foreach (var toast in _toasts)
@@ -39,22 +41,27 @@
 </style>
 
 @code {
-    private List<ToastItem> _toasts = new();
+    private readonly List<ToastItem> _toasts = new();
     private int _toastCounter = 0;
-
-    public static ToastContainer? Instance { get; private set; }
 
     protected override void OnInitialized()
     {
-        Instance = this;
+        AppState.OnToast += HandleToast;
     }
 
-    public void ShowToast(string title, string message, ToastType type = ToastType.Info)
+    private void HandleToast(LumexDashboard.Services.ToastMessage message)
     {
-        var toast = new ToastItem(++_toastCounter, title, message, type);
+        var type = message.Type switch
+        {
+            LumexDashboard.Services.ToastType.Success => ToastType.Success,
+            LumexDashboard.Services.ToastType.Error => ToastType.Error,
+            LumexDashboard.Services.ToastType.Warning => ToastType.Warning,
+            _ => ToastType.Info
+        };
+        
+        var toast = new ToastItem(++_toastCounter, message.Title, message.Message, type);
         _toasts.Add(toast);
         
-        // Use InvokeAsync to ensure we're on the correct thread for StateHasChanged
         InvokeAsync(StateHasChanged);
 
         // Auto-remove after 4 seconds
@@ -66,11 +73,6 @@
             });
         });
     }
-
-    public void ShowSuccess(string title, string message) => ShowToast(title, message, ToastType.Success);
-    public void ShowError(string title, string message) => ShowToast(title, message, ToastType.Error);
-    public void ShowWarning(string title, string message) => ShowToast(title, message, ToastType.Warning);
-    public void ShowInfo(string title, string message) => ShowToast(title, message, ToastType.Info);
 
     private void RemoveToast(int id)
     {
@@ -113,6 +115,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
     };
+
+    public void Dispose()
+    {
+        AppState.OnToast -= HandleToast;
+    }
 
     public enum ToastType { Info, Success, Warning, Error }
     private record ToastItem(int Id, string Title, string Message, ToastType Type);

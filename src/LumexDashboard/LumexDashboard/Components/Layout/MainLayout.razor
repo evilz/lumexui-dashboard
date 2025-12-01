@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject IJSRuntime JS
+@inject LumexDashboard.Services.AppStateService AppState
 
 <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
@@ -94,7 +95,7 @@
 </div>
 
 <!-- Toast Container -->
-<ToastContainer @ref="_toastContainer" />
+<ToastContainer />
 
 <!-- Command Palette -->
 <CommandPalette @ref="_commandPalette" />
@@ -108,7 +109,6 @@
 @code {
     private bool _sidebarOpen = false;
     private bool _sidebarCollapsed = false;
-    private ToastContainer? _toastContainer;
     private CommandPalette? _commandPalette;
 
     // Navbar classes removed - using custom header element now
@@ -142,8 +142,22 @@
     }
 
     // Public method to show toasts from anywhere
-    public void ShowToast(string message, string type = "info")
+    public void ShowToast(string title, string message, string type = "info")
     {
-        _toastContainer?.ShowToast(message, type);
+        switch (type.ToLower())
+        {
+            case "success":
+                AppState.ShowSuccess(title, message);
+                break;
+            case "error":
+                AppState.ShowError(title, message);
+                break;
+            case "warning":
+                AppState.ShowWarning(title, message);
+                break;
+            default:
+                AppState.ShowInfo(title, message);
+                break;
+        }
     }
 }

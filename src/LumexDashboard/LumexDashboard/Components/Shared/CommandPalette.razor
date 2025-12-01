@@ -136,8 +136,9 @@
     private string _searchQuery = string.Empty;
     private int _selectedIndex = 0;
     private ElementReference _searchInput;
+    private DotNetObjectReference<CommandPalette>? _dotNetRef;
 
-    private List<CommandItem> _quickActions = new()
+    private readonly List<CommandItem> _quickActions = new()
     {
         new("New Task", "Create a new task", "action", "⌘N",
             @<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +158,7 @@
             </svg>)
     };
 
-    private List<CommandItem> _navigationItems = new()
+    private readonly List<CommandItem> _navigationItems = new()
     {
         new("Dashboard", "Go to dashboard overview", "nav", null,
             @<svg class="w-4 h-4 text-default-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,12 +192,21 @@
         if (firstRender)
         {
             AppState.OnChange += OnStateChanged;
-            await JS.InvokeVoidAsync("eval", @"
-                document.addEventListener('keydown', (e) => {
-                    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("eval", $@"
+                window.commandPaletteRef = {{}};
+                window.commandPaletteRef.dotNetRef = DotNet.attachReviver(null);
+                document.addEventListener('keydown', (e) => {{
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {{
                         e.preventDefault();
-                        DotNet.invokeMethodAsync('LumexDashboard', 'OpenCommandPaletteStatic');
-                    }
+                        window.dispatchEvent(new CustomEvent('open-command-palette'));
+                    }}
+                }});
+            ");
+            await JS.InvokeVoidAsync("eval", @"
+                window.addEventListener('open-command-palette', () => {
+                    const event = new CustomEvent('blazor-open-command-palette');
+                    document.dispatchEvent(event);
                 });
             ");
         }
@@ -204,20 +214,19 @@
         if (AppState.CommandPaletteOpen)
         {
             await Task.Delay(50);
-            try { await _searchInput.FocusAsync(); } catch { }
+            try { await _searchInput.FocusAsync(); } catch (Exception) { /* Element may not be rendered yet */ }
         }
+    }
+
+    [JSInvokable]
+    public void OpenFromJs()
+    {
+        Open();
     }
 
     private void OnStateChanged()
     {
         InvokeAsync(StateHasChanged);
-    }
-
-    [JSInvokable]
-    public static Task OpenCommandPaletteStatic()
-    {
-        // This would need a different approach with a service
-        return Task.CompletedTask;
     }
 
     public void Open()
@@ -280,8 +289,8 @@
             await OnAction.InvokeAsync(item.Title);
         }
 
-        // Show toast
-        ToastContainer.Instance?.ShowSuccess("Action Executed", $"{item.Title} command executed successfully");
+        // Show toast via AppStateService
+        AppState.ShowSuccess("Action Executed", $"{item.Title} command executed successfully");
     }
 
     private string GetItemClass(CommandItem item)
@@ -298,6 +307,7 @@
     public void Dispose()
     {
         AppState.OnChange -= OnStateChanged;
+        _dotNetRef?.Dispose();
     }
 
     private record CommandItem(string Title, string Description, string Category, string? Shortcut, RenderFragment Icon, string? Route = null);
