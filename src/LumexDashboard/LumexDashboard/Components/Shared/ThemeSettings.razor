@@ -125,7 +125,7 @@
     // Allowed values for theme settings validation (prevents XSS through localStorage manipulation)
     private static readonly HashSet<string> ValidThemeModes = new() { "light", "dark" };
     private static readonly HashSet<string> ValidThemeColors = new() { "blue", "purple", "green", "red", "pink", "yellow", "cyan", "zinc", "orange", "teal" };
-    private static readonly HashSet<string> ValidRadiusOptions = new() { "none", "sm", "md", "lg", "full" };
+    private static readonly HashSet<string> ValidRadiusOptions = new() { "none", "sm", "md", "lg" };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

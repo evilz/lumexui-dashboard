@@ -193,22 +193,20 @@
         {
             AppState.OnChange += OnStateChanged;
             _dotNetRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("eval", $@"
-                window.commandPaletteRef = {{}};
-                window.commandPaletteRef.dotNetRef = DotNet.attachReviver(null);
-                document.addEventListener('keydown', (e) => {{
-                    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {{
-                        e.preventDefault();
-                        window.dispatchEvent(new CustomEvent('open-command-palette'));
-                    }}
-                }});
-            ");
             await JS.InvokeVoidAsync("eval", @"
-                window.addEventListener('open-command-palette', () => {
-                    const event = new CustomEvent('blazor-open-command-palette');
-                    document.dispatchEvent(event);
-                });
+                window.registerCommandPaletteRef = (dotNetRef) => {
+                    window.commandPaletteRef = dotNetRef;
+                    document.addEventListener('keydown', (e) => {
+                        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                            e.preventDefault();
+                            if (window.commandPaletteRef) {
+                                window.commandPaletteRef.invokeMethodAsync('OpenFromJs');
+                            }
+                        }
+                    });
+                };
             ");
+            await JS.InvokeVoidAsync("registerCommandPaletteRef", _dotNetRef);
         }
 
         if (AppState.CommandPaletteOpen)
