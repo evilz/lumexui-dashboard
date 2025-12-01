@@ -580,7 +580,6 @@
         public int SubtasksCompleted { get; set; }
         public int SubtasksTotal { get; set; }
         public bool Selected { get; set; }
-        public int Order { get; set; }
 
         public TaskItem(string title, string stage, string priority, DateTime dueDate, 
             List<string> assignees, List<string> tags, int subtasksCompleted, int subtasksTotal)
@@ -594,7 +593,6 @@
             SubtasksCompleted = subtasksCompleted;
             SubtasksTotal = subtasksTotal;
             Selected = false;
-            Order = 0;
         }
     }
     
@@ -633,18 +631,6 @@
         _dragOverIndex = null;
     }
     
-    private void OnDropOnTask(TaskItem targetTask)
-    {
-        if (_draggedTask != null && _draggedTask != targetTask)
-        {
-            // Move to same stage as target and position near it
-            _draggedTask.Stage = targetTask.Stage;
-        }
-        _draggedTask = null;
-        _dragOverStage = null;
-        _dragOverIndex = null;
-    }
-    
     private string GetDropZoneClass(string stageKey)
     {
         var baseClass = "flex-1 space-y-3 p-3 rounded-xl transition-all duration-200";
@@ -675,18 +661,17 @@
     {
         if (_draggedTask != null)
         {
-            var tasks = _allTasks.ToList();
-            var draggedIndex = tasks.IndexOf(_draggedTask);
+            var draggedIndex = _allTasks.IndexOf(_draggedTask);
             
             if (draggedIndex != -1 && draggedIndex != targetIndex)
             {
-                tasks.RemoveAt(draggedIndex);
+                // Remove from current position and insert at target position
+                _allTasks.RemoveAt(draggedIndex);
                 if (targetIndex > draggedIndex)
                 {
                     targetIndex--;
                 }
-                tasks.Insert(targetIndex, _draggedTask);
-                _allTasks = tasks;
+                _allTasks.Insert(targetIndex, _draggedTask);
             }
         }
         _draggedTask = null;
