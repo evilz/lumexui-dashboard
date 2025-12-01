@@ -94,13 +94,13 @@
     private record ThemeColor(string Value, string Label, string Hex);
     private record RadiusOption(string Value, string Label, string Preview);
 
-    private List<ThemeMode> _themeModes = new()
+    private readonly List<ThemeMode> _themeModes = new()
     {
         new("light", "Light", @<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" /></svg>),
         new("dark", "Dark", @<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>)
     };
 
-    private List<ThemeColor> _themeColors = new()
+    private readonly List<ThemeColor> _themeColors = new()
     {
         new("blue", "Blue", "#006FEE"),
         new("purple", "Purple", "#9353D3"),
@@ -114,7 +114,7 @@
         new("teal", "Teal", "#14B8A6")
     };
 
-    private List<RadiusOption> _radiusOptions = new()
+    private readonly List<RadiusOption> _radiusOptions = new()
     {
         new("none", "None", "rounded-none"),
         new("sm", "Small", "rounded-sm"),
@@ -122,19 +122,32 @@
         new("lg", "Large", "rounded-lg")
     };
 
+    // Allowed values for theme settings validation (prevents XSS through localStorage manipulation)
+    private static readonly HashSet<string> ValidThemeModes = new() { "light", "dark" };
+    private static readonly HashSet<string> ValidThemeColors = new() { "blue", "purple", "green", "red", "pink", "yellow", "cyan", "zinc", "orange", "teal" };
+    private static readonly HashSet<string> ValidRadiusOptions = new() { "none", "sm", "md", "lg" };
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _currentMode = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeMode') || 'light'");
-            _currentColor = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeColor') || 'blue'");
-            _currentRadius = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeRadius') || 'md'");
+            var mode = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeMode') || 'light'");
+            var color = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeColor') || 'blue'");
+            var radius = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeRadius') || 'md'");
+            
+            // Validate values against allowlist to prevent XSS
+            _currentMode = ValidThemeModes.Contains(mode) ? mode : "light";
+            _currentColor = ValidThemeColors.Contains(color) ? color : "blue";
+            _currentRadius = ValidRadiusOptions.Contains(radius) ? radius : "md";
             StateHasChanged();
         }
     }
 
     private async Task SetThemeMode(string mode)
     {
+        // Validate input against allowlist
+        if (!ValidThemeModes.Contains(mode)) return;
+        
         _currentMode = mode;
         await JS.InvokeVoidAsync("eval", $@"
             localStorage.setItem('themeMode', '{mode}');
@@ -146,6 +159,9 @@
 
     private async Task SetThemeColor(string color)
     {
+        // Validate input against allowlist
+        if (!ValidThemeColors.Contains(color)) return;
+        
         _currentColor = color;
         var colorData = _themeColors.First(c => c.Value == color);
         await JS.InvokeVoidAsync("eval", $@"
@@ -157,6 +173,9 @@
 
     private async Task SetRadius(string radius)
     {
+        // Validate input against allowlist
+        if (!ValidRadiusOptions.Contains(radius)) return;
+        
         _currentRadius = radius;
         var (small, medium, large) = radius switch
         {

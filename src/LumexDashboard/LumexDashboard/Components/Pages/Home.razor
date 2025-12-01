@@ -1,6 +1,7 @@
 @page "/"
 @using LumexUI
 @using LumexUI.Common
+@inject LumexDashboard.Services.AppStateService AppState
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -529,7 +530,7 @@
     private void SetNewGoal()
     {
         _moveGoal = 400;
-        ToastContainer.Instance?.ShowSuccess("Goal Updated", "Your daily move goal has been set to 400 calories");
+        AppState.ShowSuccess("Goal Updated", "Your daily move goal has been set to 400 calories");
     }
 
     private void DecreaseGoal()
@@ -537,7 +538,7 @@
         if (_moveGoal > 100)
         {
             _moveGoal -= 50;
-            ToastContainer.Instance?.ShowInfo("Goal Decreased", $"Move goal set to {_moveGoal} calories");
+            AppState.ShowInfo("Goal Decreased", $"Move goal set to {_moveGoal} calories");
         }
     }
 
@@ -546,73 +547,73 @@
         if (_moveGoal < _moveGoalMax)
         {
             _moveGoal += 50;
-            ToastContainer.Instance?.ShowInfo("Goal Increased", $"Move goal set to {_moveGoal} calories");
+            AppState.ShowInfo("Goal Increased", $"Move goal set to {_moveGoal} calories");
         }
     }
 
     private void SaveCookiePreferences()
     {
-        ToastContainer.Instance?.ShowSuccess("Preferences Saved", "Your cookie preferences have been updated");
+        AppState.ShowSuccess("Preferences Saved", "Your cookie preferences have been updated");
     }
 
     private void SendMessage()
     {
         if (!string.IsNullOrWhiteSpace(_chatMessage))
         {
-            ToastContainer.Instance?.ShowSuccess("Message Sent", "Your message has been delivered");
+            AppState.ShowSuccess("Message Sent", "Your message has been delivered");
             _chatMessage = "";
         }
         else
         {
-            ToastContainer.Instance?.ShowWarning("Empty Message", "Please type a message before sending");
+            AppState.ShowWarning("Empty Message", "Please type a message before sending");
         }
     }
 
     private void SignInWithGithub()
     {
-        ToastContainer.Instance?.ShowInfo("GitHub Sign In", "Redirecting to GitHub authentication...");
+        AppState.ShowInfo("GitHub Sign In", "Redirecting to GitHub authentication...");
     }
 
     private void SignInWithGoogle()
     {
-        ToastContainer.Instance?.ShowInfo("Google Sign In", "Redirecting to Google authentication...");
+        AppState.ShowInfo("Google Sign In", "Redirecting to Google authentication...");
     }
 
     private void CreateAccount()
     {
-        ToastContainer.Instance?.ShowSuccess("Account Created", "Welcome! Your account has been created successfully");
+        AppState.ShowSuccess("Account Created", "Welcome! Your account has been created successfully");
     }
 
     private void ContinuePayment()
     {
         if (string.IsNullOrEmpty(_cardNumber) || string.IsNullOrEmpty(_cardName))
         {
-            ToastContainer.Instance?.ShowError("Invalid Details", "Please fill in all card details");
+            AppState.ShowError("Invalid Details", "Please fill in all card details");
         }
         else
         {
-            ToastContainer.Instance?.ShowSuccess("Payment Method Added", "Your payment method has been saved");
+            AppState.ShowSuccess("Payment Method Added", "Your payment method has been saved");
         }
     }
 
     private void CopyDocumentLink()
     {
-        ToastContainer.Instance?.ShowSuccess("Link Copied", "Document link copied to clipboard");
+        AppState.ShowSuccess("Link Copied", "Document link copied to clipboard");
     }
 
     private void EditUser(string userName)
     {
-        ToastContainer.Instance?.ShowInfo("Edit User", $"Opening editor for {userName}...");
+        AppState.ShowInfo("Edit User", $"Opening editor for {userName}...");
     }
 
     private void PreviousPage()
     {
-        ToastContainer.Instance?.ShowInfo("Navigation", "Already on first page");
+        AppState.ShowInfo("Navigation", "Already on first page");
     }
 
     private void NextPage()
     {
-        ToastContainer.Instance?.ShowInfo("Navigation", "Loading next page...");
+        AppState.ShowInfo("Navigation", "Loading next page...");
     }
 
     private string GetPaymentMethodClass(string method)
