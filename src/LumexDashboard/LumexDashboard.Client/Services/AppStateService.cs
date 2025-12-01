@@ -1,4 +1,4 @@
-namespace LumexDashboard.Services;
+namespace LumexDashboard.Client.Services;
 
 public class AppStateService
 {
