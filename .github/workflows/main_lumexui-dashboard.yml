@@ -35,6 +35,10 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Install npm dependencies
+        run: npm install
+        working-directory: src/LumexDashboard/LumexDashboard
+
       - name: Build with dotnet
         run: dotnet build src/LumexDashboard/LumexDashboard/LumexDashboard.csproj --configuration Release
 
