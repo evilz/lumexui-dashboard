@@ -77,11 +77,12 @@ jobs:
         with:
           app-name: 'lumexui-dashboard'
           slot-name: 'Production'
-          package: ${{ github.workspace }}/publish/
+          package: .net-app
 
       - name: Configure Azure Web App startup command
         run: |
           az webapp config set --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_WEBAPP_NAME }} --startup-file "dotnet LumexDashboard.dll"
           
+
 
 
