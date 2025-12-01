@@ -48,7 +48,7 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
+          name: webapp-package
           path: ${{ github.workspace }}/publish/
 
   deploy:
@@ -62,7 +62,8 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: webapp-package
+          path: ${{ github.workspace }}/webapp-package
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -77,12 +78,13 @@ jobs:
         with:
           app-name: 'lumexui-dashboard'
           slot-name: 'Production'
-          package: .net-app
+          package: ${{ github.workspace }}/webapp-package 
 
       - name: Configure Azure Web App startup command
         run: |
           az webapp config set --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_WEBAPP_NAME }} --startup-file "dotnet LumexDashboard.dll"
           
+
 
 
 
