@@ -133,90 +133,105 @@
                         </LumexDropdown>
                     </div>
 
-                    <!-- Tasks -->
-                    <div class="flex-1 space-y-3 p-3 bg-default-100/50 rounded-xl">
+                    <!-- Tasks Drop Zone - Handles drag and drop for task cards -->
+                    <div class="@GetDropZoneClass(stage.Key)"
+                         @ondragover="@(() => OnDragOver(stage.Key))"
+                         @ondragover:preventDefault="true"
+                         @ondragleave="OnDragLeave"
+                         @ondrop="@(() => OnDropOnStage(stage.Key))"
+                         @ondrop:preventDefault="true">
                         @foreach (var task in GetTasksForStage(stage.Key))
                         {
-                            <LumexCard Class="rounded-xl cursor-pointer hover:shadow-md transition-shadow" @onclick="@(() => SelectTask(task))">
-                                <LumexCardBody Class="p-4 space-y-3">
-                                    <!-- Task Header -->
-                                    <div class="flex items-start justify-between">
-                                        <h4 class="font-medium text-default-800 text-sm">@task.Title</h4>
-                                        <LumexDropdown>
-                                            <LumexDropdownTrigger>
-                                                <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" @onclick:stopPropagation="true">
-                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                        <circle cx="12" cy="6" r="2"></circle>
-                                                        <circle cx="12" cy="12" r="2"></circle>
-                                                        <circle cx="12" cy="18" r="2"></circle>
-                                                    </svg>
-                                                </LumexButton>
-                                            </LumexDropdownTrigger>
-                                            <LumexDropdownMenu AriaLabel="Task actions">
-                                                <LumexDropdownItem Key="edit">Edit</LumexDropdownItem>
-                                                <LumexDropdownItem Key="rename">Rename</LumexDropdownItem>
-                                                <LumexDropdownItem Key="duplicate">Duplicate</LumexDropdownItem>
-                                                <LumexDropdownItem Key="move">Move to...</LumexDropdownItem>
-                                                <LumexDropdownItem Key="share">Share</LumexDropdownItem>
-                                                <LumexDropdownItem Key="archive">Archive</LumexDropdownItem>
-                                                <LumexDropdownItem Key="delete" Class="text-danger">Delete</LumexDropdownItem>
-                                            </LumexDropdownMenu>
-                                        </LumexDropdown>
-                                    </div>
-
-                                    <!-- Tags -->
-                                    @if (task.Tags.Any())
-                                    {
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach (var tag in task.Tags)
-                                            {
-                                                <span class="text-xs px-2 py-0.5 rounded-full @GetTagClass(tag)">@tag</span>
-                                            }
+                            <div draggable="true"
+                                 role="button"
+                                 tabindex="0"
+                                 aria-label="Drag to move task: @task.Title"
+                                 class="@GetTaskCardClass(task)"
+                                 @ondragstart="@(() => OnDragStart(task))"
+                                 @ondragend="OnDragEnd"
+                                 @onclick="@(() => SelectTask(task))"
+                                 @onkeydown="@((KeyboardEventArgs e) => OnTaskKeyDown(e, task, stage.Key))">
+                                <LumexCard Class="rounded-xl cursor-pointer hover:shadow-md">
+                                    <LumexCardBody Class="p-4 space-y-3">
+                                        <!-- Task Header -->
+                                        <div class="flex items-start justify-between">
+                                            <h4 class="font-medium text-default-800 text-sm">@task.Title</h4>
+                                            <LumexDropdown>
+                                                <LumexDropdownTrigger>
+                                                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" @onclick:stopPropagation="true">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                            <circle cx="12" cy="6" r="2"></circle>
+                                                            <circle cx="12" cy="12" r="2"></circle>
+                                                            <circle cx="12" cy="18" r="2"></circle>
+                                                        </svg>
+                                                    </LumexButton>
+                                                </LumexDropdownTrigger>
+                                                <LumexDropdownMenu AriaLabel="Task actions">
+                                                    <LumexDropdownItem Key="edit">Edit</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="rename">Rename</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="duplicate">Duplicate</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="move">Move to...</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="share">Share</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="archive">Archive</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="delete" Class="text-danger">Delete</LumexDropdownItem>
+                                                </LumexDropdownMenu>
+                                            </LumexDropdown>
                                         </div>
-                                    }
 
-                                    <!-- Task Footer -->
-                                    <div class="flex items-center justify-between pt-2 border-t border-divider">
-                                        <div class="flex items-center gap-2">
-                                            <!-- Priority -->
-                                            <div class="flex items-center gap-1">
-                                                @GetPriorityIcon(task.Priority)
+                                        <!-- Tags -->
+                                        @if (task.Tags.Any())
+                                        {
+                                            <div class="flex flex-wrap gap-1">
+                                                @foreach (var tag in task.Tags)
+                                                {
+                                                    <span class="text-xs px-2 py-0.5 rounded-full @GetTagClass(tag)">@tag</span>
+                                                }
                                             </div>
-                                            <!-- Due Date -->
-                                            <span class="text-xs text-default-500 flex items-center gap-1">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                                @task.DueDate.ToString("MMM d")
-                                            </span>
-                                        </div>
-                                        <!-- Assignees -->
-                                        <div class="flex -space-x-2">
-                                            @foreach (var assignee in task.Assignees.Take(3))
-                                            {
-                                                <LumexAvatar Name="@assignee" Size="Size.Small" Class="ring-2 ring-background w-6 h-6" />
-                                            }
-                                            @if (task.Assignees.Count > 3)
-                                            {
-                                                <div class="w-6 h-6 rounded-full bg-default-300 flex items-center justify-center text-[10px] font-medium ring-2 ring-background">
-                                                    +@(task.Assignees.Count - 3)
+                                        }
+
+                                        <!-- Task Footer -->
+                                        <div class="flex items-center justify-between pt-2 border-t border-divider">
+                                            <div class="flex items-center gap-2">
+                                                <!-- Priority -->
+                                                <div class="flex items-center gap-1">
+                                                    @GetPriorityIcon(task.Priority)
                                                 </div>
-                                            }
-                                        </div>
-                                    </div>
-
-                                    <!-- Subtasks Progress -->
-                                    @if (task.SubtasksTotal > 0)
-                                    {
-                                        <div class="flex items-center gap-2">
-                                            <div class="flex-1 h-1.5 bg-default-200 rounded-full overflow-hidden">
-                                                <div class="h-full bg-success rounded-full" style="width: @(task.SubtasksCompleted * 100 / task.SubtasksTotal)%"></div>
+                                                <!-- Due Date -->
+                                                <span class="text-xs text-default-500 flex items-center gap-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    @task.DueDate.ToString("MMM d")
+                                                </span>
                                             </div>
-                                            <span class="text-xs text-default-400">@task.SubtasksCompleted/@task.SubtasksTotal</span>
+                                            <!-- Assignees -->
+                                            <div class="flex -space-x-2">
+                                                @foreach (var assignee in task.Assignees.Take(3))
+                                                {
+                                                    <LumexAvatar Name="@assignee" Size="Size.Small" Class="ring-2 ring-background w-6 h-6" />
+                                                }
+                                                @if (task.Assignees.Count > 3)
+                                                {
+                                                    <div class="w-6 h-6 rounded-full bg-default-300 flex items-center justify-center text-[10px] font-medium ring-2 ring-background">
+                                                        +@(task.Assignees.Count - 3)
+                                                    </div>
+                                                }
+                                            </div>
                                         </div>
-                                    }
-                                </LumexCardBody>
-                            </LumexCard>
+
+                                        <!-- Subtasks Progress -->
+                                        @if (task.SubtasksTotal > 0)
+                                        {
+                                            <div class="flex items-center gap-2">
+                                                <div class="flex-1 h-1.5 bg-default-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-success rounded-full" style="width: @(task.SubtasksCompleted * 100 / task.SubtasksTotal)%"></div>
+                                                </div>
+                                                <span class="text-xs text-default-400">@task.SubtasksCompleted/@task.SubtasksTotal</span>
+                                            </div>
+                                        }
+                                    </LumexCardBody>
+                                </LumexCard>
+                            </div>
                         }
 
                         <!-- Add Task Button -->
@@ -239,6 +254,7 @@
                 <table class="w-full">
                     <thead class="bg-default-100">
                         <tr>
+                            <th class="px-2 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider w-10" aria-label="Drag handle"></th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider w-8">
                                 <LumexCheckbox @bind-Value="_selectAllTasks" />
                             </th>
@@ -251,9 +267,34 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-divider">
-                        @foreach (var task in _allTasks)
+                        @for (var i = 0; i < _allTasks.Count; i++)
                         {
-                            <tr class="hover:bg-default-50 transition-colors">
+                            var index = i;
+                            var task = _allTasks[index];
+                            <tr class="@GetListRowClass(index)"
+                                draggable="true"
+                                role="button"
+                                aria-label="Drag to reorder task: @task.Title"
+                                @ondragstart="@(() => OnDragStart(task))"
+                                @ondragend="OnDragEnd"
+                                @ondragover="@(() => OnListDragOver(index))"
+                                @ondragover:preventDefault="true"
+                                @ondrop="@(() => OnDropOnListRow(index))"
+                                @ondrop:preventDefault="true"
+                                @onkeydown="@((KeyboardEventArgs e) => OnListRowKeyDown(e, index))">
+                                <td class="px-2 py-3 cursor-grab active:cursor-grabbing"
+                                    role="button"
+                                    tabindex="0"
+                                    aria-label="Drag handle to reorder task">
+                                    <svg class="w-5 h-5 text-default-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="9" cy="6" r="1.5"></circle>
+                                        <circle cx="15" cy="6" r="1.5"></circle>
+                                        <circle cx="9" cy="12" r="1.5"></circle>
+                                        <circle cx="15" cy="12" r="1.5"></circle>
+                                        <circle cx="9" cy="18" r="1.5"></circle>
+                                        <circle cx="15" cy="18" r="1.5"></circle>
+                                    </svg>
+                                </td>
                                 <td class="px-4 py-3">
                                     <LumexCheckbox @bind-Value="task.Selected" />
                                 </td>
@@ -421,6 +462,11 @@
     private IReadOnlyList<string> _priorityFilter = Array.Empty<string>();
     private IReadOnlyList<string> _assigneeFilter = Array.Empty<string>();
     private TaskItem? _selectedTask = null;
+    
+    // Drag and drop state
+    private TaskItem? _draggedTask = null;
+    private string? _dragOverStage = null;
+    private int? _dragOverIndex = null;
 
     private InputFieldSlots _searchClasses = new()
     {
@@ -557,6 +603,159 @@
             SubtasksCompleted = subtasksCompleted;
             SubtasksTotal = subtasksTotal;
             Selected = false;
+        }
+    }
+    
+    // Drag and drop handlers for Board view
+    private void OnDragStart(TaskItem task)
+    {
+        _draggedTask = task;
+    }
+    
+    private void OnDragEnd()
+    {
+        _draggedTask = null;
+        _dragOverStage = null;
+        _dragOverIndex = null;
+    }
+    
+    private void OnDragOver(string stageKey)
+    {
+        _dragOverStage = stageKey;
+    }
+    
+    private void OnDragLeave()
+    {
+        _dragOverStage = null;
+        _dragOverIndex = null;
+    }
+    
+    private void OnDropOnStage(string stageKey)
+    {
+        if (_draggedTask != null && _draggedTask.Stage != stageKey)
+        {
+            _draggedTask.Stage = stageKey;
+            StateHasChanged();
+        }
+        _draggedTask = null;
+        _dragOverStage = null;
+        _dragOverIndex = null;
+    }
+    
+    private string GetDropZoneClass(string stageKey)
+    {
+        var baseClass = "flex-1 space-y-3 p-3 rounded-xl transition-all duration-200";
+        if (_dragOverStage == stageKey && _draggedTask?.Stage != stageKey)
+        {
+            return $"{baseClass} bg-primary-100 border-2 border-dashed border-primary";
+        }
+        return $"{baseClass} bg-default-100/50";
+    }
+    
+    private string GetTaskCardClass(TaskItem task)
+    {
+        var baseClass = "rounded-xl cursor-grab active:cursor-grabbing transition-all duration-200";
+        if (_draggedTask == task)
+        {
+            return $"{baseClass} opacity-50 scale-95";
+        }
+        return baseClass;
+    }
+    
+    // Drag and drop handlers for List view
+    private void OnListDragOver(int index)
+    {
+        _dragOverIndex = index;
+    }
+    
+    private void OnDropOnListRow(int targetIndex)
+    {
+        if (_draggedTask != null)
+        {
+            var draggedIndex = _allTasks.IndexOf(_draggedTask);
+            
+            if (draggedIndex != -1 && draggedIndex != targetIndex)
+            {
+                _allTasks.RemoveAt(draggedIndex);
+                // Adjust target index if we removed an item before it
+                if (targetIndex > draggedIndex)
+                {
+                    targetIndex--;
+                }
+                _allTasks.Insert(targetIndex, _draggedTask);
+            }
+        }
+        _draggedTask = null;
+        _dragOverIndex = null;
+        StateHasChanged();
+    }
+    
+    private string GetListRowClass(int index)
+    {
+        var baseClass = "transition-all duration-200";
+        if (_dragOverIndex == index
+            && index >= 0
+            && index < _allTasks.Count
+            && _allTasks[index] != _draggedTask)
+        {
+            return $"{baseClass} bg-primary-50 border-t-2 border-primary";
+        }
+        if (_draggedTask != null && _allTasks.IndexOf(_draggedTask) == index)
+        {
+            return $"{baseClass} opacity-50";
+        }
+        return $"{baseClass} hover:bg-default-50";
+    }
+    
+    // Keyboard navigation handlers for accessibility
+    private void OnTaskKeyDown(KeyboardEventArgs e, TaskItem task, string currentStage)
+    {
+        var stageIndex = _stages.FindIndex(s => s.Key == currentStage);
+        if (stageIndex == -1) return;
+        
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+                if (stageIndex > 0)
+                {
+                    task.Stage = _stages[stageIndex - 1].Key;
+                    StateHasChanged();
+                }
+                break;
+            case "ArrowRight":
+                if (stageIndex < _stages.Count - 1)
+                {
+                    task.Stage = _stages[stageIndex + 1].Key;
+                    StateHasChanged();
+                }
+                break;
+        }
+    }
+    
+    private void OnListRowKeyDown(KeyboardEventArgs e, int currentIndex)
+    {
+        if (_allTasks.Count == 0) return;
+        
+        switch (e.Key)
+        {
+            case "ArrowUp":
+                if (currentIndex > 0)
+                {
+                    var task = _allTasks[currentIndex];
+                    _allTasks.RemoveAt(currentIndex);
+                    _allTasks.Insert(currentIndex - 1, task);
+                    StateHasChanged();
+                }
+                break;
+            case "ArrowDown":
+                if (currentIndex < _allTasks.Count - 1)
+                {
+                    var task = _allTasks[currentIndex];
+                    _allTasks.RemoveAt(currentIndex);
+                    _allTasks.Insert(currentIndex + 1, task);
+                    StateHasChanged();
+                }
+                break;
         }
     }
 }
