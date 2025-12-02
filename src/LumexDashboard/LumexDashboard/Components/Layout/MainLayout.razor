@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject IJSRuntime JS
 @inject AppStateService AppState
+@inject ToastService Toast
 
 <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
@@ -41,10 +42,7 @@
     </aside>
 
     <!-- Overlay for mobile -->
-    @if (_sidebarOpen)
-    {
-        <div class="fixed inset-0 bg-black/50 z-20 lg:hidden" @onclick="ToggleSidebar"></div>
-    }
+    <MobileOverlay Visible="_sidebarOpen" OnClick="ToggleSidebar" ZIndex="20" />
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -53,30 +51,36 @@
             <!-- Left Section: Menu toggle, Sidebar collapse, Search -->
             <div class="flex items-center gap-3 flex-1">
                 <!-- Mobile Menu Toggle -->
-                <button class="lg:hidden p-2 rounded-lg hover:bg-default-100 transition-colors" @onclick="ToggleSidebar">
-                    <svg class="w-6 h-6 text-default-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
+                <MobileTablet Display="block">
+                    <button class="p-2 rounded-lg hover:bg-default-100 transition-colors" @onclick="ToggleSidebar">
+                        <svg class="w-6 h-6 text-default-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </MobileTablet>
                 
                 <!-- Desktop Sidebar Collapse Toggle -->
-                <button class="hidden lg:flex p-2 rounded-lg hover:bg-default-100 transition-colors" @onclick="ToggleSidebarCollapse" title="@(_sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar")">
-                    <svg class="w-5 h-5 text-default-600 transition-transform duration-200 @(_sidebarCollapsed ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
-                    </svg>
-                </button>
+                <DesktopOnly Display="flex">
+                    <button class="p-2 rounded-lg hover:bg-default-100 transition-colors" @onclick="ToggleSidebarCollapse" title="@(_sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar")">
+                        <svg class="w-5 h-5 text-default-600 transition-transform duration-200 @(_sidebarCollapsed ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                </DesktopOnly>
                 
                 <!-- Command Palette Trigger - Larger width -->
-                <button class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-default-100 hover:bg-default-200 transition-colors text-sm text-default-500 w-64 md:w-80 lg:w-96" 
-                        @onclick="OpenCommandPalette">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <span class="flex-1 text-left">Search...</span>
-                    <kbd class="hidden md:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-default-200 text-xs">
-                        <span>⌘</span>K
-                    </kbd>
-                </button>
+                <SmallUp Display="flex">
+                    <button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-default-100 hover:bg-default-200 transition-colors text-sm text-default-500 w-64 md:w-80 lg:w-96"
+                            @onclick="OpenCommandPalette">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <span class="flex-1 text-left">Search...</span>
+                        <kbd class="hidden md:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-default-200 text-xs">
+                            <span>⌘</span>K
+                        </kbd>
+                    </button>
+                </SmallUp>
             </div>
 
             <!-- Right Section: Notifications, Theme Toggle, Settings -->
@@ -94,8 +98,8 @@
     </div>
 </div>
 
-<!-- Toast Container -->
-<ToastContainer />
+<!-- Toaster -->
+<Toaster Position="ToastPosition.BottomRight" RichColors="true" CloseButton="true" />
 
 <!-- Command Palette -->
 <CommandPalette @ref="_commandPalette" />
@@ -144,19 +148,20 @@
     // Public method to show toasts from anywhere
     public void ShowToast(string title, string message, string type = "info")
     {
+        var data = new ToastModel { Description = message };
         switch (type.ToLower())
         {
             case "success":
-                AppState.ShowSuccess(title, message);
+                Toast.Success(title, data);
                 break;
             case "error":
-                AppState.ShowError(title, message);
+                Toast.Error(title, data);
                 break;
             case "warning":
-                AppState.ShowWarning(title, message);
+                Toast.Warning(title, data);
                 break;
             default:
-                AppState.ShowInfo(title, message);
+                Toast.Info(title, data);
                 break;
         }
     }

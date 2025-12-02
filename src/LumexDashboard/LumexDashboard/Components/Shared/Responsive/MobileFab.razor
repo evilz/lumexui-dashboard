@@ -1,0 +1,79 @@
+@* 
+    A floating action button (FAB) for mobile that opens a sidebar or panel.
+    Typically positioned at the bottom corner, visible only on mobile/tablet.
+    
+    Usage:
+    <MobileFab Icon="menu" OnClick="ToggleSidebar" />
+    
+    <MobileFab OnClick="ToggleSidebar" Position="right">
+        <svg>...</svg>
+    </MobileFab>
+*@
+
+<div class="@GetClasses()">
+    <button class="w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
+            @onclick="OnClick">
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <!-- Default menu icon -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        }
+    </button>
+</div>
+
+@code {
+    /// <summary>
+    /// Custom icon content. If not provided, a default menu icon is shown.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    /// <summary>
+    /// Callback when the FAB is clicked.
+    /// </summary>
+    [Parameter] public EventCallback OnClick { get; set; }
+    
+    /// <summary>
+    /// Horizontal position of the FAB. Defaults to "left".
+    /// Options: left, right
+    /// </summary>
+    [Parameter] public string Position { get; set; } = "left";
+    
+    /// <summary>
+    /// The breakpoint at which to hide the FAB. Defaults to "lg".
+    /// Options: sm, md, lg, xl, 2xl
+    /// </summary>
+    [Parameter] public string HideAt { get; set; } = "lg";
+    
+    /// <summary>
+    /// Z-index value. Defaults to 50.
+    /// </summary>
+    [Parameter] public int ZIndex { get; set; } = 50;
+    
+    /// <summary>
+    /// Additional CSS classes to apply.
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+
+    private string GetClasses()
+    {
+        var hideClass = HideAt switch
+        {
+            "sm" => "sm:hidden",
+            "md" => "md:hidden",
+            "xl" => "xl:hidden",
+            "2xl" => "2xl:hidden",
+            _ => "lg:hidden"
+        };
+        
+        var positionClass = Position == "right" ? "right-4" : "left-4";
+        var baseClasses = $"fixed bottom-4 {positionClass} z-{ZIndex} {hideClass}";
+        
+        return string.IsNullOrEmpty(Class) ? baseClasses : $"{baseClasses} {Class}";
+    }
+}

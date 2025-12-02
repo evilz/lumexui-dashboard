@@ -1,3 +1,4 @@
+using Blazor.Sonner.Extensions;
 using LumexDashboard.Client.Pages;
 using LumexDashboard.Client.Services;
 using LumexDashboard.Components;
@@ -12,6 +13,9 @@ builder.Services.AddRazorComponents()
 
 // Add LumexUI services
 builder.Services.AddLumexServices();
+
+// Add Blazor Sonner toast service
+builder.Services.AddSonner();
 
 // Add app state service
 builder.Services.AddScoped<AppStateService>();

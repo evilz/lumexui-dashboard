@@ -6,28 +6,25 @@
 
 <div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-divider overflow-hidden bg-default-50">
     <!-- Mobile Navigation Toggle -->
-    <button class="lg:hidden fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center" @onclick="() => _showMobileSidebar = !_showMobileSidebar">
+    <MobileFab OnClick="@(() => _showMobileSidebar = !_showMobileSidebar)">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
         </svg>
-    </button>
+    </MobileFab>
 
     <!-- Mobile Overlay -->
-    @if (_showMobileSidebar)
-    {
-        <div class="lg:hidden fixed inset-0 bg-black/50 z-40" @onclick="() => _showMobileSidebar = false"></div>
-    }
+    <MobileOverlay Visible="_showMobileSidebar" OnClick="@(() => _showMobileSidebar = false)" />
 
     <!-- Sidebar -->
     <aside class="@GetSidebarClass()">
         <!-- Close button for mobile -->
-        <div class="lg:hidden flex justify-end p-2">
+        <MobileTablet Display="flex" Class="justify-end p-2">
             <button class="p-2 rounded-lg hover:bg-default-100" @onclick="() => _showMobileSidebar = false">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
-        </div>
+        </MobileTablet>
         <!-- Account Selector -->
         <div class="p-2 border-b border-divider">
             <LumexDropdown>
@@ -110,22 +107,25 @@
     <!-- Email List -->
     <div class="@GetEmailListClass()">
         <!-- Back button for mobile when email is selected -->
-        <div class="md:hidden p-2 border-b border-divider @(_showMobileEmailList ? "hidden" : "")">
-            <button class="flex items-center gap-2 text-sm text-default-600" @onclick="() => _showMobileEmailList = true">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Back to list
-            </button>
-        </div>
+        @if (!_showMobileEmailList)
+        {
+            <MobileOnly Class="p-2 border-b border-divider">
+                <button class="flex items-center gap-2 text-sm text-default-600" @onclick="() => _showMobileEmailList = true">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to list
+                </button>
+            </MobileOnly>
+        }
 
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-divider">
             <h1 class="text-xl font-bold text-foreground">@GetFolderTitle()</h1>
-            <div class="hidden sm:flex gap-1 bg-default-100 rounded-lg p-1">
+            <SmallUp Display="flex" Class="gap-1 bg-default-100 rounded-lg p-1">
                 <button class="@GetTabClass("all")" @onclick="@(() => _selectedTab = "all")">All mail</button>
                 <button class="@GetTabClass("unread")" @onclick="@(() => _selectedTab = "unread")">Unread</button>
-            </div>
+            </SmallUp>
         </div>
 
         <!-- Search -->

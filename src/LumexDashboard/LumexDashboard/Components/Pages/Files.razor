@@ -4,17 +4,14 @@
 
 <div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-divider overflow-hidden bg-default-50">
     <!-- Mobile Sidebar Toggle -->
-    <button class="lg:hidden fixed bottom-4 left-4 z-50 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center" @onclick="() => _sidebarOpen = !_sidebarOpen">
+    <MobileFab OnClick="@(() => _sidebarOpen = !_sidebarOpen)">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
         </svg>
-    </button>
+    </MobileFab>
 
     <!-- Mobile Overlay -->
-    @if (_sidebarOpen)
-    {
-        <div class="lg:hidden fixed inset-0 bg-black/50 z-40" @onclick="() => _sidebarOpen = false"></div>
-    }
+    <MobileOverlay Visible="_sidebarOpen" OnClick="@(() => _sidebarOpen = false)" />
 
     <!-- Left Sidebar -->
     <aside class="@GetSidebarPanelClass()">

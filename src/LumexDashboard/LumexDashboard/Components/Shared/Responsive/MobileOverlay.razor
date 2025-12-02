@@ -1,0 +1,57 @@
+@* 
+    A mobile overlay/backdrop component typically used behind mobile modals/sidebars.
+    Renders a semi-transparent backdrop that is only visible on mobile/tablet.
+    
+    Usage:
+    <MobileOverlay OnClick="CloseSidebar" />
+    
+    <MobileOverlay OnClick="CloseSidebar" ZIndex="50" />
+*@
+
+@if (Visible)
+{
+    <div class="@GetClasses()" @onclick="OnClick"></div>
+}
+
+@code {
+    /// <summary>
+    /// Whether the overlay is visible.
+    /// </summary>
+    [Parameter] public bool Visible { get; set; } = true;
+    
+    /// <summary>
+    /// Callback when overlay is clicked (typically to close the associated modal/sidebar).
+    /// </summary>
+    [Parameter] public EventCallback OnClick { get; set; }
+    
+    /// <summary>
+    /// The breakpoint at which to hide the overlay. Defaults to "lg".
+    /// Options: sm, md, lg, xl, 2xl
+    /// </summary>
+    [Parameter] public string HideAt { get; set; } = "lg";
+    
+    /// <summary>
+    /// Z-index value. Defaults to 40.
+    /// </summary>
+    [Parameter] public int ZIndex { get; set; } = 40;
+    
+    /// <summary>
+    /// Additional CSS classes to apply.
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+
+    private string GetClasses()
+    {
+        var hideClass = HideAt switch
+        {
+            "sm" => "sm:hidden",
+            "md" => "md:hidden",
+            "xl" => "xl:hidden",
+            "2xl" => "2xl:hidden",
+            _ => "lg:hidden"
+        };
+        
+        var baseClasses = $"fixed inset-0 bg-black/50 z-{ZIndex} {hideClass}";
+        return string.IsNullOrEmpty(Class) ? baseClasses : $"{baseClasses} {Class}";
+    }
+}

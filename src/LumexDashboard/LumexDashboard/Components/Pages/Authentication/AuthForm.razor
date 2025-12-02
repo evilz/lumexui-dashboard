@@ -1,0 +1,85 @@
+@inject IJSRuntime JS
+
+<div class="grid gap-6">
+    <!-- Email Form -->
+    <div class="grid gap-4">
+        <div class="grid gap-2">
+            <LumexTextbox @bind-Value="_email" 
+                          Placeholder="name@example.com" 
+                          Type="InputType.Email"
+                          Disabled="IsLoading"
+                          Class="w-full" />
+        </div>
+        <LumexButton Color="ThemeColor.Primary" 
+                     Class="w-full" 
+                     Disabled="IsLoading"
+                     OnClick="HandleEmailSignIn">
+            @if (IsLoading)
+            {
+                <LumexSpinner Size="Size.Small" Color="ThemeColor.Default" Class="mr-2" />
+            }
+            Sign In with Email
+        </LumexButton>
+    </div>
+
+    <!-- Divider -->
+    <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+            <LumexDivider />
+        </div>
+        <div class="relative flex justify-center text-xs uppercase">
+            <span class="bg-background px-2 text-default-500">Or continue with</span>
+        </div>
+    </div>
+
+    <!-- Social Login Buttons -->
+    <SocialLoginButtons IsLoading="IsLoading" 
+                        OnGitHubClick="HandleGitHubSignIn" 
+                        OnGoogleClick="HandleGoogleSignIn" />
+
+    <!-- Terms -->
+    <AuthTerms />
+</div>
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public EventCallback<bool> IsLoadingChanged { get; set; }
+
+    private string _email = string.Empty;
+
+    private async Task SetLoading(bool value)
+    {
+        IsLoading = value;
+        await IsLoadingChanged.InvokeAsync(value);
+    }
+
+    private async Task HandleEmailSignIn()
+    {
+        await SetLoading(true);
+        
+        // Simulate API call
+        await Task.Delay(2000);
+        
+        await SetLoading(false);
+    }
+
+    private async Task HandleGitHubSignIn()
+    {
+        await SetLoading(true);
+        
+        // Simulate API call
+        await Task.Delay(1000);
+        
+        await SetLoading(false);
+    }
+
+    private async Task HandleGoogleSignIn()
+    {
+        await SetLoading(true);
+        
+        // Simulate API call
+        await Task.Delay(1000);
+        
+        await SetLoading(false);
+    }
+}

@@ -1,6 +1,7 @@
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 @inject AppStateService AppState
+@inject ToastService Toast
 @implements IDisposable
 
 <!-- Command Palette Modal -->
@@ -287,8 +288,8 @@
             await OnAction.InvokeAsync(item.Title);
         }
 
-        // Show toast via AppStateService
-        AppState.ShowSuccess("Action Executed", $"{item.Title} command executed successfully");
+        // Show toast via Blazor.Sonner
+        Toast.Success($"{item.Title}", new ToastModel { Description = "Command executed successfully" });
     }
 
     private string GetItemClass(CommandItem item)

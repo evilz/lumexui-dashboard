@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @import "tailwindcss";
 @import "../../LumexDashboard.Client/bin/lumexui/theme.css";
 
@@ -19,3 +22,8 @@ html, body {
 .blazor-error-boundary::after {
     content: "An error has occurred."
 }
+
+/*!* Custom class using @apply *!*/
+/*.btn-primary {*/
+/*    @apply px-4 py-2 rounded-md font-semibold bg-blue-600 text-white hover:bg-blue-700;*/
+/*}*/

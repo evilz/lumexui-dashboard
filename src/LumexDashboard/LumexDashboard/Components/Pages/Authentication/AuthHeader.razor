@@ -1,0 +1,17 @@
+<div class="flex flex-col space-y-2 text-center">
+    @if (ShowLogo)
+    {
+        <div class="flex items-center justify-center gap-2 mb-4">
+            <AuthLogo />
+            <span class="text-lg font-medium">Acme Inc</span>
+        </div>
+    }
+    <h1 class="text-2xl font-semibold tracking-tight">@Title</h1>
+    <p class="text-sm text-default-500">@Subtitle</p>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Create an account";
+    [Parameter] public string Subtitle { get; set; } = "Enter your email below to create your account";
+    [Parameter] public bool ShowLogo { get; set; } = false;
+}

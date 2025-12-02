@@ -1,0 +1,50 @@
+@* 
+    Renders content only on mobile screens (below md breakpoint - 768px).
+    Uses Tailwind's mobile-first approach: content is visible by default, hidden on md and up.
+    
+    Usage:
+    <MobileOnly>
+        <p>This is only visible on mobile</p>
+    </MobileOnly>
+    
+    <MobileOnly Class="p-4 bg-primary">
+        <p>With additional classes</p>
+    </MobileOnly>
+*@
+
+<div class="@GetClasses()">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// The content to render on mobile screens only.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    /// <summary>
+    /// Additional CSS classes to apply to the container.
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+    
+    /// <summary>
+    /// Display type to use when visible. Defaults to "block".
+    /// Options: block, flex, grid, inline, inline-block, inline-flex
+    /// </summary>
+    [Parameter] public string Display { get; set; } = "block";
+
+    private string GetClasses()
+    {
+        var displayClass = Display switch
+        {
+            "flex" => "flex md:hidden",
+            "grid" => "grid md:hidden",
+            "inline" => "inline md:hidden",
+            "inline-block" => "inline-block md:hidden",
+            "inline-flex" => "inline-flex md:hidden",
+            _ => "block md:hidden"
+        };
+        
+        return string.IsNullOrEmpty(Class) ? displayClass : $"{displayClass} {Class}";
+    }
+}
