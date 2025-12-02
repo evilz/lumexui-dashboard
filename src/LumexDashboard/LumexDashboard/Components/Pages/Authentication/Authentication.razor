@@ -1,0 +1,40 @@
+@page "/authentication"
+@layout LumexDashboard.Components.Layout.EmptyLayout
+
+<PageTitle>Authentication</PageTitle>
+
+<section class="h-screen overflow-hidden bg-background">
+    
+    <!-- Mobile View -->
+    <MobileOnly Display="flex" Class="flex-col items-center justify-center min-h-screen p-6">
+        <div class="w-full max-w-sm space-y-6">
+            <AuthHeader ShowLogo="true" />
+            <AuthForm IsLoading="_isLoading" IsLoadingChanged="@(val => _isLoading = val)" />
+        </div>
+    </MobileOnly>
+
+    <!-- Desktop View -->
+    <TabletUp Display="grid" Class="h-full lg:grid-cols-2">
+        <!-- Left Panel - Branding -->
+        <AuthBrandingPanel />
+
+        <!-- Right Panel - Auth Form -->
+        <div class="relative flex flex-col items-center justify-center p-8">
+            <!-- Login Link -->
+            <div class="absolute right-4 top-4 md:right-8 md:top-8">
+                <LumexButton Variant="Variant.Light" href="/authentication">
+                    Login
+                </LumexButton>
+            </div>
+
+            <div class="w-full max-w-sm space-y-6">
+                <AuthHeader />
+                <AuthForm IsLoading="_isLoading" IsLoadingChanged="@(val => _isLoading = val)" />
+            </div>
+        </div>
+    </TabletUp>
+</section>
+
+@code {
+    private bool _isLoading = false;
+}

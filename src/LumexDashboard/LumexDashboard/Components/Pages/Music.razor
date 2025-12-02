@@ -6,7 +6,7 @@
 
 <div class="flex flex-col h-full -m-4 lg:-m-6">
     <!-- Menu Bar (hidden on mobile) -->
-    <div class="hidden md:flex items-center gap-1 px-4 py-2 border-b border-divider bg-default-50">
+    <TabletUp Display="flex" Class="items-center gap-1 px-4 py-2 border-b border-divider bg-default-50">
         <LumexDropdown>
             <LumexDropdownTrigger>
                 <LumexButton Variant="Variant.Light" Size="Size.Small" Class="font-semibold">Music</LumexButton>
@@ -71,22 +71,19 @@
                 <LumexDropdownItem>Add Account...</LumexDropdownItem>
             </LumexDropdownMenu>
         </LumexDropdown>
-    </div>
+    </TabletUp>
 
     <!-- Main Content Area -->
     <div class="flex flex-1 overflow-hidden">
         <!-- Mobile Sidebar Toggle -->
-        <button class="md:hidden fixed bottom-24 left-4 z-50 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center" @onclick="() => _sidebarOpen = !_sidebarOpen">
+        <MobileFab HideAt="md" OnClick="@(() => _sidebarOpen = !_sidebarOpen)" Class="bottom-24">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
-        </button>
+        </MobileFab>
 
         <!-- Mobile Sidebar Overlay -->
-        @if (_sidebarOpen)
-        {
-            <div class="md:hidden fixed inset-0 bg-black/50 z-40" @onclick="() => _sidebarOpen = false"></div>
-        }
+        <MobileOverlay Visible="_sidebarOpen" HideAt="md" OnClick="@(() => _sidebarOpen = false)" />
 
         <!-- Sidebar -->
         <aside class="@GetSidebarClass()">
@@ -334,7 +331,7 @@
         </div>
 
         <!-- Volume -->
-        <div class="hidden sm:flex items-center gap-2 w-1/4 justify-end">
+        <SmallUp Display="flex" Class="items-center gap-2 w-1/4 justify-end">
             <LumexButton Variant="Variant.Light" Size="Size.Small">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
@@ -358,7 +355,7 @@
             <div class="w-24 h-1 bg-default-200 rounded-full overflow-hidden">
                 <div class="h-full bg-default-500 rounded-full" style="width: @(_isMuted ? 0 : _volume)%"></div>
             </div>
-        </div>
+        </SmallUp>
     </div>
 </div>
 

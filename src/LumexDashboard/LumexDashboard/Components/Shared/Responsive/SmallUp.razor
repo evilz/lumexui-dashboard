@@ -1,0 +1,45 @@
+@* 
+    Renders content only on small screens (sm breakpoint and up - 640px+).
+    Uses Tailwind's mobile-first approach: content is hidden by default, shown on sm and up.
+    
+    Usage:
+    <SmallUp>
+        <p>This is visible on sm screens and up (640px+)</p>
+    </SmallUp>
+*@
+
+<div class="@GetClasses()">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// The content to render on small screens and up.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    /// <summary>
+    /// Additional CSS classes to apply to the container.
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+    
+    /// <summary>
+    /// Display type to use when visible. Defaults to "block".
+    /// </summary>
+    [Parameter] public string Display { get; set; } = "block";
+
+    private string GetClasses()
+    {
+        var displayClass = Display switch
+        {
+            "flex" => "hidden sm:flex",
+            "grid" => "hidden sm:grid",
+            "inline" => "hidden sm:inline",
+            "inline-block" => "hidden sm:inline-block",
+            "inline-flex" => "hidden sm:inline-flex",
+            _ => "hidden sm:block"
+        };
+        
+        return string.IsNullOrEmpty(Class) ? displayClass : $"{displayClass} {Class}";
+    }
+}

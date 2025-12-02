@@ -1,0 +1,50 @@
+@* 
+    Renders content only on desktop screens (lg breakpoint and up - 1024px+).
+    Uses Tailwind's mobile-first approach: content is hidden by default, shown on lg and up.
+    
+    Usage:
+    <DesktopOnly>
+        <p>This is only visible on desktop</p>
+    </DesktopOnly>
+    
+    <DesktopOnly Class="space-y-4" Display="flex">
+        <p>With flex display and additional classes</p>
+    </DesktopOnly>
+*@
+
+<div class="@GetClasses()">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// The content to render on desktop screens only.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    /// <summary>
+    /// Additional CSS classes to apply to the container.
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+    
+    /// <summary>
+    /// Display type to use when visible. Defaults to "block".
+    /// Options: block, flex, grid, inline, inline-block, inline-flex
+    /// </summary>
+    [Parameter] public string Display { get; set; } = "block";
+
+    private string GetClasses()
+    {
+        var displayClass = Display switch
+        {
+            "flex" => "hidden lg:flex",
+            "grid" => "hidden lg:grid",
+            "inline" => "hidden lg:inline",
+            "inline-block" => "hidden lg:inline-block",
+            "inline-flex" => "hidden lg:inline-flex",
+            _ => "hidden lg:block"
+        };
+        
+        return string.IsNullOrEmpty(Class) ? displayClass : $"{displayClass} {Class}";
+    }
+}

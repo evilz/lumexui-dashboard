@@ -2,6 +2,7 @@
 @using LumexUI
 @using LumexUI.Common
 @inject AppStateService AppState
+@inject ToastService Toast
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -530,7 +531,7 @@
     private void SetNewGoal()
     {
         _moveGoal = 400;
-        AppState.ShowSuccess("Goal Updated", "Your daily move goal has been set to 400 calories");
+        Toast.Success("Goal Updated", new ToastModel { Description = "Your daily move goal has been set to 400 calories" });
     }
 
     private void DecreaseGoal()
@@ -538,7 +539,7 @@
         if (_moveGoal > 100)
         {
             _moveGoal -= 50;
-            AppState.ShowInfo("Goal Decreased", $"Move goal set to {_moveGoal} calories");
+            Toast.Info("Goal Decreased", new ToastModel { Description = $"Move goal set to {_moveGoal} calories" });
         }
     }
 
@@ -547,73 +548,73 @@
         if (_moveGoal < _moveGoalMax)
         {
             _moveGoal += 50;
-            AppState.ShowInfo("Goal Increased", $"Move goal set to {_moveGoal} calories");
+            Toast.Info("Goal Increased", new ToastModel { Description = $"Move goal set to {_moveGoal} calories" });
         }
     }
 
     private void SaveCookiePreferences()
     {
-        AppState.ShowSuccess("Preferences Saved", "Your cookie preferences have been updated");
+        Toast.Success("Preferences Saved", new ToastModel { Description = "Your cookie preferences have been updated" });
     }
 
     private void SendMessage()
     {
         if (!string.IsNullOrWhiteSpace(_chatMessage))
         {
-            AppState.ShowSuccess("Message Sent", "Your message has been delivered");
+            Toast.Success("Message Sent", new ToastModel { Description = "Your message has been delivered" });
             _chatMessage = "";
         }
         else
         {
-            AppState.ShowWarning("Empty Message", "Please type a message before sending");
+            Toast.Warning("Empty Message", new ToastModel { Description = "Please type a message before sending" });
         }
     }
 
     private void SignInWithGithub()
     {
-        AppState.ShowInfo("GitHub Sign In", "Redirecting to GitHub authentication...");
+        Toast.Info("GitHub Sign In", new ToastModel { Description = "Redirecting to GitHub authentication..." });
     }
 
     private void SignInWithGoogle()
     {
-        AppState.ShowInfo("Google Sign In", "Redirecting to Google authentication...");
+        Toast.Info("Google Sign In", new ToastModel { Description = "Redirecting to Google authentication..." });
     }
 
     private void CreateAccount()
     {
-        AppState.ShowSuccess("Account Created", "Welcome! Your account has been created successfully");
+        Toast.Success("Account Created", new ToastModel { Description = "Welcome! Your account has been created successfully" });
     }
 
     private void ContinuePayment()
     {
         if (string.IsNullOrEmpty(_cardNumber) || string.IsNullOrEmpty(_cardName))
         {
-            AppState.ShowError("Invalid Details", "Please fill in all card details");
+            Toast.Error("Invalid Details", new ToastModel { Description = "Please fill in all card details" });
         }
         else
         {
-            AppState.ShowSuccess("Payment Method Added", "Your payment method has been saved");
+            Toast.Success("Payment Method Added", new ToastModel { Description = "Your payment method has been saved" });
         }
     }
 
     private void CopyDocumentLink()
     {
-        AppState.ShowSuccess("Link Copied", "Document link copied to clipboard");
+        Toast.Success("Link Copied", new ToastModel { Description = "Document link copied to clipboard" });
     }
 
     private void EditUser(string userName)
     {
-        AppState.ShowInfo("Edit User", $"Opening editor for {userName}...");
+        Toast.Info("Edit User", new ToastModel { Description = $"Opening editor for {userName}..." });
     }
 
     private void PreviousPage()
     {
-        AppState.ShowInfo("Navigation", "Already on first page");
+        Toast.Info("Navigation", new ToastModel { Description = "Already on first page" });
     }
 
     private void NextPage()
     {
-        AppState.ShowInfo("Navigation", "Loading next page...");
+        Toast.Info("Navigation", new ToastModel { Description = "Loading next page..." });
     }
 
     private string GetPaymentMethodClass(string method)

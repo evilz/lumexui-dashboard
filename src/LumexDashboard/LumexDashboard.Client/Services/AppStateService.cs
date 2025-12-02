@@ -3,7 +3,6 @@ namespace LumexDashboard.Client.Services;
 public class AppStateService
 {
     public event Action? OnChange;
-    public event Action<ToastMessage>? OnToast;
 
     // Sidebar state
     private bool _sidebarCollapsed = false;
@@ -83,25 +82,5 @@ public class AppStateService
     public void OpenCommandPalette() => CommandPaletteOpen = true;
     public void CloseCommandPalette() => CommandPaletteOpen = false;
 
-    // Toast methods
-    public void ShowToast(string title, string message, ToastType type = ToastType.Info) 
-        => OnToast?.Invoke(new ToastMessage(title, message, type));
-    
-    public void ShowSuccess(string title, string message) 
-        => ShowToast(title, message, ToastType.Success);
-    
-    public void ShowError(string title, string message) 
-        => ShowToast(title, message, ToastType.Error);
-    
-    public void ShowWarning(string title, string message) 
-        => ShowToast(title, message, ToastType.Warning);
-    
-    public void ShowInfo(string title, string message) 
-        => ShowToast(title, message, ToastType.Info);
-
     private void NotifyStateChanged() => OnChange?.Invoke();
 }
-
-public record ToastMessage(string Title, string Message, ToastType Type);
-
-public enum ToastType { Info, Success, Warning, Error }

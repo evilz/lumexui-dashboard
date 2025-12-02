@@ -1,0 +1,50 @@
+@* 
+    Renders content only on tablet and larger screens (md breakpoint and up - 768px+).
+    Uses Tailwind's mobile-first approach: content is hidden by default, shown on md and up.
+    
+    Usage:
+    <TabletUp>
+        <p>This is visible on tablet and desktop</p>
+    </TabletUp>
+    
+    <TabletUp Class="p-4" Display="flex">
+        <p>With flex display and additional classes</p>
+    </TabletUp>
+*@
+
+<div class="@GetClasses()">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// The content to render on tablet and larger screens.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    /// <summary>
+    /// Additional CSS classes to apply to the container.
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+    
+    /// <summary>
+    /// Display type to use when visible. Defaults to "block".
+    /// Options: block, flex, grid, inline, inline-block, inline-flex
+    /// </summary>
+    [Parameter] public string Display { get; set; } = "block";
+
+    private string GetClasses()
+    {
+        var displayClass = Display switch
+        {
+            "flex" => "hidden md:flex",
+            "grid" => "hidden md:grid",
+            "inline" => "hidden md:inline",
+            "inline-block" => "hidden md:inline-block",
+            "inline-flex" => "hidden md:inline-flex",
+            _ => "hidden md:block"
+        };
+        
+        return string.IsNullOrEmpty(Class) ? displayClass : $"{displayClass} {Class}";
+    }
+}
