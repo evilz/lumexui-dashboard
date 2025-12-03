@@ -1,0 +1,70 @@
+@* TopBar component extracted from MainLayout *@
+<header class="w-full h-16 px-4 flex items-center justify-between border-b border-divider bg-background sticky top-0 z-10">
+    <!-- Left Section: Menu toggle, Sidebar collapse, Search -->
+    <div class="flex items-center gap-3 flex-1">
+        <!-- Mobile Menu Toggle -->
+        <MobileTablet Display="block">
+            <button class="p-2 rounded-lg hover:bg-default-100 transition-colors" @onclick="OnMobileMenuClick">
+                <svg class="w-6 h-6 text-default-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </MobileTablet>
+        
+        <!-- Desktop Sidebar Collapse Toggle -->
+        <DesktopOnly Display="flex">
+            <button class="p-2 rounded-lg hover:bg-default-100 transition-colors" @onclick="OnSidebarCollapseClick" title="@(SidebarCollapsed ? "Expand sidebar" : "Collapse sidebar")">
+                <svg class="w-5 h-5 text-default-600 transition-transform duration-200 @(SidebarCollapsed ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                </svg>
+            </button>
+        </DesktopOnly>
+        
+        <!-- Command Palette Trigger - Larger width -->
+        <SmallUp Display="flex">
+            <button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-default-100 hover:bg-default-200 transition-colors text-sm text-default-500 w-64 md:w-80 lg:w-96"
+                    @onclick="OnSearchClick">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span class="flex-1 text-left">Search...</span>
+                <kbd class="hidden md:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-default-200 text-xs">
+                    <span>⌘</span>K
+                </kbd>
+            </button>
+        </SmallUp>
+    </div>
+
+    <!-- Right Section: Notifications, Theme Toggle, Settings -->
+    <div class="flex items-center gap-2">
+        <NotificationBell />
+        <ThemeToggle />
+        <ThemeSettings />
+    </div>
+</header>
+
+@code {
+    /// <summary>
+    /// Indicates whether the sidebar is collapsed.
+    /// </summary>
+    [Parameter]
+    public bool SidebarCollapsed { get; set; }
+
+    /// <summary>
+    /// Event callback for when the mobile menu toggle is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnMobileMenuClick { get; set; }
+
+    /// <summary>
+    /// Event callback for when the sidebar collapse toggle is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnSidebarCollapseClick { get; set; }
+
+    /// <summary>
+    /// Event callback for when the search button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnSearchClick { get; set; }
+}
