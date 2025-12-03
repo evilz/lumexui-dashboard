@@ -1,0 +1,63 @@
+@* Sidebar component extracted from MainLayout *@
+<aside class="@GetSidebarClasses()">
+    <div class="flex flex-col h-full">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 px-6 py-5">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+            </div>
+            @if (!IsCollapsed || IsOpen)
+            {
+                <span class="text-lg font-semibold text-foreground whitespace-nowrap">LumexDashboard</span>
+            }
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            <NavMenu Collapsed="@(IsCollapsed && !IsOpen)" />
+        </nav>
+
+        <!-- User Profile -->
+        <div class="px-4 py-4 border-t border-divider">
+            <div class="flex items-center gap-3">
+                <LumexAvatar Name="John Doe" Size="@Size.Small" />
+                @if (!IsCollapsed || IsOpen)
+                {
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-foreground truncate">John Doe</p>
+                        <p class="text-xs text-default-500 truncate">admin@example.com</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</aside>
+
+@code {
+    /// <summary>
+    /// Indicates whether the sidebar is open (for mobile view).
+    /// </summary>
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    /// <summary>
+    /// Indicates whether the sidebar is collapsed (for desktop view).
+    /// </summary>
+    [Parameter]
+    public bool IsCollapsed { get; set; }
+
+    private string GetSidebarClasses()
+    {
+        var baseClasses = "fixed lg:relative z-30 h-full bg-background border-r border-divider transition-all duration-300 ease-in-out";
+        
+        // Mobile: full width sidebar with translate
+        var mobileClasses = IsOpen ? "translate-x-0 w-64" : "-translate-x-full w-64";
+        
+        // Desktop: collapsed or expanded
+        var desktopClasses = IsCollapsed ? "lg:translate-x-0 lg:w-20" : "lg:translate-x-0 lg:w-64";
+        
+        return $"{baseClasses} {mobileClasses} {desktopClasses}";
+    }
+}
