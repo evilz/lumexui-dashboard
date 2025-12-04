@@ -8,7 +8,7 @@
 /* styles */
 
 /* ===================================
-   Sidebar CSS Custom Properties
+   Layout CSS Custom Properties
    =================================== */
 :root {
     /* Sidebar dimensions */
@@ -29,6 +29,34 @@
 
     /* User section */
     --sidebar-avatar-size: 2rem;
+
+    /* TopBar */
+    --topbar-height: 4rem;
+    /* 64px */
+    --topbar-button-size: 2.5rem;
+    /* 40px */
+    --topbar-search-width-sm: 16rem;
+    /* 256px on small */
+    --topbar-search-width-md: 20rem;
+    /* 320px on medium */
+    --topbar-search-width-lg: 24rem;
+    /* 384px on large */
+
+    /* NavMenu */
+    --nav-item-height: 2.5rem;
+    /* 40px - collapsed mode */
+    --nav-item-padding-x: 0.75rem;
+    /* 12px */
+    --nav-item-padding-y: 0.625rem;
+    /* 10px */
+    --nav-icon-size: 1.25rem;
+    /* 20px */
+
+    /* Content */
+    --content-padding: 1rem;
+    /* Mobile */
+    --content-padding-lg: 1.5rem;
+    /* Desktop */
 }
 
 /* Custom dashboard styles */
@@ -51,7 +79,6 @@ body {
 
 /* ===================================
    Sidebar Utility Classes
-   (Use CSS variables for sizes)
    =================================== */
 .sidebar {
     width: var(--sidebar-width);
@@ -71,4 +98,62 @@ body {
 .sidebar-logo-icon {
     width: var(--sidebar-logo-icon-size);
     height: var(--sidebar-logo-icon-size);
+}
+
+/* ===================================
+   TopBar Utility Classes
+   =================================== */
+.topbar {
+    height: var(--topbar-height);
+}
+
+.topbar-button {
+    width: var(--topbar-button-size);
+    height: var(--topbar-button-size);
+}
+
+.topbar-search {
+    width: var(--topbar-search-width-sm);
+}
+
+@media (min-width: 768px) {
+    .topbar-search {
+        width: var(--topbar-search-width-md);
+    }
+}
+
+@media (min-width: 1024px) {
+    .topbar-search {
+        width: var(--topbar-search-width-lg);
+    }
+}
+
+/* ===================================
+   NavMenu Utility Classes
+   =================================== */
+.nav-item {
+    padding: var(--nav-item-padding-y) var(--nav-item-padding-x);
+}
+
+.nav-item-collapsed {
+    width: var(--nav-item-height);
+    height: var(--nav-item-height);
+}
+
+.nav-icon {
+    width: var(--nav-icon-size);
+    height: var(--nav-icon-size);
+}
+
+/* ===================================
+   Content Utility Classes
+   =================================== */
+.main-content {
+    padding: var(--content-padding);
+}
+
+@media (min-width: 1024px) {
+    .main-content {
+        padding: var(--content-padding-lg);
+    }
 }
