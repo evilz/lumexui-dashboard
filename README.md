@@ -270,26 +270,37 @@ LumexUI theme colors are configured via CSS variables:
 - `--lumex-warning`
 - `--lumex-danger`
 
-### Sidebar Customization
+### Layout Customization
 
-The sidebar uses CSS custom properties for easy customization. Edit `wwwroot/app.css` to modify these values:
+All layout components use CSS custom properties for easy customization. Edit `wwwroot/app.css` to modify these values:
 
 ```css
 :root {
-    /* Sidebar dimensions */
-    --sidebar-width: 16rem;           /* Expanded width (default: 256px) */
-    --sidebar-collapsed-width: 5rem;  /* Collapsed width (default: 80px) */
-    
-    /* Transition timing */
+    /* Sidebar */
+    --sidebar-width: 16rem;              /* Expanded width (256px) */
+    --sidebar-collapsed-width: 5rem;     /* Collapsed width (80px) */
     --sidebar-transition-duration: 300ms;
     --sidebar-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Logo */
-    --sidebar-logo-size: 2rem;        /* Logo container size */
-    --sidebar-logo-icon-size: 1.25rem; /* Icon size within logo */
-    
-    /* User section */
+    --sidebar-logo-size: 2rem;           /* Logo container (32px) */
+    --sidebar-logo-icon-size: 1.25rem;   /* Icon inside logo (20px) */
     --sidebar-avatar-size: 2rem;
+
+    /* TopBar */
+    --topbar-height: 4rem;               /* Header height (64px) */
+    --topbar-button-size: 2.5rem;        /* Icon buttons (40px) */
+    --topbar-search-width-sm: 16rem;     /* Search bar - small screens */
+    --topbar-search-width-md: 20rem;     /* Search bar - medium screens */
+    --topbar-search-width-lg: 24rem;     /* Search bar - large screens */
+
+    /* NavMenu */
+    --nav-item-height: 2.5rem;           /* Collapsed item size (40px) */
+    --nav-item-padding-x: 0.75rem;       /* Horizontal padding (12px) */
+    --nav-item-padding-y: 0.625rem;      /* Vertical padding (10px) */
+    --nav-icon-size: 1.25rem;            /* Nav icon size (20px) */
+
+    /* Content */
+    --content-padding: 1rem;             /* Mobile padding (16px) */
+    --content-padding-lg: 1.5rem;        /* Desktop padding (24px) */
 }
 ```
 
@@ -299,42 +310,42 @@ The sidebar uses CSS custom properties for easy customization. Edit `wwwroot/app
 ```css
 [data-theme="compact"] {
     --sidebar-width: 12rem;
-    --sidebar-collapsed-width: 4rem;
+    --topbar-height: 3rem;
+    --nav-item-height: 2rem;
 }
 ```
 
-**2. Faster/slower transitions:**
+**2. Custom layout proportions:**
 ```css
 :root {
-    --sidebar-transition-duration: 150ms;  /* Snappier feel */
-}
-```
-
-**3. Wider sidebar for dense content:**
-```css
-:root {
-    --sidebar-width: 20rem;  /* 320px */
+    --sidebar-width: 20rem;          /* Wider sidebar */
+    --content-padding-lg: 2rem;      /* More content spacing */
 }
 ```
 
 #### Architecture
 
-The sidebar styling follows the [LumexUI pattern](https://github.com/LumexUI/lumexui) using `ElementClass` for type-safe CSS composition:
+All layout components follow the [LumexUI pattern](https://github.com/LumexUI/lumexui) using `ElementClass` for type-safe CSS composition:
 
 ```
 Styles/
-└── Sidebar.cs          # Centralized style definitions using ElementClass
+├── SidebarStyles.cs       # Sidebar style definitions
+├── TopBarStyles.cs        # TopBar style definitions
+├── NavMenuStyles.cs       # NavMenu style definitions
+└── MainLayoutStyles.cs    # MainLayout style definitions
+
 Components/Layout/
-└── Sidebar.razor       # Component using SidebarStyles.GetXxxStyles()
-wwwroot/
-└── app.css             # CSS custom properties (:root variables)
+├── Sidebar.razor          # Uses SidebarStyles.GetXxxStyles()
+├── TopBar.razor           # Uses TopBarStyles.GetXxxStyles()
+├── NavMenu.razor          # Uses NavMenuStyles.GetItemStyles()
+└── MainLayout.razor       # Uses MainLayoutStyles.GetXxxStyles()
 ```
 
-This pattern provides:
-- **Static caching** - Invariant styles computed once at startup
-- **Fluent API** - Readable `.Add("class", when: condition)` syntax  
+Benefits of this pattern:
+- **Static caching** - Styles computed once at startup
+- **Fluent API** - Readable `.Add("class", when: condition)` syntax
 - **CSS Variables** - Runtime customization without recompilation
-- **Separation of concerns** - Styles in dedicated files, not inline
+- **External customization** - `Class` parameter on each component
 
 ---
 

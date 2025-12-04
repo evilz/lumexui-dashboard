@@ -1,47 +1,56 @@
-# Sidebar Customization Walkthrough
+# Layout Components Refactoring Walkthrough
 
 ## Summary
 
-Refactored the Sidebar component to use the LumexUI styling pattern with `ElementClass` for CSS management, and added CSS custom properties for runtime customization.
+Refactored all layout components (MainLayout, TopBar, NavMenu, Sidebar) to use the LumexUI `ElementClass` pattern for centralized CSS management with CSS custom properties for runtime customization.
 
 ## Changes Made
 
-### 1. Created `Styles/Sidebar.cs`
-A dedicated styles file using `LumexUI.Utilities.ElementClass` for fluent CSS composition:
-- Static caching for performance
-- Conditional class composition with `.Add("class", when: condition)`
-- Support for external class injection
+### Style Files Created
 
-### 2. Updated `Components/Layout/Sidebar.razor`
-- Replaced inline class logic with `SidebarStyles.GetXxxStyles()` calls
-- Added `Class` parameter for consumer customization
+| File | Purpose |
+|------|---------|
+| `Styles/TopBarStyles.cs` | TopBar header, buttons, search bar |
+| `Styles/NavMenuStyles.cs` | Nav items (expanded/collapsed) |
+| `Styles/MainLayoutStyles.cs` | Container, content area, main padding |
+| `Styles/SidebarStyles.cs` | (Previously created) |
 
-### 3. Added CSS Custom Properties in `wwwroot/app.css`
+### Components Updated
+
+- **TopBar.razor** - Added `Class` parameter, using `TopBarStyles`
+- **NavMenu.razor** - Added `Class` parameter, using `NavMenuStyles`
+- **MainLayout.razor** - Using `MainLayoutStyles`
+- **Sidebar.razor** - (Previously updated)
+
+### CSS Variables Added
+
 ```css
-:root {
-    --sidebar-width: 16rem;
-    --sidebar-collapsed-width: 5rem;
-    --sidebar-transition-duration: 300ms;
-    --sidebar-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    --sidebar-logo-size: 2rem;
-    --sidebar-logo-icon-size: 1.25rem;
-    --sidebar-avatar-size: 2rem;
-}
+/* TopBar */
+--topbar-height: 4rem;
+--topbar-button-size: 2.5rem;
+--topbar-search-width-sm/md/lg: responsive widths
+
+/* NavMenu */
+--nav-item-height: 2.5rem;
+--nav-item-padding-x/y: spacing
+--nav-icon-size: 1.25rem;
+
+/* Content */
+--content-padding: 1rem (mobile)
+--content-padding-lg: 1.5rem (desktop)
 ```
 
 ## Browser Testing
 
 | State | Screenshot |
 |-------|------------|
-| Expanded | ![Sidebar expanded](images/sidebar-expanded.png) |
-| Collapsed | ![Sidebar collapsed](images/sidebar-collapsed.png) |
+| Expanded | ![Layout expanded](images/layout-expanded.png) |
+| Collapsed | ![Layout collapsed](images/layout-collapsed.png) |
 
 ### Demo Recording
 
-![Sidebar collapse/expand demo](images/sidebar-demo.webp)
+![Layout demo](images/layout-demo.webp)
 
-## Commits
+## Branch
 
-1. `refactor(sidebar): use LumexUI styling pattern with ElementClass`
-2. `feat(sidebar): add CSS custom properties for customization`
-3. `docs: add sidebar customization documentation to README`
+All changes committed to `feature/layout-elementclass-pattern` branch.
