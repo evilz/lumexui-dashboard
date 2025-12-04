@@ -4,10 +4,36 @@
 @import "tailwindcss";
 @import "../../LumexDashboard.Client/bin/lumexui/theme.css";
 
-@source "../../LumexDashboard.Client/bin/lumexui/*.cs"; /* styles */
+@source "../../LumexDashboard.Client/bin/lumexui/*.cs";
+/* styles */
+
+/* ===================================
+   Sidebar CSS Custom Properties
+   =================================== */
+:root {
+    /* Sidebar dimensions */
+    --sidebar-width: 16rem;
+    /* 256px - expanded width */
+    --sidebar-collapsed-width: 5rem;
+    /* 80px - collapsed width */
+
+    /* Transition timing */
+    --sidebar-transition-duration: 300ms;
+    --sidebar-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Logo */
+    --sidebar-logo-size: 2rem;
+    /* 32px */
+    --sidebar-logo-icon-size: 1.25rem;
+    /* 20px */
+
+    /* User section */
+    --sidebar-avatar-size: 2rem;
+}
 
 /* Custom dashboard styles */
-html, body {
+html,
+body {
     font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     @apply bg-background text-foreground;
 }
@@ -23,7 +49,26 @@ html, body {
     content: "An error has occurred."
 }
 
-/*!* Custom class using @apply *!*/
-/*.btn-primary {*/
-/*    @apply px-4 py-2 rounded-md font-semibold bg-blue-600 text-white hover:bg-blue-700;*/
-/*}*/
+/* ===================================
+   Sidebar Utility Classes
+   (Use CSS variables for sizes)
+   =================================== */
+.sidebar {
+    width: var(--sidebar-width);
+    transition: width var(--sidebar-transition-duration) var(--sidebar-transition-easing),
+        transform var(--sidebar-transition-duration) var(--sidebar-transition-easing);
+}
+
+.sidebar-collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-logo {
+    width: var(--sidebar-logo-size);
+    height: var(--sidebar-logo-size);
+}
+
+.sidebar-logo-icon {
+    width: var(--sidebar-logo-icon-size);
+    height: var(--sidebar-logo-icon-size);
+}

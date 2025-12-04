@@ -9,6 +9,7 @@ namespace LumexDashboard.Styles;
 internal readonly record struct SidebarStyles
 {
     private static readonly string _base = ElementClass.Empty()
+        .Add("sidebar")              // Uses CSS custom properties for width/transition
         .Add("fixed")
         .Add("lg:relative")
         .Add("z-30")
@@ -16,9 +17,6 @@ internal readonly record struct SidebarStyles
         .Add("bg-background")
         .Add("border-r")
         .Add("border-divider")
-        .Add("transition-all")
-        .Add("duration-300")
-        .Add("ease-in-out")
         .ToString();
 
     private static readonly string _header = ElementClass.Empty()
@@ -30,8 +28,7 @@ internal readonly record struct SidebarStyles
         .ToString();
 
     private static readonly string _logoContainer = ElementClass.Empty()
-        .Add("w-8")
-        .Add("h-8")
+        .Add("sidebar-logo")         // Uses --sidebar-logo-size variable
         .Add("bg-primary")
         .Add("rounded-lg")
         .Add("flex")
@@ -41,8 +38,7 @@ internal readonly record struct SidebarStyles
         .ToString();
 
     private static readonly string _logoIcon = ElementClass.Empty()
-        .Add("w-5")
-        .Add("h-5")
+        .Add("sidebar-logo-icon")    // Uses --sidebar-logo-icon-size variable
         .Add("text-white")
         .ToString();
 
@@ -102,16 +98,14 @@ internal readonly record struct SidebarStyles
     {
         return ElementClass.Empty()
             .Add("translate-x-0", when: isOpen)
-            .Add("-translate-x-full", when: !isOpen)
-            .Add("w-64");
+            .Add("-translate-x-full", when: !isOpen);
     }
 
     private static ElementClass GetDesktopStyles(bool isCollapsed)
     {
         return ElementClass.Empty()
             .Add("lg:translate-x-0")
-            .Add("lg:w-20", when: isCollapsed)
-            .Add("lg:w-64", when: !isCollapsed);
+            .Add("sidebar-collapsed", when: isCollapsed);  // Uses --sidebar-collapsed-width variable
     }
 
     public static string GetStyles(bool isOpen, bool isCollapsed, string? additionalClass = null)
