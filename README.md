@@ -270,6 +270,72 @@ LumexUI theme colors are configured via CSS variables:
 - `--lumex-warning`
 - `--lumex-danger`
 
+### Sidebar Customization
+
+The sidebar uses CSS custom properties for easy customization. Edit `wwwroot/app.css` to modify these values:
+
+```css
+:root {
+    /* Sidebar dimensions */
+    --sidebar-width: 16rem;           /* Expanded width (default: 256px) */
+    --sidebar-collapsed-width: 5rem;  /* Collapsed width (default: 80px) */
+    
+    /* Transition timing */
+    --sidebar-transition-duration: 300ms;
+    --sidebar-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Logo */
+    --sidebar-logo-size: 2rem;        /* Logo container size */
+    --sidebar-logo-icon-size: 1.25rem; /* Icon size within logo */
+    
+    /* User section */
+    --sidebar-avatar-size: 2rem;
+}
+```
+
+#### Customization Patterns
+
+**1. Theme-specific overrides:**
+```css
+[data-theme="compact"] {
+    --sidebar-width: 12rem;
+    --sidebar-collapsed-width: 4rem;
+}
+```
+
+**2. Faster/slower transitions:**
+```css
+:root {
+    --sidebar-transition-duration: 150ms;  /* Snappier feel */
+}
+```
+
+**3. Wider sidebar for dense content:**
+```css
+:root {
+    --sidebar-width: 20rem;  /* 320px */
+}
+```
+
+#### Architecture
+
+The sidebar styling follows the [LumexUI pattern](https://github.com/LumexUI/lumexui) using `ElementClass` for type-safe CSS composition:
+
+```
+Styles/
+└── Sidebar.cs          # Centralized style definitions using ElementClass
+Components/Layout/
+└── Sidebar.razor       # Component using SidebarStyles.GetXxxStyles()
+wwwroot/
+└── app.css             # CSS custom properties (:root variables)
+```
+
+This pattern provides:
+- **Static caching** - Invariant styles computed once at startup
+- **Fluent API** - Readable `.Add("class", when: condition)` syntax  
+- **CSS Variables** - Runtime customization without recompilation
+- **Separation of concerns** - Styles in dedicated files, not inline
+
 ---
 
 ## 🔧 Configuration
