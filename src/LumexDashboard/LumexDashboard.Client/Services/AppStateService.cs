@@ -16,7 +16,7 @@ public class AppStateService
                 NotifyStateChanged();
             }
         }
-    }
+    } = false;
 
     public bool SidebarOpen
     {
@@ -29,7 +29,7 @@ public class AppStateService
                 NotifyStateChanged();
             }
         }
-    }
+    } = false;
 
     // Command palette state
     public bool CommandPaletteOpen
@@ -43,7 +43,7 @@ public class AppStateService
                 NotifyStateChanged();
             }
         }
-    }
+    } = false;
 
     // Theme state
     public string ThemeMode

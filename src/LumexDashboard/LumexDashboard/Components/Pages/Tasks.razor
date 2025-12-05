@@ -670,7 +670,7 @@
     
     private void OnDropOnListRow(int targetIndex)
     {
-        if (_draggedTask != null)
+        if (_draggedTask is not null)
         {
             var draggedIndex = _allTasks.IndexOf(_draggedTask);
             
@@ -700,7 +700,7 @@
         {
             return $"{baseClass} bg-primary-50 border-t-2 border-primary";
         }
-        if (_draggedTask != null && _allTasks.IndexOf(_draggedTask) == index)
+        if (_draggedTask is not null && _allTasks.IndexOf(_draggedTask) == index)
         {
             return $"{baseClass} opacity-50";
         }
