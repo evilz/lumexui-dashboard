@@ -1,10 +1,13 @@
 @inject IJSRuntime JS
 
+@inject AppStateService AppState
+@implements IDisposable
+
 <div class="relative">
     <button class="p-2 rounded-lg hover:bg-default-100 transition-colors flex items-center gap-1" 
             @onclick="ToggleTheme" 
             title="@GetTooltip()">
-        @if (_isDarkMode)
+        @if (AppState.ThemeMode == "dark")
         {
             <!-- Sun icon - click to switch to light -->
             <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
@@ -22,36 +25,50 @@
 </div>
 
 @code {
-    private bool _isDarkMode = false;
+    protected override async Task OnInitializedAsync()
+    {
+        AppState.OnChange += StateHasChanged;
+        
+        // Sync initial state if needed, though usually AppState is source of truth.
+        // If AppState is fresh (e.g. refresh), we might want to read from localStorage here or in AppStateService.
+        // For now, let's assume AppStateService will handle initialization or we do it here.
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             var storedMode = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeMode') || 'light'");
-            _isDarkMode = storedMode == "dark";
-            await ApplyTheme();
-            StateHasChanged();
+            if (AppState.ThemeMode != storedMode)
+            {
+                AppState.ThemeMode = storedMode;
+                await ApplyTheme();
+            }
         }
     }
 
-    private string GetTooltip() => _isDarkMode ? "Switch to light mode" : "Switch to dark mode";
+    private string GetTooltip() => AppState.ThemeMode == "dark" ? "Switch to light mode" : "Switch to dark mode";
 
     private async Task ToggleTheme()
     {
-        _isDarkMode = !_isDarkMode;
-        var mode = _isDarkMode ? "dark" : "light";
-        await JS.InvokeVoidAsync("eval", $"localStorage.setItem('themeMode', '{mode}')");
+        var newMode = AppState.ThemeMode == "dark" ? "light" : "dark";
+        AppState.ThemeMode = newMode;
+        await JS.InvokeVoidAsync("eval", $"localStorage.setItem('themeMode', '{newMode}')");
         await ApplyTheme();
     }
 
     private async Task ApplyTheme()
     {
-        var mode = _isDarkMode ? "dark" : "light";
+        var mode = AppState.ThemeMode;
         await JS.InvokeVoidAsync("eval", $@"
             const html = document.documentElement;
             html.classList.remove('light', 'dark');
             html.classList.add('{mode}');
         ");
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
     }
 }

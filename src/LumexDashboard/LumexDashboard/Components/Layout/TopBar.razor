@@ -6,7 +6,7 @@
     <div class="@TopBarStyles.GetLeftSectionStyles()">
         <!-- Mobile Menu Toggle -->
         <MobileTablet Display="block">
-            <button class="@TopBarStyles.GetIconButtonStyles()" @onclick="OnMobileMenuClick">
+            <button class="@TopBarStyles.GetIconButtonStyles()" @onclick="AppState.ToggleSidebar">
                 <svg class="@TopBarStyles.GetMenuIconStyles()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
@@ -15,8 +15,8 @@
         
         <!-- Desktop Sidebar Collapse Toggle -->
         <DesktopOnly Display="flex">
-            <button class="@TopBarStyles.GetIconButtonStyles()" @onclick="OnSidebarCollapseClick" title="@(SidebarCollapsed ? "Expand sidebar" : "Collapse sidebar")">
-                <svg class="@TopBarStyles.GetCollapseIconStyles(SidebarCollapsed)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button class="@TopBarStyles.GetIconButtonStyles()" @onclick="AppState.ToggleSidebarCollapse" title="@(AppState.SidebarCollapsed ? "Expand sidebar" : "Collapse sidebar")">
+                <svg class="@TopBarStyles.GetCollapseIconStyles(AppState.SidebarCollapsed)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
                 </svg>
             </button>
@@ -24,7 +24,7 @@
         
         <!-- Command Palette Trigger -->
         <SmallUp Display="flex">
-            <button class="@TopBarStyles.GetSearchButtonStyles()" @onclick="OnSearchClick">
+            <button class="@TopBarStyles.GetSearchButtonStyles()" @onclick="AppState.OpenCommandPalette">
                 <svg class="@TopBarStyles.GetSearchIconStyles()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
@@ -44,34 +44,24 @@
     </div>
 </header>
 
+@inject AppStateService AppState
+
+@implements IDisposable
+
 @code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
     /// <summary>
     /// Additional CSS class to apply to the topbar.
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
-
-    /// <summary>
-    /// Indicates whether the sidebar is collapsed.
-    /// </summary>
-    [Parameter]
-    public bool SidebarCollapsed { get; set; }
-
-    /// <summary>
-    /// Event callback for when the mobile menu toggle is clicked.
-    /// </summary>
-    [Parameter]
-    public EventCallback OnMobileMenuClick { get; set; }
-
-    /// <summary>
-    /// Event callback for when the sidebar collapse toggle is clicked.
-    /// </summary>
-    [Parameter]
-    public EventCallback OnSidebarCollapseClick { get; set; }
-
-    /// <summary>
-    /// Event callback for when the search button is clicked.
-    /// </summary>
-    [Parameter]
-    public EventCallback OnSearchClick { get; set; }
 }

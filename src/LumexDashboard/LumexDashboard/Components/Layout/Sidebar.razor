@@ -1,7 +1,7 @@
 @using LumexDashboard.Styles
 
 @* Sidebar component extracted from MainLayout *@
-<aside class="@SidebarStyles.GetStyles(IsOpen, IsCollapsed, Class)">
+<aside class="@SidebarStyles.GetStyles(AppState.SidebarOpen, AppState.SidebarCollapsed, Class)">
     <div class="@SidebarStyles.GetContentStyles()">
         <!-- Logo -->
         <div class="@SidebarStyles.GetHeaderStyles()">
@@ -10,7 +10,7 @@
                     <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
                 </svg>
             </div>
-            @if (!IsCollapsed || IsOpen)
+            @if (!AppState.SidebarCollapsed || AppState.SidebarOpen)
             {
                 <span class="@SidebarStyles.GetTitleStyles()">LumexDashboard</span>
             }
@@ -18,14 +18,14 @@
 
         <!-- Navigation -->
         <nav class="@SidebarStyles.GetNavStyles()">
-            <NavMenu Collapsed="@(IsCollapsed && !IsOpen)" />
+            <NavMenu Collapsed="@(AppState.SidebarCollapsed && !AppState.SidebarOpen)" />
         </nav>
 
         <!-- User Profile -->
         <div class="@SidebarStyles.GetUserSectionStyles()">
             <div class="@SidebarStyles.GetUserContainerStyles()">
                 <LumexAvatar Name="John Doe" Size="@Size.Small" />
-                @if (!IsCollapsed || IsOpen)
+                @if (!AppState.SidebarCollapsed || AppState.SidebarOpen)
                 {
                     <div class="@SidebarStyles.GetUserInfoStyles()">
                         <p class="@SidebarStyles.GetUserNameStyles()">John Doe</p>
@@ -37,22 +37,24 @@
     </div>
 </aside>
 
+@inject AppStateService AppState
+
+@implements IDisposable
+
 @code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
     /// <summary>
     /// Additional CSS class to apply to the sidebar.
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
-
-    /// <summary>
-    /// Indicates whether the sidebar is open (for mobile view).
-    /// </summary>
-    [Parameter]
-    public bool IsOpen { get; set; }
-
-    /// <summary>
-    /// Indicates whether the sidebar is collapsed (for desktop view).
-    /// </summary>
-    [Parameter]
-    public bool IsCollapsed { get; set; }
 }

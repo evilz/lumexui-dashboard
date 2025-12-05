@@ -95,28 +95,22 @@ internal readonly record struct SidebarStyles
         .ToString();
 
     private static ElementClass GetMobileStyles(bool isOpen)
-    {
-        return ElementClass.Empty()
+        => ElementClass.Empty()
             .Add("translate-x-0", when: isOpen)
             .Add("-translate-x-full", when: !isOpen);
-    }
 
     private static ElementClass GetDesktopStyles(bool isCollapsed)
-    {
-        return ElementClass.Empty()
+        => ElementClass.Empty()
             .Add("lg:translate-x-0")
             .Add("sidebar-collapsed", when: isCollapsed);  // Uses --sidebar-collapsed-width variable
-    }
 
     public static string GetStyles(bool isOpen, bool isCollapsed, string? additionalClass = null)
-    {
-        return ElementClass.Empty()
+        => ElementClass.Empty()
             .Add(_base)
             .Add(GetMobileStyles(isOpen))
             .Add(GetDesktopStyles(isCollapsed))
             .Add(additionalClass)
             .ToString();
-    }
 
     public static string GetContentStyles() => _content;
 

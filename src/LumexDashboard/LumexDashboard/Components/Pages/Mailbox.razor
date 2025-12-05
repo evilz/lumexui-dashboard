@@ -387,12 +387,12 @@
             : "fixed lg:relative inset-y-0 left-0 z-50 w-56 flex-shrink-0 border-r border-divider flex flex-col bg-default-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300";
 
     private string GetEmailListClass() =>
-        _showMobileEmailList || _selectedEmail == null
+        _showMobileEmailList || _selectedEmail is null
             ? "w-full md:w-80 flex-shrink-0 border-r border-divider flex flex-col"
             : "hidden md:flex w-80 flex-shrink-0 border-r border-divider flex-col";
 
     private string GetEmailContentClass() =>
-        !_showMobileEmailList && _selectedEmail != null
+        !_showMobileEmailList && _selectedEmail is not null
             ? "flex-1 flex flex-col"
             : "hidden md:flex flex-1 flex-col";
 

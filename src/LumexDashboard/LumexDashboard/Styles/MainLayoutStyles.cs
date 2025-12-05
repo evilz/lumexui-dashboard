@@ -29,12 +29,10 @@ internal readonly record struct MainLayoutStyles
         .ToString();
 
     public static string GetContainerStyles(string? additionalClass = null)
-    {
-        return ElementClass.Empty()
+        => ElementClass.Empty()
             .Add(_container)
             .Add(additionalClass)
             .ToString();
-    }
 
     public static string GetContentAreaStyles() => _contentArea;
 

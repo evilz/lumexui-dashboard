@@ -105,12 +105,10 @@ internal readonly record struct TopBarStyles
         .ToString();
 
     public static string GetStyles(string? additionalClass = null)
-    {
-        return ElementClass.Empty()
+        => ElementClass.Empty()
             .Add(_base)
             .Add(additionalClass)
             .ToString();
-    }
 
     public static string GetLeftSectionStyles() => _leftSection;
 
@@ -121,12 +119,10 @@ internal readonly record struct TopBarStyles
     public static string GetIconButtonIconStyles() => _iconButtonIcon;
 
     public static string GetCollapseIconStyles(bool isCollapsed)
-    {
-        return ElementClass.Empty()
+        => ElementClass.Empty()
             .Add(_collapseIcon)
             .Add("rotate-180", when: isCollapsed)
             .ToString();
-    }
 
     public static string GetSearchButtonStyles() => _searchButton;
 

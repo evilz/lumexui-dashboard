@@ -6,18 +6,15 @@
 
 <div class="@MainLayoutStyles.GetContainerStyles()">
     <!-- Sidebar -->
-    <Sidebar IsOpen="_sidebarOpen" IsCollapsed="_sidebarCollapsed" />
+    <Sidebar />
 
     <!-- Overlay for mobile -->
-    <MobileOverlay Visible="_sidebarOpen" OnClick="ToggleSidebar" ZIndex="20" />
+    <MobileOverlay Visible="AppState.SidebarOpen" OnClick="AppState.ToggleSidebar" ZIndex="20" />
 
     <!-- Main Content Area -->
     <div class="@MainLayoutStyles.GetContentAreaStyles()">
         <!-- Top Bar -->
-        <TopBar SidebarCollapsed="_sidebarCollapsed"
-                OnMobileMenuClick="ToggleSidebar"
-                OnSidebarCollapseClick="ToggleSidebarCollapse"
-                OnSearchClick="OpenCommandPalette" />
+        <TopBar />
 
         <!-- Page Content -->
         <main class="@MainLayoutStyles.GetMainStyles()">
@@ -38,24 +35,18 @@
     <span class="dismiss">🗙</span>
 </div>
 
+@implements IDisposable
 @code {
-    private bool _sidebarOpen = false;
-    private bool _sidebarCollapsed = false;
     private CommandPalette? _commandPalette;
 
-    private void ToggleSidebar()
+    protected override void OnInitialized()
     {
-        _sidebarOpen = !_sidebarOpen;
+        AppState.OnChange += StateHasChanged;
     }
 
-    private void ToggleSidebarCollapse()
+    public void Dispose()
     {
-        _sidebarCollapsed = !_sidebarCollapsed;
-    }
-
-    private void OpenCommandPalette()
-    {
-        _commandPalette?.Open();
+        AppState.OnChange -= StateHasChanged;
     }
 
     // Public method to show toasts from anywhere
