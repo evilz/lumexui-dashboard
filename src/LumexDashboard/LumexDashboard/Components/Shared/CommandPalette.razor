@@ -220,24 +220,14 @@
     [JSInvokable]
     public void OpenFromJs()
     {
-        Open();
-    }
-
-    private void OnStateChanged()
-    {
-        InvokeAsync(StateHasChanged);
-    }
-
-    public void Open()
-    {
         AppState.OpenCommandPalette();
         _searchQuery = string.Empty;
         _selectedIndex = 0;
     }
 
-    public void OpenCommandPalette()
+    private void OnStateChanged()
     {
-        Open();
+        InvokeAsync(StateHasChanged);
     }
 
     private void CloseCommandPalette()

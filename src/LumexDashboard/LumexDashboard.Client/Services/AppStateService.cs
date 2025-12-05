@@ -5,77 +5,72 @@ public class AppStateService
     public event Action? OnChange;
 
     // Sidebar state
-    private bool _sidebarCollapsed = false;
     public bool SidebarCollapsed
     {
-        get => _sidebarCollapsed;
+        get;
         set
         {
-            if (_sidebarCollapsed != value)
+            if (field != value)
             {
-                _sidebarCollapsed = value;
+                field = value;
                 NotifyStateChanged();
             }
         }
     }
 
-    private bool _sidebarOpen = false;
     public bool SidebarOpen
     {
-        get => _sidebarOpen;
+        get;
         set
         {
-            if (_sidebarOpen != value)
+            if (field != value)
             {
-                _sidebarOpen = value;
+                field = value;
                 NotifyStateChanged();
             }
         }
     }
 
     // Command palette state
-    private bool _commandPaletteOpen = false;
     public bool CommandPaletteOpen
     {
-        get => _commandPaletteOpen;
+        get;
         set
         {
-            if (_commandPaletteOpen != value)
+            if (field != value)
             {
-                _commandPaletteOpen = value;
+                field = value;
                 NotifyStateChanged();
             }
         }
     }
 
     // Theme state
-    private string _themeMode = "system";
     public string ThemeMode
     {
-        get => _themeMode;
+        get;
         set
         {
-            if (_themeMode != value)
+            if (field != value)
             {
-                _themeMode = value;
+                field = value;
                 NotifyStateChanged();
             }
         }
-    }
+    } = "system";
 
-    private string _themeColor = "blue";
     public string ThemeColor
     {
-        get => _themeColor;
+        get;
         set
         {
-            if (_themeColor != value)
+            if (field != value)
             {
-                _themeColor = value;
+                field = value;
                 NotifyStateChanged();
             }
         }
-    }
+    } = "blue";
 
     public void ToggleSidebar() => SidebarOpen = !SidebarOpen;
     public void ToggleSidebarCollapse() => SidebarCollapsed = !SidebarCollapsed;

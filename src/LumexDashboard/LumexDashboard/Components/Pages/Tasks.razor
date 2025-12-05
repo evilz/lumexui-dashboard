@@ -632,7 +632,7 @@
     
     private void OnDropOnStage(string stageKey)
     {
-        if (_draggedTask != null && _draggedTask.Stage != stageKey)
+        if (_draggedTask is not null && _draggedTask.Stage != stageKey)
         {
             _draggedTask.Stage = stageKey;
             StateHasChanged();

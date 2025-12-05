@@ -52,7 +52,7 @@
                                     class="@GetColorButtonClass(color.Value)"
                                     style="background-color: @color.Hex"
                                     title="@color.Label">
-                                @if (_currentColor == color.Value)
+                                @if (AppState.ThemeColor == color.Value)
                                 {
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -84,10 +84,10 @@
     </div>
 }
 
+@implements IDisposable
+
 @code {
     private bool _isOpen = false;
-    private string _currentMode = "light";
-    private string _currentColor = "blue";
     private string _currentRadius = "md";
 
     private record ThemeMode(string Value, string Label, RenderFragment Icon);
@@ -127,6 +127,11 @@
     private static readonly HashSet<string> ValidThemeColors = new() { "blue", "purple", "green", "red", "pink", "yellow", "cyan", "zinc", "orange", "teal" };
     private static readonly HashSet<string> ValidRadiusOptions = new() { "none", "sm", "md", "lg" };
 
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -136,9 +141,13 @@
             var radius = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeRadius') || 'md'");
             
             // Validate values against allowlist to prevent XSS
-            _currentMode = ValidThemeModes.Contains(mode) ? mode : "light";
-            _currentColor = ValidThemeColors.Contains(color) ? color : "blue";
+            var validatedMode = ValidThemeModes.Contains(mode) ? mode : "light";
+            var validatedColor = ValidThemeColors.Contains(color) ? color : "blue";
             _currentRadius = ValidRadiusOptions.Contains(radius) ? radius : "md";
+
+            if (AppState.ThemeMode != validatedMode) AppState.ThemeMode = validatedMode;
+            if (AppState.ThemeColor != validatedColor) AppState.ThemeColor = validatedColor;
+
             StateHasChanged();
         }
     }
@@ -148,7 +157,7 @@
         // Validate input against allowlist
         if (!ValidThemeModes.Contains(mode)) return;
         
-        _currentMode = mode;
+        AppState.ThemeMode = mode;
         await JS.InvokeVoidAsync("eval", $@"
             localStorage.setItem('themeMode', '{mode}');
             const html = document.documentElement;
@@ -162,7 +171,7 @@
         // Validate input against allowlist
         if (!ValidThemeColors.Contains(color)) return;
         
-        _currentColor = color;
+        AppState.ThemeColor = color;
         var colorData = _themeColors.First(c => c.Value == color);
         await JS.InvokeVoidAsync("eval", $@"
             localStorage.setItem('themeColor', '{color}');
@@ -197,7 +206,7 @@
     private string GetModeButtonClass(string mode)
     {
         var baseClass = "flex-1 flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-200";
-        return _currentMode == mode
+        return AppState.ThemeMode == mode
             ? $"{baseClass} bg-primary text-primary-foreground"
             : $"{baseClass} bg-default-100 hover:bg-default-200 text-default-600";
     }
@@ -205,7 +214,7 @@
     private string GetColorButtonClass(string color)
     {
         var baseClass = "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200";
-        return _currentColor == color
+        return AppState.ThemeColor == color
             ? $"{baseClass} ring-2 ring-offset-2 ring-offset-background ring-primary scale-110"
             : $"{baseClass} hover:scale-110";
     }
@@ -216,5 +225,10 @@
         return _currentRadius == radius
             ? $"{baseClass} bg-primary text-primary-foreground"
             : $"{baseClass} bg-default-100 hover:bg-default-200 text-default-600";
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
     }
 }

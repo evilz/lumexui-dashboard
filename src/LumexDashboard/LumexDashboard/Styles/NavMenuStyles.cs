@@ -39,14 +39,12 @@ internal readonly record struct NavMenuStyles
         .ToString();
 
     public static string GetItemStyles(bool collapsed, string? additionalClass = null)
-    {
-        return ElementClass.Empty()
+        => ElementClass.Empty()
             .Add(_itemBase)
             .Add(_itemCollapsed, when: collapsed)
             .Add(_itemExpanded, when: !collapsed)
             .Add(additionalClass)
             .ToString();
-    }
 
     public static string GetIconStyles() => _icon;
 

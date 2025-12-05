@@ -266,7 +266,7 @@
     <div class="flex flex-col sm:flex-row items-center justify-between px-4 py-3 gap-3 border-t border-divider bg-default-50">
         <!-- Now Playing -->
         <div class="flex items-center gap-3 w-full sm:w-1/4">
-            @if (_currentSong != null)
+            @if (_currentSong is not null)
             {
                 <div class="w-12 h-12 rounded-lg overflow-hidden">
                     <img src="@_currentSong.ImageUrl" alt="@_currentSong.AlbumName" class="w-full h-full object-cover" />
