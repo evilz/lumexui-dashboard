@@ -1,5 +1,7 @@
 @page "/competition-results"
 @inject ToastService Toast
+@using LumexUI
+@using LumexUI.Common
 
 <PageTitle>Competition Results - Parkour/Gymnastics</PageTitle>
 
@@ -190,14 +192,19 @@
 
             <!-- Pagination -->
             <div class="flex items-center justify-between px-6 py-4 border-t border-divider">
+                @{
+                    var filteredCount = FilteredResults.Count();
+                    var fromItem = filteredCount > 0 ? (_currentPage - 1) * _pageSize + 1 : 0;
+                    var toItem = Math.Min(_currentPage * _pageSize, filteredCount);
+                }
                 <p class="text-sm text-default-500">
-                    Showing @Math.Min((_currentPage - 1) * _pageSize + 1, _results.Count) to @Math.Min(_currentPage * _pageSize, FilteredResults.Count()) of @FilteredResults.Count() results
+                    Showing @fromItem to @toItem of @filteredCount results
                 </p>
                 <div class="flex gap-2">
                     <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage == 1)" OnClick="PreviousPage">
                         Previous
                     </LumexButton>
-                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage * _pageSize >= FilteredResults.Count())" OnClick="NextPage">
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage * _pageSize >= filteredCount)" OnClick="NextPage">
                         Next
                     </LumexButton>
                 </div>
