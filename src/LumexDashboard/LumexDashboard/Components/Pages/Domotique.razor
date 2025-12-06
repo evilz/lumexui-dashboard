@@ -1,0 +1,520 @@
+@page "/domotique"
+@using LumexUI
+@using LumexUI.Common
+@inject AppStateService AppState
+@inject ToastService Toast
+
+<PageTitle>Home Domotique</PageTitle>
+
+<div class="flex flex-col gap-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-foreground">Home Domotique</h1>
+            <p class="text-default-500">Control and monitor your smart home devices</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <LumexChip Size="Size.Small" Color="ThemeColor.Success" Variant="ChipVariant.Flat">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="6"/>
+                </svg>
+                @_activeDevices Active
+            </LumexChip>
+            <LumexButton Variant="Variant.Outlined" Size="Size.Small" OnClick="RefreshAllDevices">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Refresh
+            </LumexButton>
+        </div>
+    </div>
+
+    <!-- Room Selector -->
+    <div class="flex flex-wrap gap-2">
+        @foreach (var room in _rooms)
+        {
+            <LumexButton 
+                Variant="@(_selectedRoom == room ? Variant.Solid : Variant.Outlined)" 
+                Color="@(_selectedRoom == room ? ThemeColor.Primary : ThemeColor.Default)"
+                Size="Size.Small"
+                OnClick="@(() => SelectRoom(room))">
+                @room
+            </LumexButton>
+        }
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Temperature Control Card -->
+        <LumexCard Class="hover:shadow-lg transition-shadow">
+            <LumexCardBody Class="p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-default-900 text-lg font-semibold">Thermostat</span>
+                            <span class="text-default-500 text-sm">@_selectedRoom</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-warning/10">
+                            <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex justify-center items-center py-4">
+                        <div class="relative w-32 h-32">
+                            <svg class="w-full h-full" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="8" class="text-default-200" />
+                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="@(282.7 * ((_temperature - 15) / 20.0)) 282.7" stroke-linecap="round" transform="rotate(-90 50 50)" class="text-warning" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-3xl font-bold text-foreground">@_temperature°</span>
+                                <span class="text-sm text-default-500">Celsius</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center gap-2">
+                        <LumexButton Variant="Variant.Outlined" Size="Size.Small" OnClick="DecreaseTemperature">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                        </LumexButton>
+                        <LumexButton Variant="Variant.Outlined" Size="Size.Small" OnClick="IncreaseTemperature">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </LumexButton>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-default-700">Heating</span>
+                        <LumexSwitch @bind-Value="_heatingOn" Color="ThemeColor.Warning" />
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Lighting Control Card -->
+        <LumexCard Class="hover:shadow-lg transition-shadow">
+            <LumexCardBody Class="p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-default-900 text-lg font-semibold">Lighting</span>
+                            <span class="text-default-500 text-sm">@_selectedRoom</span>
+                        </div>
+                        <div class="p-2 rounded-lg @(_mainLightOn ? "bg-primary/10" : "bg-default-100")">
+                            <svg class="w-6 h-6 @(_mainLightOn ? "text-primary" : "text-default-400")" fill="@(_mainLightOn ? "currentColor" : "none")" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-default-700">Main Light</span>
+                            <LumexSwitch @bind-Value="_mainLightOn" Color="ThemeColor.Primary" />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-default-700">Ambient Light</span>
+                            <LumexSwitch @bind-Value="_ambientLightOn" Color="ThemeColor.Secondary" />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-default-700">Reading Light</span>
+                            <LumexSwitch @bind-Value="_readingLightOn" Color="ThemeColor.Primary" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-default-700">Brightness</span>
+                            <span class="text-sm font-medium text-foreground">@_brightness%</span>
+                        </div>
+                        <input type="range" min="0" max="100" @bind="_brightness" @bind:event="oninput" class="w-full h-2 bg-default-200 rounded-lg appearance-none cursor-pointer accent-primary" />
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Security Camera Card -->
+        <LumexCard Class="hover:shadow-lg transition-shadow">
+            <LumexCardBody Class="p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-default-900 text-lg font-semibold">Security</span>
+                            <span class="text-default-500 text-sm">Cameras & Locks</span>
+                        </div>
+                        <div class="p-2 rounded-lg @(_securityArmed ? "bg-success/10" : "bg-danger/10")">
+                            <svg class="w-6 h-6 @(_securityArmed ? "text-success" : "text-danger")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-default-700">Alarm Armed</span>
+                            <LumexSwitch @bind-Value="_securityArmed" Color="ThemeColor.Success" />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-default-700">Front Door</span>
+                            <LumexChip Size="Size.Small" Color="@(_frontDoorLocked ? ThemeColor.Success : ThemeColor.Danger)" Variant="ChipVariant.Flat">
+                                @(_frontDoorLocked ? "Locked" : "Unlocked")
+                            </LumexChip>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-default-700">Back Door</span>
+                            <LumexChip Size="Size.Small" Color="@(_backDoorLocked ? ThemeColor.Success : ThemeColor.Danger)" Variant="ChipVariant.Flat">
+                                @(_backDoorLocked ? "Locked" : "Unlocked")
+                            </LumexChip>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-default-700">Garage Door</span>
+                            <LumexChip Size="Size.Small" Color="@(_garageDoorClosed ? ThemeColor.Success : ThemeColor.Warning)" Variant="ChipVariant.Flat">
+                                @(_garageDoorClosed ? "Closed" : "Open")
+                            </LumexChip>
+                        </div>
+                    </div>
+                    <LumexButton Color="ThemeColor.Primary" Class="w-full" Size="Size.Small" OnClick="ToggleAllLocks">
+                        @(_frontDoorLocked && _backDoorLocked ? "Unlock All" : "Lock All")
+                    </LumexButton>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Blinds Control Card -->
+        <LumexCard Class="hover:shadow-lg transition-shadow">
+            <LumexCardBody Class="p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-default-900 text-lg font-semibold">Blinds</span>
+                            <span class="text-default-500 text-sm">@_selectedRoom</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-secondary/10">
+                            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5h16M4 8h16M4 11h16M4 14h16M4 17h16"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        @foreach (var blind in _blinds)
+                        {
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-default-700">@blind.Name</span>
+                                    <span class="text-sm font-medium text-foreground">@blind.Position%</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="px-2 py-1 text-xs bg-default-100 hover:bg-default-200 rounded transition-colors" @onclick="@(() => SetBlindPosition(blind.Name, 0))">Close</button>
+                                    <div class="flex-1 h-2 bg-default-200 rounded-lg overflow-hidden">
+                                        <div class="h-full bg-secondary transition-all" style="width: @blind.Position%"></div>
+                                    </div>
+                                    <button class="px-2 py-1 text-xs bg-default-100 hover:bg-default-200 rounded transition-colors" @onclick="@(() => SetBlindPosition(blind.Name, 100))">Open</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Energy Consumption Card -->
+        <LumexCard Class="sm:col-span-2 hover:shadow-lg transition-shadow">
+            <LumexCardBody Class="p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-default-900 text-lg font-semibold">Energy Consumption</span>
+                            <span class="text-default-500 text-sm">Today's usage overview</span>
+                        </div>
+                        <select @bind="_energyPeriod" class="px-3 py-1.5 text-sm bg-default-100 border border-divider rounded-lg text-foreground">
+                            <option>Today</option>
+                            <option>This Week</option>
+                            <option>This Month</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="flex flex-col items-center p-4 bg-default-50 rounded-lg">
+                            <svg class="w-8 h-8 text-warning mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <span class="text-2xl font-bold text-foreground">@_electricityUsage</span>
+                            <span class="text-sm text-default-500">kWh</span>
+                        </div>
+                        <div class="flex flex-col items-center p-4 bg-default-50 rounded-lg">
+                            <svg class="w-8 h-8 text-info mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                            </svg>
+                            <span class="text-2xl font-bold text-foreground">@_waterUsage</span>
+                            <span class="text-sm text-default-500">Liters</span>
+                        </div>
+                        <div class="flex flex-col items-center p-4 bg-default-50 rounded-lg">
+                            <svg class="w-8 h-8 text-danger mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                            </svg>
+                            <span class="text-2xl font-bold text-foreground">@_gasUsage</span>
+                            <span class="text-sm text-default-500">m³</span>
+                        </div>
+                    </div>
+                    <!-- Energy chart placeholder -->
+                    <div class="h-32 flex items-end gap-1">
+                        @foreach (var value in _energyChartData)
+                        {
+                            <div class="flex-1 bg-primary/20 rounded-t transition-all hover:bg-primary/30" style="height: @value%;"></div>
+                        }
+                    </div>
+                    <div class="flex justify-between text-xs text-default-500">
+                        <span>00:00</span>
+                        <span>06:00</span>
+                        <span>12:00</span>
+                        <span>18:00</span>
+                        <span>24:00</span>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Smart Appliances Card -->
+        <LumexCard Class="sm:col-span-2 hover:shadow-lg transition-shadow">
+            <LumexCardBody Class="p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-default-900 text-lg font-semibold">Smart Appliances</span>
+                        <span class="text-default-500 text-sm">Connected devices status</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @foreach (var appliance in _appliances)
+                        {
+                            <div class="flex items-center justify-between p-3 bg-default-50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 rounded-lg @(appliance.IsOn ? "bg-primary/10" : "bg-default-100")">
+                                        @((MarkupString)appliance.Icon)
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-medium text-foreground">@appliance.Name</span>
+                                        <span class="text-xs text-default-500">@appliance.Status</span>
+                                    </div>
+                                </div>
+                                <LumexSwitch Value="@appliance.IsOn" ValueChanged="@((bool val) => ToggleAppliance(appliance.Name, val))" Color="ThemeColor.Primary" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Scenes Card -->
+        <LumexCard Class="sm:col-span-2 lg:col-span-4 hover:shadow-lg transition-shadow">
+            <LumexCardBody Class="p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-default-900 text-lg font-semibold">Quick Scenes</span>
+                            <span class="text-default-500 text-sm">Activate predefined automation scenes</span>
+                        </div>
+                        <LumexButton Variant="Variant.Outlined" Size="Size.Small" OnClick="CreateNewScene">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Create Scene
+                        </LumexButton>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                        @foreach (var scene in _scenes)
+                        {
+                            <button class="flex flex-col items-center gap-2 p-4 rounded-lg border border-divider hover:border-primary hover:bg-primary/5 transition-all @(_activeScene == scene.Name ? "border-primary bg-primary/10" : "")" @onclick="@(() => ActivateScene(scene.Name))">
+                                <div class="p-3 rounded-full @(_activeScene == scene.Name ? "bg-primary/20" : "bg-default-100")">
+                                    @((MarkupString)scene.Icon)
+                                </div>
+                                <span class="text-sm font-medium text-foreground">@scene.Name</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </div>
+</div>
+
+@code {
+    // Room selection
+    private List<string> _rooms = new() { "All Rooms", "Living Room", "Bedroom", "Kitchen", "Bathroom", "Office", "Garage" };
+    private string _selectedRoom = "Living Room";
+
+    // Thermostat
+    private int _temperature = 22;
+    private bool _heatingOn = true;
+
+    // Lighting
+    private bool _mainLightOn = true;
+    private bool _ambientLightOn = false;
+    private bool _readingLightOn = true;
+    private int _brightness = 75;
+
+    // Security
+    private bool _securityArmed = true;
+    private bool _frontDoorLocked = true;
+    private bool _backDoorLocked = true;
+    private bool _garageDoorClosed = true;
+
+    // Blinds
+    private List<BlindData> _blinds = new()
+    {
+        new("Window 1", 75),
+        new("Window 2", 50),
+        new("Window 3", 100)
+    };
+
+    // Energy
+    private string _energyPeriod = "Today";
+    private double _electricityUsage = 12.4;
+    private int _waterUsage = 156;
+    private double _gasUsage = 2.3;
+    private int[] _energyChartData = { 20, 35, 25, 40, 30, 45, 55, 70, 85, 75, 60, 50, 65, 80, 70, 55, 45, 60, 75, 65, 50, 40, 30, 25 };
+
+    // Appliances
+    private List<ApplianceData> _appliances = new()
+    {
+        new("Smart TV", "<svg class=\"w-5 h-5 text-primary\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z\"/></svg>", true, "Playing Netflix"),
+        new("Air Conditioner", "<svg class=\"w-5 h-5 text-info\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z\"/></svg>", true, "Cooling - 22°C"),
+        new("Washing Machine", "<svg class=\"w-5 h-5 text-secondary\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15\"/></svg>", false, "Idle"),
+        new("Robot Vacuum", "<svg class=\"w-5 h-5 text-success\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"/></svg>", true, "Cleaning - 45%"),
+        new("Coffee Maker", "<svg class=\"w-5 h-5 text-warning\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z\"/></svg>", false, "Ready"),
+        new("Smart Speaker", "<svg class=\"w-5 h-5 text-primary\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z\"/></svg>", true, "Listening")
+    };
+
+    // Scenes
+    private string _activeScene = "";
+    private List<SceneData> _scenes = new()
+    {
+        new("Morning", "<svg class=\"w-6 h-6 text-warning\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z\"/></svg>"),
+        new("Evening", "<svg class=\"w-6 h-6 text-orange-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z\"/></svg>"),
+        new("Night", "<svg class=\"w-6 h-6 text-indigo-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z\"/></svg>"),
+        new("Movie", "<svg class=\"w-6 h-6 text-red-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z\"/></svg>"),
+        new("Party", "<svg class=\"w-6 h-6 text-pink-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3\"/></svg>"),
+        new("Away", "<svg class=\"w-6 h-6 text-success\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z\"/></svg>")
+    };
+
+    private int _activeDevices => _appliances.Count(a => a.IsOn) + (_mainLightOn ? 1 : 0) + (_ambientLightOn ? 1 : 0) + (_readingLightOn ? 1 : 0) + (_heatingOn ? 1 : 0);
+
+    private void SelectRoom(string room)
+    {
+        _selectedRoom = room;
+        Toast.Info("Room Selected", new ToastModel { Description = $"Showing devices for {room}" });
+    }
+
+    private void RefreshAllDevices()
+    {
+        Toast.Success("Devices Refreshed", new ToastModel { Description = "All device statuses have been updated" });
+    }
+
+    private void DecreaseTemperature()
+    {
+        if (_temperature > 15)
+        {
+            _temperature--;
+            Toast.Info("Temperature Adjusted", new ToastModel { Description = $"Temperature set to {_temperature}°C" });
+        }
+    }
+
+    private void IncreaseTemperature()
+    {
+        if (_temperature < 30)
+        {
+            _temperature++;
+            Toast.Info("Temperature Adjusted", new ToastModel { Description = $"Temperature set to {_temperature}°C" });
+        }
+    }
+
+    private void ToggleAllLocks()
+    {
+        var newState = !(_frontDoorLocked && _backDoorLocked);
+        _frontDoorLocked = newState;
+        _backDoorLocked = newState;
+        Toast.Success(newState ? "All Doors Locked" : "All Doors Unlocked", new ToastModel { Description = newState ? "Your home is now secured" : "All doors have been unlocked" });
+    }
+
+    private void SetBlindPosition(string blindName, int position)
+    {
+        var blind = _blinds.FirstOrDefault(b => b.Name == blindName);
+        if (blind != null)
+        {
+            blind.Position = position;
+            Toast.Info("Blind Adjusted", new ToastModel { Description = $"{blindName} set to {position}%" });
+        }
+    }
+
+    private void ToggleAppliance(string name, bool isOn)
+    {
+        var appliance = _appliances.FirstOrDefault(a => a.Name == name);
+        if (appliance != null)
+        {
+            appliance.IsOn = isOn;
+            appliance.Status = isOn ? "On" : "Off";
+            Toast.Info(name, new ToastModel { Description = isOn ? "Device turned on" : "Device turned off" });
+        }
+    }
+
+    private void ActivateScene(string sceneName)
+    {
+        _activeScene = sceneName;
+        Toast.Success("Scene Activated", new ToastModel { Description = $"{sceneName} scene has been applied" });
+        
+        // Apply scene-specific settings
+        switch (sceneName)
+        {
+            case "Morning":
+                _brightness = 100;
+                _mainLightOn = true;
+                _temperature = 21;
+                break;
+            case "Evening":
+                _brightness = 60;
+                _ambientLightOn = true;
+                _temperature = 22;
+                break;
+            case "Night":
+                _mainLightOn = false;
+                _ambientLightOn = false;
+                _brightness = 0;
+                _securityArmed = true;
+                break;
+            case "Movie":
+                _brightness = 20;
+                _mainLightOn = false;
+                _ambientLightOn = true;
+                break;
+            case "Away":
+                _mainLightOn = false;
+                _ambientLightOn = false;
+                _readingLightOn = false;
+                _securityArmed = true;
+                _heatingOn = false;
+                break;
+        }
+    }
+
+    private void CreateNewScene()
+    {
+        Toast.Info("Create Scene", new ToastModel { Description = "Scene creation wizard would open here" });
+    }
+
+    private record BlindData(string Name, int Position)
+    {
+        public int Position { get; set; } = Position;
+    }
+
+    private class ApplianceData
+    {
+        public string Name { get; set; }
+        public string Icon { get; set; }
+        public bool IsOn { get; set; }
+        public string Status { get; set; }
+
+        public ApplianceData(string name, string icon, bool isOn, string status)
+        {
+            Name = name;
+            Icon = icon;
+            IsOn = isOn;
+            Status = status;
+        }
+    }
+
+    private record SceneData(string Name, string Icon);
+}
