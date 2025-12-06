@@ -1,0 +1,782 @@
+@page "/calendar"
+@inject ToastService Toast
+
+<PageTitle>Calendar</PageTitle>
+
+<div class="flex flex-col xl:flex-row gap-6">
+    <!-- Main Calendar Content -->
+    <div class="flex-1 space-y-6 min-w-0">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-default-800">Calendar</h1>
+                <p class="text-sm text-default-500">Manage your events and schedule</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <LumexButton Color="ThemeColor.Primary" Size="Size.Small" OnClick="OpenCreateEventModal">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    New Event
+                </LumexButton>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <LumexCard Class="rounded-xl">
+            <LumexCardBody Class="p-3">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <!-- Navigation -->
+                    <div class="flex items-center gap-2">
+                        <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true" OnClick="PreviousPeriod">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </LumexButton>
+                        <LumexButton Variant="Variant.Flat" Size="Size.Small" OnClick="GoToToday">Today</LumexButton>
+                        <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true" OnClick="NextPeriod">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </LumexButton>
+                        <h2 class="text-lg font-semibold text-default-800 ml-2">@GetCurrentPeriodLabel()</h2>
+                    </div>
+
+                    <!-- View Switcher -->
+                    <div class="flex items-center gap-2">
+                        <div class="flex bg-default-100 rounded-lg p-1">
+                            <button class="@GetViewButtonClass("day")" @onclick="@(() => _currentView = "day")">
+                                <span>Day</span>
+                            </button>
+                            <button class="@GetViewButtonClass("week")" @onclick="@(() => _currentView = "week")">
+                                <span>Week</span>
+                            </button>
+                            <button class="@GetViewButtonClass("month")" @onclick="@(() => _currentView = "month")">
+                                <span>Month</span>
+                            </button>
+                            <button class="@GetViewButtonClass("year")" @onclick="@(() => _currentView = "year")">
+                                <span>Year</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Calendar Views -->
+        @if (_currentView == "day")
+        {
+            <!-- Day View -->
+            <LumexCard Class="rounded-xl">
+                <LumexCardBody Class="p-4">
+                    <div class="text-center mb-4">
+                        <h3 class="text-xl font-semibold text-foreground">@_currentDate.ToString("dddd, MMMM d, yyyy")</h3>
+                    </div>
+                    <div class="space-y-1 max-h-[600px] overflow-y-auto">
+                        @for (int hour = 0; hour < 24; hour++)
+                        {
+                            var currentHour = hour;
+                            var hourEvents = GetEventsForHour(_currentDate, currentHour);
+                            <div class="flex gap-4 min-h-[60px] border-t border-divider py-2 hover:bg-default-50 transition-colors">
+                                <div class="w-16 text-sm text-default-400 font-medium flex-shrink-0">
+                                    @(currentHour == 0 ? "12 AM" : currentHour < 12 ? $"{currentHour} AM" : currentHour == 12 ? "12 PM" : $"{currentHour - 12} PM")
+                                </div>
+                                <div class="flex-1 space-y-1">
+                                    @foreach (var evt in hourEvents)
+                                    {
+                                        <div class="@GetEventClass(evt.Color) rounded-lg px-3 py-2 cursor-pointer hover:opacity-80 transition-opacity"
+                                             @onclick="@(() => OpenEditEventModal(evt))">
+                                            <p class="font-medium text-sm">@evt.Title</p>
+                                            <p class="text-xs opacity-80">@evt.StartTime.ToString("h:mm tt") - @evt.EndTime.ToString("h:mm tt")</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+        }
+        else if (_currentView == "week")
+        {
+            <!-- Week View -->
+            <LumexCard Class="rounded-xl overflow-hidden">
+                <LumexCardBody Class="p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[700px]">
+                            <thead class="bg-default-100">
+                                <tr>
+                                    <th class="px-2 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider w-16"></th>
+                                    @foreach (var day in GetWeekDays())
+                                    {
+                                        <th class="px-2 py-3 text-center @(day.Date == DateTime.Today ? "bg-primary/10" : "")">
+                                            <p class="text-xs font-semibold text-default-500 uppercase">@day.ToString("ddd")</p>
+                                            <p class="text-lg font-bold @(day.Date == DateTime.Today ? "text-primary" : "text-foreground")">@day.Day</p>
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-divider">
+                                @for (int hour = 8; hour < 20; hour++)
+                                {
+                                    var currentHour = hour;
+                                    <tr class="divide-x divide-divider">
+                                        <td class="px-2 py-2 text-xs text-default-400 font-medium align-top">
+                                            @(currentHour == 0 ? "12 AM" : currentHour < 12 ? $"{currentHour} AM" : currentHour == 12 ? "12 PM" : $"{currentHour - 12} PM")
+                                        </td>
+                                        @foreach (var day in GetWeekDays())
+                                        {
+                                            var hourEvents = GetEventsForHour(day, currentHour);
+                                            <td class="px-1 py-1 min-h-[50px] @(day.Date == DateTime.Today ? "bg-primary/5" : "")">
+                                                @foreach (var evt in hourEvents)
+                                                {
+                                                    <div class="@GetEventClass(evt.Color) rounded px-2 py-1 mb-1 cursor-pointer hover:opacity-80 transition-opacity text-xs"
+                                                         @onclick="@(() => OpenEditEventModal(evt))">
+                                                        <p class="font-medium truncate">@evt.Title</p>
+                                                    </div>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+        }
+        else if (_currentView == "month")
+        {
+            <!-- Month View -->
+            <LumexCard Class="rounded-xl">
+                <LumexCardBody Class="p-4">
+                    <!-- Weekday Headers -->
+                    <div class="grid grid-cols-7 gap-1 mb-2">
+                        @foreach (var day in new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" })
+                        {
+                            <div class="text-center text-xs font-semibold text-default-500 uppercase py-2">@day</div>
+                        }
+                    </div>
+                    <!-- Calendar Grid -->
+                    <div class="grid grid-cols-7 gap-1">
+                        @foreach (var day in GetMonthDays())
+                        {
+                            var dayEvents = GetEventsForDay(day);
+                            var isCurrentMonth = day.Month == _currentDate.Month;
+                            var isToday = day.Date == DateTime.Today;
+                            <div class="@GetDayCellClass(isCurrentMonth, isToday) min-h-[100px] p-2 rounded-lg cursor-pointer hover:bg-default-100 transition-colors"
+                                 @onclick="@(() => SelectDate(day))">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="@(isToday ? "bg-primary text-white w-7 h-7 rounded-full flex items-center justify-center" : "") text-sm font-medium">
+                                        @day.Day
+                                    </span>
+                                    @if (dayEvents.Count > 3)
+                                    {
+                                        <span class="text-xs text-default-400">+@(dayEvents.Count - 3)</span>
+                                    }
+                                </div>
+                                <div class="space-y-1">
+                                    @foreach (var evt in dayEvents.Take(3))
+                                    {
+                                        <div class="@GetEventClass(evt.Color) rounded px-1.5 py-0.5 text-xs truncate cursor-pointer hover:opacity-80"
+                                             @onclick:stopPropagation="true"
+                                             @onclick="@(() => OpenEditEventModal(evt))">
+                                            @evt.Title
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </LumexCardBody>
+            </LumexCard>
+        }
+        else
+        {
+            <!-- Year View -->
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                @for (int month = 1; month <= 12; month++)
+                {
+                    var currentMonth = month;
+                    var monthDate = new DateTime(_currentDate.Year, currentMonth, 1);
+                    var isCurrentMonth = DateTime.Today.Month == currentMonth && DateTime.Today.Year == _currentDate.Year;
+                    <LumexCard Class="@($"rounded-xl {(isCurrentMonth ? "ring-2 ring-primary" : "")}")">
+                        <LumexCardBody Class="p-3">
+                            <h4 class="font-semibold text-foreground mb-2 text-center @(isCurrentMonth ? "text-primary" : "")">
+                                @monthDate.ToString("MMMM")
+                            </h4>
+                            <div class="grid grid-cols-7 gap-0.5 text-center">
+                                @foreach (var day in new[] { "S", "M", "T", "W", "T", "F", "S" })
+                                {
+                                    <div class="text-[10px] text-default-400 font-medium">@day</div>
+                                }
+                                @foreach (var day in GetMiniMonthDays(currentMonth))
+                                {
+                                    var hasEvents = GetEventsForDay(day).Any();
+                                    var isToday = day.Date == DateTime.Today;
+                                    var isMonthDay = day.Month == currentMonth;
+                                    <div class="@GetMiniDayClass(isMonthDay, isToday, hasEvents) text-[11px] w-5 h-5 flex items-center justify-center rounded-full cursor-pointer"
+                                         @onclick="@(() => { _currentDate = day; _currentView = "month"; })">
+                                        @(isMonthDay ? day.Day.ToString() : "")
+                                    </div>
+                                }
+                            </div>
+                        </LumexCardBody>
+                    </LumexCard>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Right Sidebar: Upcoming Events -->
+    <aside class="w-full xl:w-80 flex-shrink-0 space-y-6">
+        <!-- Mini Calendar -->
+        <LumexCard Class="rounded-2xl hidden xl:block">
+            <LumexCardBody Class="p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-foreground">@_miniCalendarDate.ToString("MMMM yyyy")</h3>
+                    <div class="flex gap-1">
+                        <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" OnClick="PreviousMiniMonth">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </LumexButton>
+                        <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" OnClick="NextMiniMonth">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </LumexButton>
+                    </div>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center">
+                    @foreach (var day in new[] { "S", "M", "T", "W", "T", "F", "S" })
+                    {
+                        <div class="text-xs text-default-400 font-medium py-1">@day</div>
+                    }
+                    @foreach (var day in GetMiniMonthDays(_miniCalendarDate.Month, _miniCalendarDate.Year))
+                    {
+                        var hasEvents = GetEventsForDay(day).Any();
+                        var isToday = day.Date == DateTime.Today;
+                        var isSelected = day.Date == _currentDate.Date;
+                        var isMonthDay = day.Month == _miniCalendarDate.Month;
+                        <div class="@GetMiniCalendarDayClass(isMonthDay, isToday, isSelected, hasEvents) text-xs w-7 h-7 flex items-center justify-center rounded-full cursor-pointer transition-colors"
+                             @onclick="@(() => { _currentDate = day; })">
+                            @(isMonthDay ? day.Day.ToString() : "")
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Upcoming Events -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-foreground">Upcoming Events</h3>
+                    <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Primary">
+                        @GetUpcomingEvents().Count()
+                    </LumexChip>
+                </div>
+                <div class="space-y-3">
+                    @foreach (var evt in GetUpcomingEvents().Take(5))
+                    {
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-default-100 cursor-pointer hover:bg-default-200 transition-colors"
+                             @onclick="@(() => OpenEditEventModal(evt))">
+                            <div class="w-1 h-full min-h-[40px] rounded-full @GetEventBorderClass(evt.Color)"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-medium text-foreground truncate">@evt.Title</p>
+                                <p class="text-xs text-default-500">@evt.StartTime.ToString("MMM d, h:mm tt")</p>
+                                @if (!string.IsNullOrEmpty(evt.Location))
+                                {
+                                    <p class="text-xs text-default-400 flex items-center gap-1 mt-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        @evt.Location
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                    }
+                    @if (!GetUpcomingEvents().Any())
+                    {
+                        <div class="text-center py-8">
+                            <svg class="w-12 h-12 mx-auto text-default-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="text-default-500 text-sm">No upcoming events</p>
+                            <LumexButton Variant="Variant.Light" Size="Size.Small" Class="mt-2" OnClick="OpenCreateEventModal">
+                                Add Event
+                            </LumexButton>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <!-- Event Categories -->
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-4">
+                <h3 class="font-semibold text-foreground mb-4">Categories</h3>
+                <div class="space-y-2">
+                    @foreach (var category in _categories)
+                    {
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full @GetEventBorderClass(category.Color)"></div>
+                                <span class="text-sm text-default-700">@category.Name</span>
+                            </div>
+                            <span class="text-xs text-default-400">@GetEventCountByCategory(category.Name)</span>
+                        </div>
+                    }
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </aside>
+</div>
+
+<!-- Event Modal -->
+@if (_showEventModal)
+{
+    <div class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @onclick="CloseEventModal"></div>
+        
+        <!-- Modal -->
+        <div class="relative w-full max-w-lg bg-background rounded-2xl shadow-2xl border border-divider overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-divider">
+                <h3 class="text-lg font-semibold text-foreground">
+                    @(_editingEvent == null ? "Create Event" : "Edit Event")
+                </h3>
+                <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" OnClick="CloseEventModal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </LumexButton>
+            </div>
+            
+            <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-medium text-default-700 mb-2">Event Title</label>
+                    <input type="text" @bind="_eventForm.Title" placeholder="Enter event title" 
+                           class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground placeholder-default-400" />
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-default-700 mb-2">Description</label>
+                    <textarea @bind="_eventForm.Description" placeholder="Enter event description" rows="3"
+                              class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground placeholder-default-400 resize-none"></textarea>
+                </div>
+
+                <!-- Date and Time -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-default-700 mb-2">Start Date</label>
+                        <input type="date" @bind="_eventForm.StartDate" 
+                               class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-default-700 mb-2">Start Time</label>
+                        <input type="time" @bind="_eventForm.StartTimeOnly" 
+                               class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-default-700 mb-2">End Date</label>
+                        <input type="date" @bind="_eventForm.EndDate" 
+                               class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-default-700 mb-2">End Time</label>
+                        <input type="time" @bind="_eventForm.EndTimeOnly" 
+                               class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground" />
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div>
+                    <label class="block text-sm font-medium text-default-700 mb-2">Location</label>
+                    <input type="text" @bind="_eventForm.Location" placeholder="Enter location (optional)" 
+                           class="w-full px-4 py-2 text-sm bg-default-100 border border-divider rounded-lg text-foreground placeholder-default-400" />
+                </div>
+
+                <!-- Category/Color -->
+                <div>
+                    <label class="block text-sm font-medium text-default-700 mb-2">Category</label>
+                    <div class="flex gap-2 flex-wrap">
+                        @foreach (var category in _categories)
+                        {
+                            <button class="@GetCategoryButtonClass(category.Color)" 
+                                    @onclick="@(() => _eventForm.Color = category.Color)">
+                                <div class="w-4 h-4 rounded-full @GetEventBorderClass(category.Color)"></div>
+                                <span class="text-sm">@category.Name</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- All Day Toggle -->
+                <div class="flex items-center gap-3">
+                    <LumexSwitch @bind-Value="_eventForm.AllDay" Color="ThemeColor.Primary" />
+                    <span class="text-sm text-default-700">All day event</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between px-6 py-4 border-t border-divider bg-default-50">
+                @if (_editingEvent != null)
+                {
+                    <LumexButton Variant="Variant.Light" Color="ThemeColor.Danger" OnClick="DeleteEvent">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Delete
+                    </LumexButton>
+                }
+                else
+                {
+                    <div></div>
+                }
+                <div class="flex gap-2">
+                    <LumexButton Variant="Variant.Flat" OnClick="CloseEventModal">Cancel</LumexButton>
+                    <LumexButton Color="ThemeColor.Primary" OnClick="SaveEvent">
+                        @(_editingEvent == null ? "Create Event" : "Save Changes")
+                    </LumexButton>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string _currentView = "month";
+    private DateTime _currentDate = DateTime.Today;
+    private DateTime _miniCalendarDate = DateTime.Today;
+    private bool _showEventModal = false;
+    private CalendarEvent? _editingEvent = null;
+    private EventFormModel _eventForm = new();
+
+    private List<EventCategory> _categories = new()
+    {
+        new("Work", "blue"),
+        new("Personal", "green"),
+        new("Meeting", "purple"),
+        new("Important", "red"),
+        new("Other", "gray")
+    };
+
+    private List<CalendarEvent> _events = new()
+    {
+        new("Team Standup", "Daily team sync meeting", DateTime.Today.AddHours(9), DateTime.Today.AddHours(9.5), "Conference Room A", "blue", false),
+        new("Project Review", "Q4 project milestone review", DateTime.Today.AddHours(14), DateTime.Today.AddHours(15.5), "Main Office", "purple", false),
+        new("Lunch with Client", "Business lunch at downtown restaurant", DateTime.Today.AddHours(12), DateTime.Today.AddHours(13), "Downtown Cafe", "green", false),
+        new("Product Launch", "New product launch event", DateTime.Today.AddDays(2).AddHours(10), DateTime.Today.AddDays(2).AddHours(16), "Convention Center", "red", false),
+        new("Code Review", "Review pull requests for sprint", DateTime.Today.AddDays(1).AddHours(11), DateTime.Today.AddDays(1).AddHours(12), "", "blue", false),
+        new("Birthday Party", "John's birthday celebration", DateTime.Today.AddDays(3), DateTime.Today.AddDays(3).AddHours(23.99), "Office Lounge", "green", true),
+        new("Sprint Planning", "Plan next sprint tasks", DateTime.Today.AddDays(4).AddHours(9), DateTime.Today.AddDays(4).AddHours(11), "Meeting Room B", "purple", false),
+        new("Dentist Appointment", "Regular checkup", DateTime.Today.AddDays(5).AddHours(15), DateTime.Today.AddDays(5).AddHours(16), "City Dental Clinic", "gray", false),
+        new("Quarterly Report Due", "Submit Q4 financial report", DateTime.Today.AddDays(7), DateTime.Today.AddDays(7).AddHours(17), "", "red", true),
+        new("Team Building", "Outdoor team activities", DateTime.Today.AddDays(10).AddHours(9), DateTime.Today.AddDays(10).AddHours(17), "Central Park", "green", false)
+    };
+
+    private void OpenCreateEventModal()
+    {
+        _editingEvent = null;
+        _eventForm = new EventFormModel
+        {
+            StartDate = _currentDate,
+            EndDate = _currentDate,
+            StartTimeOnly = new TimeOnly(9, 0),
+            EndTimeOnly = new TimeOnly(10, 0),
+            Color = "blue"
+        };
+        _showEventModal = true;
+    }
+
+    private void OpenEditEventModal(CalendarEvent evt)
+    {
+        _editingEvent = evt;
+        _eventForm = new EventFormModel
+        {
+            Title = evt.Title,
+            Description = evt.Description,
+            StartDate = evt.StartTime.Date,
+            EndDate = evt.EndTime.Date,
+            StartTimeOnly = TimeOnly.FromDateTime(evt.StartTime),
+            EndTimeOnly = TimeOnly.FromDateTime(evt.EndTime),
+            Location = evt.Location,
+            Color = evt.Color,
+            AllDay = evt.AllDay
+        };
+        _showEventModal = true;
+    }
+
+    private void CloseEventModal()
+    {
+        _showEventModal = false;
+        _editingEvent = null;
+        _eventForm = new();
+    }
+
+    private void SaveEvent()
+    {
+        if (string.IsNullOrWhiteSpace(_eventForm.Title))
+        {
+            Toast.Error("Error", new ToastModel { Description = "Please enter an event title" });
+            return;
+        }
+
+        var startTime = _eventForm.StartDate.Add(_eventForm.StartTimeOnly.ToTimeSpan());
+        var endTime = _eventForm.EndDate.Add(_eventForm.EndTimeOnly.ToTimeSpan());
+
+        if (endTime <= startTime)
+        {
+            Toast.Error("Error", new ToastModel { Description = "End time must be after start time" });
+            return;
+        }
+
+        if (_editingEvent != null)
+        {
+            _editingEvent.Title = _eventForm.Title;
+            _editingEvent.Description = _eventForm.Description;
+            _editingEvent.StartTime = startTime;
+            _editingEvent.EndTime = endTime;
+            _editingEvent.Location = _eventForm.Location;
+            _editingEvent.Color = _eventForm.Color;
+            _editingEvent.AllDay = _eventForm.AllDay;
+            Toast.Success("Event Updated", new ToastModel { Description = $"'{_eventForm.Title}' has been updated" });
+        }
+        else
+        {
+            var newEvent = new CalendarEvent(
+                _eventForm.Title,
+                _eventForm.Description,
+                startTime,
+                endTime,
+                _eventForm.Location,
+                _eventForm.Color,
+                _eventForm.AllDay
+            );
+            _events.Add(newEvent);
+            Toast.Success("Event Created", new ToastModel { Description = $"'{_eventForm.Title}' has been created" });
+        }
+
+        CloseEventModal();
+    }
+
+    private void DeleteEvent()
+    {
+        if (_editingEvent != null)
+        {
+            _events.Remove(_editingEvent);
+            Toast.Success("Event Deleted", new ToastModel { Description = $"'{_editingEvent.Title}' has been deleted" });
+            CloseEventModal();
+        }
+    }
+
+    private void SelectDate(DateTime date)
+    {
+        _currentDate = date;
+        _currentView = "day";
+    }
+
+    private void GoToToday()
+    {
+        _currentDate = DateTime.Today;
+        _miniCalendarDate = DateTime.Today;
+    }
+
+    private void PreviousPeriod()
+    {
+        _currentDate = _currentView switch
+        {
+            "day" => _currentDate.AddDays(-1),
+            "week" => _currentDate.AddDays(-7),
+            "month" => _currentDate.AddMonths(-1),
+            "year" => _currentDate.AddYears(-1),
+            _ => _currentDate
+        };
+    }
+
+    private void NextPeriod()
+    {
+        _currentDate = _currentView switch
+        {
+            "day" => _currentDate.AddDays(1),
+            "week" => _currentDate.AddDays(7),
+            "month" => _currentDate.AddMonths(1),
+            "year" => _currentDate.AddYears(1),
+            _ => _currentDate
+        };
+    }
+
+    private void PreviousMiniMonth() => _miniCalendarDate = _miniCalendarDate.AddMonths(-1);
+    private void NextMiniMonth() => _miniCalendarDate = _miniCalendarDate.AddMonths(1);
+
+    private string GetCurrentPeriodLabel() => _currentView switch
+    {
+        "day" => _currentDate.ToString("MMMM d, yyyy"),
+        "week" => $"{GetWeekStart(_currentDate):MMM d} - {GetWeekEnd(_currentDate):MMM d, yyyy}",
+        "month" => _currentDate.ToString("MMMM yyyy"),
+        "year" => _currentDate.Year.ToString(),
+        _ => ""
+    };
+
+    private DateTime GetWeekStart(DateTime date)
+    {
+        int diff = (7 + (date.DayOfWeek - DayOfWeek.Sunday)) % 7;
+        return date.AddDays(-diff).Date;
+    }
+
+    private DateTime GetWeekEnd(DateTime date) => GetWeekStart(date).AddDays(6);
+
+    private List<DateTime> GetWeekDays()
+    {
+        var weekStart = GetWeekStart(_currentDate);
+        return Enumerable.Range(0, 7).Select(i => weekStart.AddDays(i)).ToList();
+    }
+
+    private List<DateTime> GetMonthDays()
+    {
+        var firstOfMonth = new DateTime(_currentDate.Year, _currentDate.Month, 1);
+        var startDay = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
+        return Enumerable.Range(0, 42).Select(i => startDay.AddDays(i)).ToList();
+    }
+
+    private List<DateTime> GetMiniMonthDays(int month, int? year = null)
+    {
+        var targetYear = year ?? _currentDate.Year;
+        var firstOfMonth = new DateTime(targetYear, month, 1);
+        var startDay = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
+        return Enumerable.Range(0, 42).Select(i => startDay.AddDays(i)).ToList();
+    }
+
+    private List<CalendarEvent> GetEventsForDay(DateTime date)
+    {
+        return _events.Where(e => e.StartTime.Date <= date.Date && e.EndTime.Date >= date.Date).ToList();
+    }
+
+    private List<CalendarEvent> GetEventsForHour(DateTime date, int hour)
+    {
+        return _events.Where(e => 
+            e.StartTime.Date == date.Date && 
+            e.StartTime.Hour == hour
+        ).ToList();
+    }
+
+    private IEnumerable<CalendarEvent> GetUpcomingEvents()
+    {
+        return _events
+            .Where(e => e.StartTime >= DateTime.Now)
+            .OrderBy(e => e.StartTime)
+            .Take(10);
+    }
+
+    private int GetEventCountByCategory(string categoryName)
+    {
+        var color = _categories.FirstOrDefault(c => c.Name == categoryName)?.Color ?? "";
+        return _events.Count(e => e.Color == color);
+    }
+
+    private string GetViewButtonClass(string view)
+    {
+        var baseClass = "px-3 py-1.5 rounded-md text-sm font-medium transition-colors";
+        return _currentView == view
+            ? $"{baseClass} bg-background shadow-sm text-default-800"
+            : $"{baseClass} text-default-500 hover:text-default-700";
+    }
+
+    private string GetDayCellClass(bool isCurrentMonth, bool isToday)
+    {
+        if (!isCurrentMonth) return "bg-default-50 opacity-50";
+        if (isToday) return "bg-primary/5";
+        return "bg-background";
+    }
+
+    private string GetMiniDayClass(bool isMonthDay, bool isToday, bool hasEvents)
+    {
+        if (!isMonthDay) return "";
+        if (isToday) return "bg-primary text-white font-bold";
+        if (hasEvents) return "bg-primary/20 text-primary font-medium";
+        return "text-default-600 hover:bg-default-100";
+    }
+
+    private string GetMiniCalendarDayClass(bool isMonthDay, bool isToday, bool isSelected, bool hasEvents)
+    {
+        if (!isMonthDay) return "";
+        if (isToday) return "bg-primary text-white font-bold";
+        if (isSelected) return "bg-primary/30 text-primary font-medium";
+        if (hasEvents) return "bg-primary/10 text-primary";
+        return "text-default-600 hover:bg-default-100";
+    }
+
+    private string GetEventClass(string color) => color switch
+    {
+        "blue" => "bg-blue-100 text-blue-700",
+        "green" => "bg-green-100 text-green-700",
+        "purple" => "bg-purple-100 text-purple-700",
+        "red" => "bg-red-100 text-red-700",
+        "gray" => "bg-gray-100 text-gray-700",
+        _ => "bg-default-100 text-default-700"
+    };
+
+    private string GetEventBorderClass(string color) => color switch
+    {
+        "blue" => "bg-blue-500",
+        "green" => "bg-green-500",
+        "purple" => "bg-purple-500",
+        "red" => "bg-red-500",
+        "gray" => "bg-gray-500",
+        _ => "bg-default-500"
+    };
+
+    private string GetCategoryButtonClass(string color)
+    {
+        var isSelected = _eventForm.Color == color;
+        var baseClass = "flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors";
+        return isSelected
+            ? $"{baseClass} border-primary bg-primary/10"
+            : $"{baseClass} border-divider hover:border-primary";
+    }
+
+    private record EventCategory(string Name, string Color);
+
+    private class CalendarEvent
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public string Location { get; set; }
+        public string Color { get; set; }
+        public bool AllDay { get; set; }
+
+        public CalendarEvent(string title, string description, DateTime startTime, DateTime endTime, string location, string color, bool allDay)
+        {
+            Title = title;
+            Description = description;
+            StartTime = startTime;
+            EndTime = endTime;
+            Location = location;
+            Color = color;
+            AllDay = allDay;
+        }
+    }
+
+    private class EventFormModel
+    {
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public DateTime StartDate { get; set; } = DateTime.Today;
+        public DateTime EndDate { get; set; } = DateTime.Today;
+        public TimeOnly StartTimeOnly { get; set; } = new TimeOnly(9, 0);
+        public TimeOnly EndTimeOnly { get; set; } = new TimeOnly(10, 0);
+        public string Location { get; set; } = "";
+        public string Color { get; set; } = "blue";
+        public bool AllDay { get; set; } = false;
+    }
+}
