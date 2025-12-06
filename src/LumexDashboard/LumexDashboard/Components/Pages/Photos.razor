@@ -1,0 +1,773 @@
+@page "/photos"
+
+<PageTitle>Photo Album</PageTitle>
+
+<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-divider overflow-hidden bg-default-50">
+    <!-- Mobile Sidebar Toggle -->
+    <MobileFab OnClick="@(() => _sidebarOpen = !_sidebarOpen)">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+        </svg>
+    </MobileFab>
+
+    <!-- Mobile Overlay -->
+    <MobileOverlay Visible="_sidebarOpen" OnClick="@(() => _sidebarOpen = false)" />
+
+    <!-- Left Sidebar -->
+    <aside class="@GetSidebarPanelClass()">
+        <!-- Storage Info -->
+        <div class="p-4 border-b border-divider">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-foreground">Photo Library</p>
+                    <p class="text-xs text-default-500">@_photos.Count photos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 p-2 space-y-1 overflow-y-auto">
+            <p class="px-3 py-2 text-xs font-semibold text-default-400 uppercase tracking-wider">Library</p>
+            @foreach (var item in _sidebarItems)
+            {
+                <button class="@GetSidebarItemClass(item.Key)" @onclick="@(() => SelectCategory(item.Key))">
+                    @item.Icon
+                    <span>@item.Label</span>
+                    @if (item.Count > 0)
+                    {
+                        <span class="ml-auto text-xs bg-default-200 px-2 py-0.5 rounded-full">@item.Count</span>
+                    }
+                </button>
+            }
+
+            <LumexDivider Class="my-3" />
+
+            <p class="px-3 py-2 text-xs font-semibold text-default-400 uppercase tracking-wider">Albums</p>
+            @foreach (var album in _albums)
+            {
+                <button class="@GetAlbumItemClass(album.Name)" @onclick="@(() => SelectAlbum(album.Name))">
+                    <span class="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+                        <img src="@album.CoverUrl" alt="@album.Name" class="w-full h-full object-cover" />
+                    </span>
+                    <span class="truncate">@album.Name</span>
+                    <span class="ml-auto text-xs text-default-400">@album.PhotoCount</span>
+                </button>
+            }
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <!-- Header -->
+        <header class="p-4 border-b border-divider bg-background">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-xl font-semibold text-foreground">@GetCategoryTitle()</h1>
+                    <p class="text-sm text-default-500">@GetFilteredPhotos().Count photos</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <LumexTextbox @bind-Value="_searchQuery" 
+                                  Placeholder="Search photos..." 
+                                  Type="InputType.Search"
+                                  Size="Size.Small"
+                                  Class="w-64"
+                                  Classes="_searchClasses" />
+                    <LumexButton Variant="Variant.Flat" Size="Size.Small" IconOnly="true" OnClick="ToggleViewMode">
+                        @if (_viewMode == "grid")
+                        {
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                            </svg>
+                        }
+                    </LumexButton>
+                    <LumexButton Color="ThemeColor.Primary" Size="Size.Small">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Upload
+                    </LumexButton>
+                </div>
+            </div>
+
+            <!-- Date Filter Chips -->
+            <div class="flex gap-2 overflow-x-auto pb-2">
+                @foreach (var dateGroup in GetDateGroups())
+                {
+                    <LumexChip Size="Size.Small" 
+                               Variant="@(_selectedDateFilter == dateGroup.Key ? ChipVariant.Solid : ChipVariant.Flat)" 
+                               Color="@(_selectedDateFilter == dateGroup.Key ? ThemeColor.Primary : ThemeColor.Default)"
+                               Class="cursor-pointer flex-shrink-0"
+                               @onclick="@(() => SelectDateFilter(dateGroup.Key))">
+                        @dateGroup.Label (@dateGroup.Count)
+                    </LumexChip>
+                }
+            </div>
+        </header>
+
+        <!-- Photo Grid/List -->
+        <div class="flex-1 overflow-auto p-4">
+            @if (_viewMode == "grid")
+            {
+                @foreach (var group in GetGroupedPhotos())
+                {
+                    <div class="mb-6">
+                        <h3 class="text-sm font-semibold text-default-600 mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            @group.Key.ToString("dddd, MMMM d, yyyy")
+                            <span class="text-default-400 font-normal">(@group.Count() photos)</span>
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                            @foreach (var photo in group)
+                            {
+                                <div class="@GetPhotoCardClass(photo)" @onclick="@(() => SelectPhoto(photo))">
+                                    <div class="relative aspect-square rounded-xl overflow-hidden group">
+                                        <img src="@photo.ThumbnailUrl" alt="@photo.Title" class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
+                                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200"></div>
+                                        
+                                        <!-- Favorite Badge -->
+                                        @if (photo.IsFavorite)
+                                        {
+                                            <div class="absolute top-2 right-2">
+                                                <svg class="w-5 h-5 text-red-500 drop-shadow-md" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        }
+                                        
+                                        <!-- Hover Overlay Actions -->
+                                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <div class="flex items-center justify-between">
+                                                <button class="text-white hover:text-red-400 transition-colors" @onclick:stopPropagation="true" @onclick="@(() => ToggleFavorite(photo))">
+                                                    <svg class="w-5 h-5" fill="@(photo.IsFavorite ? "currentColor" : "none")" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                    </svg>
+                                                </button>
+                                                <button class="text-white hover:text-primary transition-colors" @onclick:stopPropagation="true" @onclick="@(() => OpenLightbox(photo))">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <LumexCard Class="rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-default-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Photo</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Title</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Size</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider">Category</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-default-500 uppercase tracking-wider"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-divider">
+                                @foreach (var photo in GetFilteredPhotos())
+                                {
+                                    <tr class="@GetPhotoRowClass(photo)" @onclick="@(() => SelectPhoto(photo))">
+                                        <td class="px-4 py-3">
+                                            <div class="w-12 h-12 rounded-lg overflow-hidden">
+                                                <img src="@photo.ThumbnailUrl" alt="@photo.Title" class="w-full h-full object-cover" />
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-medium text-foreground">@photo.Title</span>
+                                                @if (photo.IsFavorite)
+                                                {
+                                                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                                                    </svg>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-default-500">@photo.TakenDate.ToString("MMM d, yyyy")</td>
+                                        <td class="px-4 py-3 text-sm text-default-500">@photo.Dimensions</td>
+                                        <td class="px-4 py-3">
+                                            <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Primary">@photo.Category</LumexChip>
+                                        </td>
+                                        <td class="px-4 py-3" @onclick:stopPropagation="true">
+                                            <LumexDropdown>
+                                                <LumexDropdownTrigger>
+                                                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                            <circle cx="12" cy="6" r="2"></circle>
+                                                            <circle cx="12" cy="12" r="2"></circle>
+                                                            <circle cx="12" cy="18" r="2"></circle>
+                                                        </svg>
+                                                    </LumexButton>
+                                                </LumexDropdownTrigger>
+                                                <LumexDropdownMenu AriaLabel="Photo actions">
+                                                    <LumexDropdownItem Key="view">View Full Size</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="favorite">@(photo.IsFavorite ? "Remove from Favorites" : "Add to Favorites")</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="download">Download</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="share">Share</LumexDropdownItem>
+                                                    <LumexDropdownItem Key="delete" Class="text-danger">Delete</LumexDropdownItem>
+                                                </LumexDropdownMenu>
+                                            </LumexDropdown>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </LumexCard>
+            }
+        </div>
+    </div>
+
+    <!-- Right Info Panel -->
+    @if (_selectedPhoto is not null)
+    {
+        <aside class="w-80 flex-shrink-0 border-l border-divider bg-background overflow-y-auto hidden lg:block">
+            <!-- Photo Preview -->
+            <div class="p-6 border-b border-divider">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-foreground">Photo Details</h2>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" OnClick="@(() => _selectedPhoto = null)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+                <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-4 cursor-pointer group" @onclick="@(() => OpenLightbox(_selectedPhoto))">
+                    <img src="@_selectedPhoto.ThumbnailUrl" alt="@_selectedPhoto.Title" class="w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                        <svg class="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="font-semibold text-foreground text-center mb-1">@_selectedPhoto.Title</h3>
+                <p class="text-sm text-default-500 text-center">@_selectedPhoto.Category</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="p-4 border-b border-divider flex justify-center gap-2">
+                <LumexButton Variant="Variant.Flat" Size="Size.Small" Color="@(_selectedPhoto.IsFavorite ? ThemeColor.Danger : ThemeColor.Default)" OnClick="@(() => ToggleFavorite(_selectedPhoto))">
+                    <svg class="w-4 h-4 mr-1" fill="@(_selectedPhoto.IsFavorite ? "currentColor" : "none")" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    @(_selectedPhoto.IsFavorite ? "Favorited" : "Favorite")
+                </LumexButton>
+                <LumexButton Variant="Variant.Flat" Size="Size.Small">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download
+                </LumexButton>
+                <LumexButton Variant="Variant.Flat" Size="Size.Small">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    Share
+                </LumexButton>
+            </div>
+
+            <!-- Metadata -->
+            <div class="p-6 border-b border-divider space-y-4">
+                <h3 class="text-sm font-semibold text-foreground">Information</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Date Taken</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedPhoto.TakenDate.ToString("MMM d, yyyy")</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Time</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedPhoto.TakenDate.ToString("h:mm tt")</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Dimensions</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedPhoto.Dimensions</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">File Size</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedPhoto.FileSize</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-default-500">Camera</span>
+                        <span class="text-sm font-medium text-foreground">@_selectedPhoto.Camera</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Camera Settings -->
+            <div class="p-6 border-b border-divider">
+                <h3 class="text-sm font-semibold text-foreground mb-3">Camera Settings</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-default-100 rounded-lg text-center">
+                        <p class="text-xs text-default-500 mb-1">Aperture</p>
+                        <p class="text-sm font-medium text-foreground">@_selectedPhoto.Aperture</p>
+                    </div>
+                    <div class="p-3 bg-default-100 rounded-lg text-center">
+                        <p class="text-xs text-default-500 mb-1">Shutter</p>
+                        <p class="text-sm font-medium text-foreground">@_selectedPhoto.ShutterSpeed</p>
+                    </div>
+                    <div class="p-3 bg-default-100 rounded-lg text-center">
+                        <p class="text-xs text-default-500 mb-1">ISO</p>
+                        <p class="text-sm font-medium text-foreground">@_selectedPhoto.ISO</p>
+                    </div>
+                    <div class="p-3 bg-default-100 rounded-lg text-center">
+                        <p class="text-xs text-default-500 mb-1">Focal</p>
+                        <p class="text-sm font-medium text-foreground">@_selectedPhoto.FocalLength</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-foreground">Tags</h3>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var tag in _selectedPhoto.Tags)
+                    {
+                        <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Primary" Class="cursor-pointer">
+                            @tag
+                        </LumexChip>
+                    }
+                </div>
+            </div>
+        </aside>
+    }
+</div>
+
+<!-- Lightbox Modal -->
+@if (_lightboxPhoto is not null)
+{
+    <div class="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" @onclick="CloseLightbox">
+        <!-- Close Button -->
+        <button class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10" @onclick="CloseLightbox">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- Navigation Arrows -->
+        <button class="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2" @onclick:stopPropagation="true" @onclick="PreviousPhoto">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2" @onclick:stopPropagation="true" @onclick="NextPhoto">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+
+        <!-- Image -->
+        <div class="max-w-[90vw] max-h-[90vh]" @onclick:stopPropagation="true">
+            <img src="@_lightboxPhoto.FullUrl" alt="@_lightboxPhoto.Title" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" />
+        </div>
+
+        <!-- Bottom Info -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-white">
+            <p class="font-medium text-lg">@_lightboxPhoto.Title</p>
+            <p class="text-sm text-white/70">@_lightboxPhoto.TakenDate.ToString("MMMM d, yyyy") • @_lightboxPhoto.Dimensions</p>
+        </div>
+    </div>
+}
+
+@code {
+    private string _activeCategory = "all";
+    private string _selectedAlbum = "";
+    private string _searchQuery = string.Empty;
+    private string _viewMode = "grid";
+    private string _selectedDateFilter = "all";
+    private bool _sidebarOpen = false;
+    private PhotoItem? _selectedPhoto = null;
+    private PhotoItem? _lightboxPhoto = null;
+
+    private InputFieldSlots _searchClasses = new()
+    {
+        InputWrapper = "bg-default-100"
+    };
+
+    private List<SidebarItem> _sidebarItems = new()
+    {
+        new("all", "All Photos", 0,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>),
+        new("favorites", "Favorites", 0,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>),
+        new("recent", "Recently Added", 0,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>),
+        new("screenshots", "Screenshots", 0,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>),
+        new("selfies", "Selfies", 0,
+            @<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>)
+    };
+
+    private List<AlbumItem> _albums = new()
+    {
+        new("Vacation 2025", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&h=100&fit=crop", 24),
+        new("Family", "https://images.unsplash.com/photo-1609220136736-443140cffec6?w=100&h=100&fit=crop", 156),
+        new("Nature", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=100&h=100&fit=crop", 89),
+        new("City Life", "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=100&h=100&fit=crop", 45),
+        new("Food", "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop", 32)
+    };
+
+    private List<PhotoItem> _photos = new()
+    {
+        // Today
+        new("Sunset Beach", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop", 
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddHours(17).AddMinutes(30), "Travel", "4000 × 2667", "3.2 MB", "Canon EOS R5",
+            "f/2.8", "1/250s", "100", "24mm", new List<string> { "sunset", "beach", "ocean" }, true),
+        new("Mountain Vista", "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddHours(10).AddMinutes(15), "Nature", "5472 × 3648", "4.5 MB", "Sony A7 IV",
+            "f/8", "1/500s", "200", "35mm", new List<string> { "mountain", "landscape", "nature" }, false),
+        new("City Lights", "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddHours(21).AddMinutes(45), "Urban", "6000 × 4000", "5.1 MB", "Nikon Z6 II",
+            "f/4", "1/30s", "800", "50mm", new List<string> { "city", "night", "lights" }, true),
+        
+        // Yesterday
+        new("Forest Path", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-1).AddHours(14), "Nature", "4928 × 3264", "3.8 MB", "Canon EOS R5",
+            "f/5.6", "1/125s", "400", "24mm", new List<string> { "forest", "trees", "nature" }, false),
+        new("Ocean Waves", "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-1).AddHours(9), "Travel", "5184 × 3456", "4.2 MB", "Sony A7 IV",
+            "f/11", "1/1000s", "100", "70mm", new List<string> { "ocean", "waves", "water" }, true),
+        new("Coffee Art", "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-1).AddHours(8), "Food", "4000 × 6000", "2.9 MB", "iPhone 15 Pro",
+            "f/1.8", "1/60s", "100", "26mm", new List<string> { "coffee", "art", "morning" }, false),
+        
+        // 2 Days Ago
+        new("Golden Hour", "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-2).AddHours(18), "Nature", "5760 × 3840", "5.8 MB", "Canon EOS R5",
+            "f/4", "1/200s", "100", "85mm", new List<string> { "sunset", "field", "golden" }, true),
+        new("Street Portrait", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-2).AddHours(15), "Portrait", "4480 × 6720", "4.1 MB", "Sony A7 IV",
+            "f/1.4", "1/500s", "100", "85mm", new List<string> { "portrait", "street", "fashion" }, false),
+        new("Architecture", "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-2).AddHours(12), "Urban", "6000 × 4000", "4.7 MB", "Nikon Z6 II",
+            "f/8", "1/250s", "200", "16mm", new List<string> { "architecture", "building", "modern" }, false),
+        
+        // 3 Days Ago
+        new("Autumn Leaves", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-3).AddHours(11), "Nature", "5472 × 3648", "3.5 MB", "Canon EOS R5",
+            "f/2.8", "1/320s", "200", "50mm", new List<string> { "autumn", "leaves", "fall" }, false),
+        new("Starry Night", "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-3).AddHours(23), "Nature", "6720 × 4480", "6.2 MB", "Sony A7S III",
+            "f/1.4", "25s", "6400", "14mm", new List<string> { "stars", "night", "milkyway" }, true),
+        new("Fresh Salad", "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-3).AddHours(12).AddMinutes(30), "Food", "4000 × 6000", "3.1 MB", "iPhone 15 Pro",
+            "f/1.8", "1/100s", "100", "26mm", new List<string> { "food", "healthy", "salad" }, false),
+        
+        // Last Week
+        new("Desert Dunes", "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-5).AddHours(16), "Travel", "5184 × 3456", "4.0 MB", "Canon EOS R5",
+            "f/11", "1/500s", "100", "24mm", new List<string> { "desert", "sand", "travel" }, false),
+        new("Waterfall", "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-6).AddHours(10), "Nature", "5760 × 3840", "5.5 MB", "Nikon Z6 II",
+            "f/16", "1/4s", "100", "35mm", new List<string> { "waterfall", "nature", "water" }, true),
+        new("Night Market", "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=400&fit=crop",
+            "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&h=1080&fit=crop",
+            DateTime.Today.AddDays(-7).AddHours(20), "Travel", "6000 × 4000", "4.3 MB", "Sony A7 IV",
+            "f/2.8", "1/60s", "1600", "24mm", new List<string> { "market", "night", "food" }, false)
+    };
+
+    protected override void OnInitialized()
+    {
+        UpdateSidebarCounts();
+    }
+
+    private void UpdateSidebarCounts()
+    {
+        var allItem = _sidebarItems.FirstOrDefault(x => x.Key == "all");
+        if (allItem != null) allItem.Count = _photos.Count;
+
+        var favItem = _sidebarItems.FirstOrDefault(x => x.Key == "favorites");
+        if (favItem != null) favItem.Count = _photos.Count(p => p.IsFavorite);
+
+        var recentItem = _sidebarItems.FirstOrDefault(x => x.Key == "recent");
+        if (recentItem != null) recentItem.Count = _photos.Count(p => p.TakenDate >= DateTime.Today.AddDays(-7));
+    }
+
+    private void SelectCategory(string key)
+    {
+        _activeCategory = key;
+        _selectedAlbum = "";
+        _selectedPhoto = null;
+        _selectedDateFilter = "all";
+    }
+
+    private void SelectAlbum(string albumName)
+    {
+        _selectedAlbum = albumName;
+        _activeCategory = "";
+        _selectedPhoto = null;
+        _selectedDateFilter = "all";
+    }
+
+    private void SelectPhoto(PhotoItem photo)
+    {
+        _selectedPhoto = photo;
+    }
+
+    private void ToggleViewMode()
+    {
+        _viewMode = _viewMode == "grid" ? "list" : "grid";
+    }
+
+    private void ToggleFavorite(PhotoItem photo)
+    {
+        photo.IsFavorite = !photo.IsFavorite;
+        UpdateSidebarCounts();
+    }
+
+    private void OpenLightbox(PhotoItem photo)
+    {
+        _lightboxPhoto = photo;
+    }
+
+    private void CloseLightbox()
+    {
+        _lightboxPhoto = null;
+    }
+
+    private void PreviousPhoto()
+    {
+        if (_lightboxPhoto == null) return;
+        var photos = GetFilteredPhotos();
+        var currentIndex = photos.IndexOf(_lightboxPhoto);
+        if (currentIndex > 0)
+        {
+            _lightboxPhoto = photos[currentIndex - 1];
+        }
+        else
+        {
+            _lightboxPhoto = photos[photos.Count - 1];
+        }
+    }
+
+    private void NextPhoto()
+    {
+        if (_lightboxPhoto == null) return;
+        var photos = GetFilteredPhotos();
+        var currentIndex = photos.IndexOf(_lightboxPhoto);
+        if (currentIndex < photos.Count - 1)
+        {
+            _lightboxPhoto = photos[currentIndex + 1];
+        }
+        else
+        {
+            _lightboxPhoto = photos[0];
+        }
+    }
+
+    private void SelectDateFilter(string key)
+    {
+        _selectedDateFilter = key;
+    }
+
+    private List<PhotoItem> GetFilteredPhotos()
+    {
+        var photos = _photos.AsEnumerable();
+
+        // Filter by category
+        if (_activeCategory == "favorites")
+        {
+            photos = photos.Where(p => p.IsFavorite);
+        }
+        else if (_activeCategory == "recent")
+        {
+            photos = photos.Where(p => p.TakenDate >= DateTime.Today.AddDays(-7));
+        }
+        else if (!string.IsNullOrEmpty(_selectedAlbum))
+        {
+            // Filter by album: match photos whose category or tags contain the album name
+            // This allows albums to group photos by either their explicit category or related tags
+            photos = photos.Where(p => p.Category.Equals(_selectedAlbum, StringComparison.OrdinalIgnoreCase) ||
+                                       p.Tags.Any(t => t.Equals(_selectedAlbum, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        // Filter by date
+        if (_selectedDateFilter != "all")
+        {
+            if (_selectedDateFilter == "today")
+                photos = photos.Where(p => p.TakenDate.Date == DateTime.Today);
+            else if (_selectedDateFilter == "yesterday")
+                photos = photos.Where(p => p.TakenDate.Date == DateTime.Today.AddDays(-1));
+            else if (_selectedDateFilter == "thisweek")
+                photos = photos.Where(p => p.TakenDate >= DateTime.Today.AddDays(-7));
+            else if (_selectedDateFilter == "thismonth")
+                photos = photos.Where(p => p.TakenDate >= DateTime.Today.AddDays(-30));
+        }
+
+        // Filter by search
+        if (!string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            photos = photos.Where(p => 
+                p.Title.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                p.Category.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                p.Tags.Any(t => t.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        return photos.OrderByDescending(p => p.TakenDate).ToList();
+    }
+
+    private IEnumerable<IGrouping<DateTime, PhotoItem>> GetGroupedPhotos()
+    {
+        return GetFilteredPhotos().GroupBy(p => p.TakenDate.Date).OrderByDescending(g => g.Key);
+    }
+
+    private List<DateGroup> GetDateGroups()
+    {
+        var today = DateTime.Today;
+        return new List<DateGroup>
+        {
+            new("all", "All", _photos.Count),
+            new("today", "Today", _photos.Count(p => p.TakenDate.Date == today)),
+            new("yesterday", "Yesterday", _photos.Count(p => p.TakenDate.Date == today.AddDays(-1))),
+            new("thisweek", "This Week", _photos.Count(p => p.TakenDate >= today.AddDays(-7))),
+            new("thismonth", "This Month", _photos.Count(p => p.TakenDate >= today.AddDays(-30)))
+        };
+    }
+
+    private string GetSidebarItemClass(string key)
+    {
+        var baseClass = "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm";
+        return _activeCategory == key && string.IsNullOrEmpty(_selectedAlbum)
+            ? $"{baseClass} bg-primary/10 text-primary font-medium"
+            : $"{baseClass} text-default-500 hover:bg-default-100";
+    }
+
+    private string GetAlbumItemClass(string albumName)
+    {
+        var baseClass = "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm";
+        return _selectedAlbum == albumName
+            ? $"{baseClass} bg-primary/10 text-primary font-medium"
+            : $"{baseClass} text-default-500 hover:bg-default-100";
+    }
+
+    private string GetSidebarPanelClass() =>
+        _sidebarOpen
+            ? "fixed lg:relative inset-y-0 left-0 z-50 w-56 flex-shrink-0 border-r border-divider flex flex-col bg-background transform translate-x-0 transition-transform duration-300"
+            : "fixed lg:relative inset-y-0 left-0 z-50 w-56 flex-shrink-0 border-r border-divider flex flex-col bg-background transform -translate-x-full lg:translate-x-0 transition-transform duration-300";
+
+    private string GetCategoryTitle()
+    {
+        if (!string.IsNullOrEmpty(_selectedAlbum))
+            return _selectedAlbum;
+        return _sidebarItems.FirstOrDefault(x => x.Key == _activeCategory)?.Label ?? "All Photos";
+    }
+
+    private string GetPhotoRowClass(PhotoItem photo)
+    {
+        var baseClass = "hover:bg-default-50 cursor-pointer transition-colors";
+        return photo == _selectedPhoto ? $"{baseClass} bg-primary/5" : baseClass;
+    }
+
+    private string GetPhotoCardClass(PhotoItem photo)
+    {
+        return photo == _selectedPhoto ? "ring-2 ring-primary rounded-xl" : "";
+    }
+
+    private record DateGroup(string Key, string Label, int Count);
+    private record AlbumItem(string Name, string CoverUrl, int PhotoCount);
+
+    private class SidebarItem
+    {
+        public string Key { get; set; }
+        public string Label { get; set; }
+        public int Count { get; set; }
+        public RenderFragment Icon { get; set; }
+
+        public SidebarItem(string key, string label, int count, RenderFragment icon)
+        {
+            Key = key;
+            Label = label;
+            Count = count;
+            Icon = icon;
+        }
+    }
+
+    private class PhotoItem
+    {
+        public string Title { get; set; }
+        public string ThumbnailUrl { get; set; }
+        public string FullUrl { get; set; }
+        public DateTime TakenDate { get; set; }
+        public string Category { get; set; }
+        public string Dimensions { get; set; }
+        public string FileSize { get; set; }
+        public string Camera { get; set; }
+        public string Aperture { get; set; }
+        public string ShutterSpeed { get; set; }
+        public string ISO { get; set; }
+        public string FocalLength { get; set; }
+        public List<string> Tags { get; set; }
+        public bool IsFavorite { get; set; }
+
+        public PhotoItem(string title, string thumbnailUrl, string fullUrl, DateTime takenDate, string category,
+            string dimensions, string fileSize, string camera, string aperture, string shutterSpeed,
+            string iso, string focalLength, List<string> tags, bool isFavorite)
+        {
+            Title = title;
+            ThumbnailUrl = thumbnailUrl;
+            FullUrl = fullUrl;
+            TakenDate = takenDate;
+            Category = category;
+            Dimensions = dimensions;
+            FileSize = fileSize;
+            Camera = camera;
+            Aperture = aperture;
+            ShutterSpeed = shutterSpeed;
+            ISO = iso;
+            FocalLength = focalLength;
+            Tags = tags;
+            IsFavorite = isFavorite;
+        }
+    }
+}
