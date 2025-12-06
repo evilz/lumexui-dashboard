@@ -1,7 +1,6 @@
 @page "/domotique"
 @using LumexUI
 @using LumexUI.Common
-@inject AppStateService AppState
 @inject ToastService Toast
 
 <PageTitle>Home Domotique</PageTitle>
@@ -486,6 +485,9 @@
                 _readingLightOn = false;
                 _securityArmed = true;
                 _heatingOn = false;
+                break;
+            default:
+                // Custom scene - no predefined settings
                 break;
         }
     }
