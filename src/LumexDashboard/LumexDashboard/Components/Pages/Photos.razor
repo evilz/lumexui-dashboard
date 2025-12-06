@@ -587,7 +587,7 @@
         }
         else
         {
-            _lightboxPhoto = photos[^1];
+            _lightboxPhoto = photos[photos.Count - 1];
         }
     }
 
@@ -626,7 +626,8 @@
         }
         else if (!string.IsNullOrEmpty(_selectedAlbum))
         {
-            // Filter by album category
+            // Filter by album: match photos whose category or tags contain the album name
+            // This allows albums to group photos by either their explicit category or related tags
             photos = photos.Where(p => p.Category.Equals(_selectedAlbum, StringComparison.OrdinalIgnoreCase) ||
                                        p.Tags.Any(t => t.Equals(_selectedAlbum, StringComparison.OrdinalIgnoreCase)));
         }
@@ -647,11 +648,10 @@
         // Filter by search
         if (!string.IsNullOrWhiteSpace(_searchQuery))
         {
-            var query = _searchQuery.ToLower();
             photos = photos.Where(p => 
-                p.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                p.Category.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                p.Tags.Any(t => t.Contains(query, StringComparison.OrdinalIgnoreCase)));
+                p.Title.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                p.Category.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                p.Tags.Any(t => t.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)));
         }
 
         return photos.OrderByDescending(p => p.TakenDate).ToList();
