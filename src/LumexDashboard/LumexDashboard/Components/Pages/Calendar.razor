@@ -117,7 +117,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-divider">
-                                @for (int hour = 8; hour < 20; hour++)
+                                @for (int hour = 6; hour < 22; hour++)
                                 {
                                     var currentHour = hour;
                                     <tr class="divide-x divide-divider">
@@ -476,7 +476,7 @@
         new("Lunch with Client", "Business lunch at downtown restaurant", DateTime.Today.AddHours(12), DateTime.Today.AddHours(13), "Downtown Cafe", "green", false),
         new("Product Launch", "New product launch event", DateTime.Today.AddDays(2).AddHours(10), DateTime.Today.AddDays(2).AddHours(16), "Convention Center", "red", false),
         new("Code Review", "Review pull requests for sprint", DateTime.Today.AddDays(1).AddHours(11), DateTime.Today.AddDays(1).AddHours(12), "", "blue", false),
-        new("Birthday Party", "John's birthday celebration", DateTime.Today.AddDays(3), DateTime.Today.AddDays(3).AddHours(23.99), "Office Lounge", "green", true),
+        new("Birthday Party", "John's birthday celebration", DateTime.Today.AddDays(3), DateTime.Today.AddDays(4).AddTicks(-1), "Office Lounge", "green", true),
         new("Sprint Planning", "Plan next sprint tasks", DateTime.Today.AddDays(4).AddHours(9), DateTime.Today.AddDays(4).AddHours(11), "Meeting Room B", "purple", false),
         new("Dentist Appointment", "Regular checkup", DateTime.Today.AddDays(5).AddHours(15), DateTime.Today.AddDays(5).AddHours(16), "City Dental Clinic", "gray", false),
         new("Quarterly Report Due", "Submit Q4 financial report", DateTime.Today.AddDays(7), DateTime.Today.AddDays(7).AddHours(17), "", "red", true),
@@ -662,9 +662,14 @@
 
     private List<CalendarEvent> GetEventsForHour(DateTime date, int hour)
     {
+        var hourStart = date.Date.AddHours(hour);
+        var hourEnd = hourStart.AddHours(1);
+        
+        // Return events that overlap with this hour slot
         return _events.Where(e => 
             e.StartTime.Date == date.Date && 
-            e.StartTime.Hour == hour
+            e.StartTime < hourEnd && 
+            e.EndTime > hourStart
         ).ToList();
     }
 
