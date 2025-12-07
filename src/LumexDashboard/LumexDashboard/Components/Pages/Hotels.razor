@@ -1,0 +1,653 @@
+@page "/hotels"
+@inject ToastService Toast
+
+<PageTitle>Hotel Search</PageTitle>
+
+<div class="flex h-[calc(100vh-8rem)] -m-4 lg:-m-6 rounded-lg border border-divider overflow-hidden bg-default-50">
+    <!-- Mobile Sidebar Toggle -->
+    <MobileFab OnClick="@(() => _sidebarOpen = !_sidebarOpen)">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+        </svg>
+    </MobileFab>
+
+    <!-- Mobile Overlay -->
+    <MobileOverlay Visible="_sidebarOpen" OnClick="@(() => _sidebarOpen = false)" />
+
+    <!-- Left Sidebar - Filters -->
+    <aside class="@GetSidebarPanelClass()">
+        <div class="p-4 border-b border-divider">
+            <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Filters
+            </h2>
+        </div>
+
+        <!-- Filters Panel -->
+        <div class="flex-1 p-4 space-y-6 overflow-y-auto">
+            <!-- Location Filter -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Location</label>
+                <LumexTextbox @bind-Value="_location" 
+                              Placeholder="Enter city or destination..." 
+                              Type="InputType.Text"
+                              Size="Size.Small"
+                              Class="w-full" />
+            </div>
+
+            <!-- Check-in Date -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Check-in</label>
+                <input type="date" @bind="_checkInDate" @bind:format="yyyy-MM-dd"
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-divider bg-default-100 text-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+
+            <!-- Check-out Date -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Check-out</label>
+                <input type="date" @bind="_checkOutDate" @bind:format="yyyy-MM-dd"
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-divider bg-default-100 text-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+
+            <!-- Number of Beds -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Beds</label>
+                <select @bind="_beds" 
+                        class="w-full px-3 py-2 text-sm rounded-lg border border-divider bg-default-100 text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">Select number of beds</option>
+                    <option value="1">1 Bed</option>
+                    <option value="2">2 Beds</option>
+                    <option value="3">3 Beds</option>
+                    <option value="4">4+ Beds</option>
+                </select>
+            </div>
+
+            <!-- Number of Guests -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Guests</label>
+                <select @bind="_guests" 
+                        class="w-full px-3 py-2 text-sm rounded-lg border border-divider bg-default-100 text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">Select number of guests</option>
+                    <option value="1">1 Guest</option>
+                    <option value="2">2 Guests</option>
+                    <option value="3">3 Guests</option>
+                    <option value="4">4 Guests</option>
+                    <option value="5">5+ Guests</option>
+                </select>
+            </div>
+
+            <!-- Property Type -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Property Type</label>
+                <div class="space-y-2">
+                    @foreach (var type in _propertyTypes)
+                    {
+                        <LumexCheckbox @bind-Value="type.Selected">
+                            @type.Name
+                        </LumexCheckbox>
+                    }
+                </div>
+            </div>
+
+            <!-- Price Range -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Price Range (per night)</label>
+                <div class="flex items-center gap-2">
+                    <input type="number" @bind="_minPrice" 
+                           placeholder="Min" 
+                           class="flex-1 px-3 py-2 text-sm rounded-lg border border-divider bg-default-100 text-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <span class="text-default-500">-</span>
+                    <input type="number" @bind="_maxPrice" 
+                           placeholder="Max" 
+                           class="flex-1 px-3 py-2 text-sm rounded-lg border border-divider bg-default-100 text-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+                </div>
+            </div>
+
+            <!-- Amenities -->
+            <div>
+                <label class="block text-sm font-medium text-foreground mb-2">Amenities</label>
+                <div class="space-y-2">
+                    @foreach (var amenity in _amenities)
+                    {
+                        <LumexCheckbox @bind-Value="amenity.Selected">
+                            @amenity.Name
+                        </LumexCheckbox>
+                    }
+                </div>
+            </div>
+
+            <!-- Search Buttons -->
+            <div class="flex gap-2">
+                <LumexButton Color="ThemeColor.Primary" 
+                            Size="Size.Small" 
+                            Class="flex-1"
+                            OnClick="SearchHotels">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Search
+                </LumexButton>
+                <LumexButton Variant="Variant.Flat" 
+                            Size="Size.Small"
+                            OnClick="ClearFilters">
+                    Clear
+                </LumexButton>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <!-- Header -->
+        <header class="p-4 border-b border-divider bg-background">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-xl font-semibold text-foreground">Hotel & B&B Search</h1>
+                    <p class="text-sm text-default-500">@GetFilteredHotels().Count properties available</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select @bind="_sortBy" 
+                            class="w-48 px-3 py-2 text-sm rounded-lg border border-divider bg-default-100 text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="recommended">Recommended</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Rating</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Active Filters Summary -->
+            @if (HasActiveFilters())
+            {
+                <div class="flex flex-wrap gap-2">
+                    @if (!string.IsNullOrWhiteSpace(_location))
+                    {
+                        <LumexChip Size="Size.Small" 
+                                  Variant="ChipVariant.Flat" 
+                                  Color="ThemeColor.Primary"
+                                  OnClose="@(() => _location = string.Empty)">
+                            📍 @_location
+                        </LumexChip>
+                    }
+                    @if (_checkInDate.HasValue)
+                    {
+                        <LumexChip Size="Size.Small" 
+                                  Variant="ChipVariant.Flat" 
+                                  Color="ThemeColor.Primary"
+                                  OnClose="@(() => _checkInDate = null)">
+                            Check-in: @_checkInDate.Value.ToString("MM/dd/yyyy")
+                        </LumexChip>
+                    }
+                    @if (_checkOutDate.HasValue)
+                    {
+                        <LumexChip Size="Size.Small" 
+                                  Variant="ChipVariant.Flat" 
+                                  Color="ThemeColor.Primary"
+                                  OnClose="@(() => _checkOutDate = null)">
+                            Check-out: @_checkOutDate.Value.ToString("MM/dd/yyyy")
+                        </LumexChip>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_beds))
+                    {
+                        <LumexChip Size="Size.Small" 
+                                  Variant="ChipVariant.Flat" 
+                                  Color="ThemeColor.Primary"
+                                  OnClose="@(() => _beds = string.Empty)">
+                            🛏️ @_beds Bed(s)
+                        </LumexChip>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_guests))
+                    {
+                        <LumexChip Size="Size.Small" 
+                                  Variant="ChipVariant.Flat" 
+                                  Color="ThemeColor.Primary"
+                                  OnClose="@(() => _guests = string.Empty)">
+                            👥 @_guests Guest(s)
+                        </LumexChip>
+                    }
+                </div>
+            }
+        </header>
+
+        <!-- Hotel List -->
+        <div class="flex-1 overflow-auto p-4">
+            @if (!_searchPerformed)
+            {
+                <div class="flex flex-col items-center justify-center h-full text-center">
+                    <svg class="w-24 h-24 text-default-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Find Your Perfect Stay</h3>
+                    <p class="text-sm text-default-500">Use the filters on the left to search for hotels and B&Bs</p>
+                </div>
+            }
+            else if (GetFilteredHotels().Count == 0)
+            {
+                <div class="flex flex-col items-center justify-center h-full text-center">
+                    <svg class="w-24 h-24 text-default-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">No Properties Found</h3>
+                    <p class="text-sm text-default-500">Try adjusting your search filters</p>
+                </div>
+            }
+            else
+            {
+                <div class="space-y-4">
+                    @foreach (var hotel in GetFilteredHotels())
+                    {
+                        <LumexCard Class="rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                                  @onclick="@(() => SelectHotel(hotel))">
+                            <div class="flex flex-col md:flex-row">
+                                <!-- Hotel Image -->
+                                <div class="w-full md:w-72 h-48 md:h-auto bg-gradient-to-br @hotel.ImageGradient flex-shrink-0">
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Hotel Details -->
+                                <div class="flex-1 p-4 md:p-6">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h3 class="text-lg font-semibold text-foreground">@hotel.Name</h3>
+                                                <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Primary">
+                                                    @hotel.Type
+                                                </LumexChip>
+                                            </div>
+                                            <p class="text-sm text-default-500 flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                </svg>
+                                                @hotel.Location
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                                            </svg>
+                                            <span class="text-sm font-semibold text-foreground">@hotel.Rating.ToString("0.0")</span>
+                                            <span class="text-xs text-default-500">(@hotel.Reviews reviews)</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="text-sm text-default-600 mb-3 line-clamp-2">@hotel.Description</p>
+
+                                    <!-- Amenities -->
+                                    <div class="flex flex-wrap gap-2 mb-3">
+                                        @foreach (var amenity in hotel.Amenities.Take(4))
+                                        {
+                                            <span class="text-xs px-2 py-1 rounded-full bg-default-100 text-default-600">
+                                                @amenity
+                                            </span>
+                                        }
+                                        @if (hotel.Amenities.Count > 4)
+                                        {
+                                            <span class="text-xs px-2 py-1 rounded-full bg-default-100 text-default-600">
+                                                +@(hotel.Amenities.Count - 4) more
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <!-- Room Info & Price -->
+                                    <div class="flex items-center justify-between pt-3 border-t border-divider">
+                                        <div class="flex items-center gap-4 text-sm text-default-500">
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                                </svg>
+                                                @hotel.Beds Bed@(hotel.Beds > 1 ? "s" : "")
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                </svg>
+                                                Up to @hotel.MaxGuests Guests
+                                            </span>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-xs text-default-500">From</p>
+                                            <p class="text-2xl font-bold text-primary">$@hotel.PricePerNight</p>
+                                            <p class="text-xs text-default-500">per night</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </LumexCard>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Right Info Panel -->
+    @if (_selectedHotel is not null)
+    {
+        <aside class="w-80 flex-shrink-0 border-l border-divider bg-background overflow-y-auto">
+            <!-- Hotel Preview -->
+            <div class="p-6 border-b border-divider">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-foreground">Details</h2>
+                    <LumexButton Variant="Variant.Light" Size="Size.Small" IconOnly="true" OnClick="@(() => _selectedHotel = null)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </LumexButton>
+                </div>
+                <div class="w-full h-40 rounded-xl bg-gradient-to-br @_selectedHotel.ImageGradient mb-4 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-foreground mb-1">@_selectedHotel.Name</h3>
+                <p class="text-sm text-default-500 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    @_selectedHotel.Location
+                </p>
+            </div>
+
+            <!-- About -->
+            <div class="p-6 border-b border-divider">
+                <h3 class="text-sm font-semibold text-foreground mb-2">About</h3>
+                <p class="text-sm text-default-600">@_selectedHotel.Description</p>
+            </div>
+
+            <!-- Details -->
+            <div class="p-6 border-b border-divider space-y-3">
+                <h3 class="text-sm font-semibold text-foreground">Property Details</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-default-500">Type</span>
+                        <span class="font-medium text-foreground">@_selectedHotel.Type</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-default-500">Beds</span>
+                        <span class="font-medium text-foreground">@_selectedHotel.Beds</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-default-500">Max Guests</span>
+                        <span class="font-medium text-foreground">@_selectedHotel.MaxGuests</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-default-500">Rating</span>
+                        <span class="font-medium text-foreground flex items-center gap-1">
+                            <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                            </svg>
+                            @_selectedHotel.Rating.ToString("0.0")
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-default-500">Price per night</span>
+                        <span class="font-bold text-primary">$@_selectedHotel.PricePerNight</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amenities -->
+            <div class="p-6 border-b border-divider">
+                <h3 class="text-sm font-semibold text-foreground mb-3">Amenities</h3>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var amenity in _selectedHotel.Amenities)
+                    {
+                        <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="ThemeColor.Default">
+                            @amenity
+                        </LumexChip>
+                    }
+                </div>
+            </div>
+
+            <!-- Book Button -->
+            <div class="p-6">
+                <LumexButton Color="ThemeColor.Primary" 
+                            Size="Size.Medium" 
+                            Class="w-full"
+                            OnClick="BookHotel">
+                    Book Now
+                </LumexButton>
+            </div>
+        </aside>
+    }
+</div>
+
+@code {
+    private bool _sidebarOpen = false;
+    private bool _searchPerformed = false;
+    private string _location = string.Empty;
+    private DateTime? _checkInDate = null;
+    private DateTime? _checkOutDate = null;
+    private string _beds = string.Empty;
+    private string _guests = string.Empty;
+    private string _minPrice = string.Empty;
+    private string _maxPrice = string.Empty;
+    private string _sortBy = "recommended";
+    private HotelItem? _selectedHotel = null;
+
+    private List<FilterOption> _propertyTypes = new()
+    {
+        new("Hotel", false),
+        new("B&B", false),
+        new("Guesthouse", false),
+        new("Apartment", false)
+    };
+
+    private List<FilterOption> _amenities = new()
+    {
+        new("WiFi", false),
+        new("Parking", false),
+        new("Pool", false),
+        new("Breakfast", false),
+        new("Pet Friendly", false),
+        new("Air Conditioning", false)
+    };
+
+    private List<HotelItem> _hotels = new()
+    {
+        new("Grand Plaza Hotel", "Hotel", "New York, NY", 4.5, 328, 
+            "Luxury hotel in the heart of Manhattan with stunning city views and world-class amenities.",
+            2, 4, 299, 
+            new List<string> { "WiFi", "Pool", "Parking", "Breakfast", "Gym", "Restaurant" },
+            "from-blue-400 to-blue-600"),
+        new("Cozy Corner B&B", "B&B", "Portland, OR", 4.8, 156, 
+            "Charming bed and breakfast in a historic Victorian home. Homemade breakfast included.",
+            1, 2, 129, 
+            new List<string> { "WiFi", "Breakfast", "Parking", "Pet Friendly" },
+            "from-pink-400 to-rose-600"),
+        new("Seaside Resort & Spa", "Hotel", "Miami Beach, FL", 4.6, 892, 
+            "Beachfront resort with spa, multiple restaurants, and breathtaking ocean views.",
+            3, 6, 399, 
+            new List<string> { "WiFi", "Pool", "Spa", "Beach Access", "Restaurant", "Bar" },
+            "from-cyan-400 to-blue-600"),
+        new("Mountain View Lodge", "Guesthouse", "Aspen, CO", 4.7, 243, 
+            "Rustic mountain lodge with panoramic views and easy access to ski slopes.",
+            2, 4, 249, 
+            new List<string> { "WiFi", "Parking", "Fireplace", "Ski Storage", "Breakfast" },
+            "from-green-400 to-emerald-600"),
+        new("City Center Apartments", "Apartment", "San Francisco, CA", 4.4, 567, 
+            "Modern apartments in the financial district with full kitchen and city views.",
+            2, 4, 199, 
+            new List<string> { "WiFi", "Parking", "Kitchen", "Air Conditioning", "Washer/Dryer" },
+            "from-purple-400 to-indigo-600"),
+        new("The Garden House B&B", "B&B", "Charleston, SC", 4.9, 189, 
+            "Beautiful garden setting with southern hospitality and gourmet breakfast.",
+            1, 2, 159, 
+            new List<string> { "WiFi", "Breakfast", "Garden", "Pet Friendly", "Air Conditioning" },
+            "from-amber-400 to-orange-600"),
+        new("Downtown Boutique Hotel", "Hotel", "Austin, TX", 4.5, 412, 
+            "Trendy boutique hotel in the entertainment district with rooftop bar.",
+            2, 4, 219, 
+            new List<string> { "WiFi", "Bar", "Restaurant", "Parking", "Air Conditioning" },
+            "from-red-400 to-pink-600"),
+        new("Lakeside Retreat", "Guesthouse", "Lake Tahoe, NV", 4.8, 298, 
+            "Peaceful lakeside retreat perfect for families and outdoor enthusiasts.",
+            3, 6, 279, 
+            new List<string> { "WiFi", "Parking", "Fireplace", "Lake Access", "BBQ Area", "Breakfast" },
+            "from-teal-400 to-cyan-600")
+    };
+
+    private void SearchHotels()
+    {
+        _searchPerformed = true;
+        _sidebarOpen = false;
+        Toast.Info("Search completed!");
+    }
+
+    private void ClearFilters()
+    {
+        _location = string.Empty;
+        _checkInDate = null;
+        _checkOutDate = null;
+        _beds = string.Empty;
+        _guests = string.Empty;
+        _minPrice = string.Empty;
+        _maxPrice = string.Empty;
+        _sortBy = "recommended";
+        
+        foreach (var type in _propertyTypes)
+        {
+            type.Selected = false;
+        }
+        
+        foreach (var amenity in _amenities)
+        {
+            amenity.Selected = false;
+        }
+        
+        _searchPerformed = false;
+        Toast.Info("Filters cleared");
+    }
+
+    private void SelectHotel(HotelItem hotel)
+    {
+        _selectedHotel = hotel;
+    }
+
+    private void BookHotel()
+    {
+        if (_selectedHotel is not null)
+        {
+            Toast.Success($"Booking request for {_selectedHotel.Name}!");
+        }
+    }
+
+    private List<HotelItem> GetFilteredHotels()
+    {
+        if (!_searchPerformed)
+        {
+            return new List<HotelItem>();
+        }
+
+        var filtered = _hotels.AsEnumerable();
+
+        // Filter by location
+        if (!string.IsNullOrWhiteSpace(_location))
+        {
+            filtered = filtered.Where(h => h.Location.Contains(_location, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Filter by beds
+        if (!string.IsNullOrWhiteSpace(_beds))
+        {
+            if (int.TryParse(_beds, out int bedsCount))
+            {
+                filtered = filtered.Where(h => h.Beds >= bedsCount);
+            }
+        }
+
+        // Filter by guests
+        if (!string.IsNullOrWhiteSpace(_guests))
+        {
+            if (int.TryParse(_guests, out int guestsCount))
+            {
+                filtered = filtered.Where(h => h.MaxGuests >= guestsCount);
+            }
+        }
+
+        // Filter by property type
+        var selectedTypes = _propertyTypes.Where(t => t.Selected).Select(t => t.Name).ToList();
+        if (selectedTypes.Any())
+        {
+            filtered = filtered.Where(h => selectedTypes.Contains(h.Type));
+        }
+
+        // Filter by price range
+        if (!string.IsNullOrWhiteSpace(_minPrice))
+        {
+            if (int.TryParse(_minPrice, out int minPrice))
+            {
+                filtered = filtered.Where(h => h.PricePerNight >= minPrice);
+            }
+        }
+        if (!string.IsNullOrWhiteSpace(_maxPrice))
+        {
+            if (int.TryParse(_maxPrice, out int maxPrice))
+            {
+                filtered = filtered.Where(h => h.PricePerNight <= maxPrice);
+            }
+        }
+
+        // Filter by amenities
+        var selectedAmenities = _amenities.Where(a => a.Selected).Select(a => a.Name).ToList();
+        if (selectedAmenities.Any())
+        {
+            filtered = filtered.Where(h => selectedAmenities.All(a => h.Amenities.Contains(a)));
+        }
+
+        // Sort
+        filtered = _sortBy switch
+        {
+            "price-low" => filtered.OrderBy(h => h.PricePerNight),
+            "price-high" => filtered.OrderByDescending(h => h.PricePerNight),
+            "rating" => filtered.OrderByDescending(h => h.Rating),
+            _ => filtered // recommended (default order)
+        };
+
+        return filtered.ToList();
+    }
+
+    private bool HasActiveFilters()
+    {
+        return !string.IsNullOrWhiteSpace(_location) ||
+               _checkInDate.HasValue ||
+               _checkOutDate.HasValue ||
+               !string.IsNullOrWhiteSpace(_beds) ||
+               !string.IsNullOrWhiteSpace(_guests) ||
+               _propertyTypes.Any(t => t.Selected) ||
+               _amenities.Any(a => a.Selected) ||
+               !string.IsNullOrWhiteSpace(_minPrice) ||
+               !string.IsNullOrWhiteSpace(_maxPrice);
+    }
+
+    private string GetSidebarPanelClass() =>
+        _sidebarOpen
+            ? "fixed lg:relative inset-y-0 left-0 z-50 w-64 flex-shrink-0 border-r border-divider flex flex-col bg-background transform translate-x-0 transition-transform duration-300"
+            : "fixed lg:relative inset-y-0 left-0 z-50 w-64 flex-shrink-0 border-r border-divider flex flex-col bg-background transform -translate-x-full lg:translate-x-0 transition-transform duration-300";
+
+    private record FilterOption(string Name, bool Selected)
+    {
+        public bool Selected { get; set; } = Selected;
+    }
+
+    private record HotelItem(
+        string Name,
+        string Type,
+        string Location,
+        double Rating,
+        int Reviews,
+        string Description,
+        int Beds,
+        int MaxGuests,
+        int PricePerNight,
+        List<string> Amenities,
+        string ImageGradient
+    );
+}
