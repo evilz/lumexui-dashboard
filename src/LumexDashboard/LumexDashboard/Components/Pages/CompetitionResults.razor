@@ -1,0 +1,577 @@
+@page "/competition-results"
+@inject ToastService Toast
+@using LumexUI
+@using LumexUI.Common
+
+<PageTitle>Competition Results - Parkour/Gymnastics</PageTitle>
+
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-foreground">Competition Results</h1>
+            <p class="text-default-500 mt-1">Parkour & Gymnastics Competition Rankings</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <LumexButton Variant="Variant.Flat" Size="Size.Small" OnClick="@(() => _detailedView = !_detailedView)">
+                @if (_detailedView)
+                {
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    @:Simplified View
+                }
+                else
+                {
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    @:Detailed View
+                }
+            </LumexButton>
+            <LumexButton Color="ThemeColor.Primary" Size="Size.Small" OnClick="RefreshScores">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Refresh Scores
+            </LumexButton>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <LumexCard>
+        <LumexCardBody Class="p-4">
+            <div class="flex flex-col md:flex-row gap-4">
+                <!-- Search Athlete -->
+                <div class="flex-1 relative">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-default-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" @bind="_searchQuery" @bind:event="oninput" placeholder="Search athlete..." class="w-full pl-10 pr-4 py-2 text-sm bg-default-100 border border-divider rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder-default-400" />
+                </div>
+
+                <!-- Event Filter -->
+                <LumexDropdown @bind-Value="_eventFilter">
+                    <LumexDropdownTrigger>
+                        <LumexButton Variant="Variant.Outlined">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            @GetEventLabel(_eventFilter)
+                        </LumexButton>
+                    </LumexDropdownTrigger>
+                    <LumexDropdownMenu>
+                        <LumexDropdownItem Value="all">All Events</LumexDropdownItem>
+                        <LumexDropdownItem Value="parkour">Parkour Speed</LumexDropdownItem>
+                        <LumexDropdownItem Value="freestyle">Parkour Freestyle</LumexDropdownItem>
+                        <LumexDropdownItem Value="floor">Floor Exercise</LumexDropdownItem>
+                        <LumexDropdownItem Value="vault">Vault</LumexDropdownItem>
+                    </LumexDropdownMenu>
+                </LumexDropdown>
+
+                <!-- Club Filter -->
+                <LumexDropdown @bind-Value="_clubFilter">
+                    <LumexDropdownTrigger>
+                        <LumexButton Variant="Variant.Outlined">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            @GetClubLabel(_clubFilter)
+                        </LumexButton>
+                    </LumexDropdownTrigger>
+                    <LumexDropdownMenu>
+                        <LumexDropdownItem Value="all">All Clubs</LumexDropdownItem>
+                        <LumexDropdownItem Value="apex">Apex Parkour</LumexDropdownItem>
+                        <LumexDropdownItem Value="momentum">Momentum Athletics</LumexDropdownItem>
+                        <LumexDropdownItem Value="urban">Urban Flow</LumexDropdownItem>
+                        <LumexDropdownItem Value="elite">Elite Gymnastics</LumexDropdownItem>
+                    </LumexDropdownMenu>
+                </LumexDropdown>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Results Table -->
+    <LumexCard>
+        <LumexCardBody Class="p-0">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-default-50">
+                        <tr>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Position</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Athlete</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Club</th>
+                            <th class="text-left text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Event</th>
+                            @if (_detailedView)
+                            {
+                                <th class="text-center text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Execution</th>
+                                <th class="text-center text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Difficulty</th>
+                                <th class="text-center text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Composition</th>
+                            }
+                            <th class="text-center text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Total Score</th>
+                            <th class="text-center text-xs font-semibold text-default-500 uppercase tracking-wider px-6 py-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-divider">
+                        @foreach (var result in FilteredResults)
+                        {
+                            <tr class="hover:bg-default-50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        @if (result.Position <= 3)
+                                        {
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold @GetPositionColor(result.Position)">
+                                                @result.Position
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-sm font-medium text-foreground">@result.Position</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <LumexAvatar Name="@result.AthleteName" Size="Size.Medium" />
+                                        <div>
+                                            <p class="text-sm font-medium text-foreground">@result.AthleteName</p>
+                                            <p class="text-xs text-default-500">@result.Age years old</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="@GetClubDotClass(result.Club) w-2 h-2 rounded-full"></span>
+                                        <span class="text-sm text-default-600">@result.Club</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <LumexChip Size="Size.Small" Variant="ChipVariant.Flat" Color="@GetEventColor(result.Event)">
+                                        @result.Event
+                                    </LumexChip>
+                                </td>
+                                @if (_detailedView)
+                                {
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-medium text-foreground">@result.ExecutionScore.ToString("F2")</span>
+                                            <span class="text-xs text-default-400">/ 10.0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-medium text-foreground">@result.DifficultyScore.ToString("F2")</span>
+                                            <span class="text-xs text-default-400">/ 10.0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-medium text-foreground">@result.CompositionScore.ToString("F2")</span>
+                                            <span class="text-xs text-default-400">/ 10.0</span>
+                                        </div>
+                                    </td>
+                                }
+                                <td class="px-6 py-4 text-center">
+                                    <span class="text-lg font-bold text-primary">@result.TotalScore.ToString("F2")</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <LumexButton Variant="Variant.Light" Size="Size.Small" IsIconOnly="true" OnClick="@(() => ViewAthleteDetails(result))">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                        </LumexButton>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between px-6 py-4 border-t border-divider">
+                @{
+                    var filteredCount = FilteredResults.Count();
+                    var fromItem = filteredCount > 0 ? (_currentPage - 1) * _pageSize + 1 : 0;
+                    var toItem = Math.Min(_currentPage * _pageSize, filteredCount);
+                }
+                <p class="text-sm text-default-500">
+                    Showing @fromItem to @toItem of @filteredCount results
+                </p>
+                <div class="flex gap-2">
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage == 1)" OnClick="PreviousPage">
+                        Previous
+                    </LumexButton>
+                    <LumexButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(_currentPage * _pageSize >= filteredCount)" OnClick="NextPage">
+                        Next
+                    </LumexButton>
+                </div>
+            </div>
+        </LumexCardBody>
+    </LumexCard>
+
+    <!-- Statistics Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-default-500 mb-1">Total Athletes</p>
+                        <p class="text-2xl font-bold text-foreground">@_results.Count</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-default-500 mb-1">Avg Score</p>
+                        <p class="text-2xl font-bold text-foreground">@(_results.Any() ? _results.Average(r => r.TotalScore).ToString("F2") : "0.00")</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-default-500 mb-1">Top Score</p>
+                        <p class="text-2xl font-bold text-foreground">@(_results.Any() ? _results.Max(r => r.TotalScore).ToString("F2") : "0.00")</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+
+        <LumexCard Class="rounded-2xl">
+            <LumexCardBody Class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-default-500 mb-1">Active Events</p>
+                        <p class="text-2xl font-bold text-foreground">@_results.Select(r => r.Event).Distinct().Count()</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </LumexCardBody>
+        </LumexCard>
+    </div>
+</div>
+
+<!-- Athlete Details Modal -->
+@if (_showDetailsModal && _selectedResult != null)
+{
+    <div class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @onclick="@(() => _showDetailsModal = false)"></div>
+        
+        <!-- Modal -->
+        <div class="relative w-full max-w-2xl bg-background rounded-2xl shadow-2xl border border-divider overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-divider">
+                <h3 class="text-xl font-semibold text-foreground">Athlete Details</h3>
+                <LumexButton Variant="Variant.Light" Size="Size.Small" IsIconOnly="true" OnClick="@(() => _showDetailsModal = false)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </LumexButton>
+            </div>
+            
+            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                <!-- Athlete Info -->
+                <div class="flex items-center gap-4">
+                    <LumexAvatar Name="@_selectedResult.AthleteName" Size="Size.Large" />
+                    <div>
+                        <h4 class="text-lg font-semibold text-foreground">@_selectedResult.AthleteName</h4>
+                        <p class="text-sm text-default-500">@_selectedResult.Club • @_selectedResult.Age years old</p>
+                        <p class="text-sm text-default-500">Event: @_selectedResult.Event</p>
+                    </div>
+                </div>
+
+                <!-- Score Breakdown -->
+                <div class="space-y-4">
+                    <h5 class="font-semibold text-foreground">Score Breakdown</h5>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-default-50 rounded-lg">
+                            <p class="text-xs text-default-500 mb-1">Execution</p>
+                            <p class="text-2xl font-bold text-foreground">@_selectedResult.ExecutionScore.ToString("F2")</p>
+                            <div class="mt-2 h-2 bg-default-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-success rounded-full" style="width: @((_selectedResult.ExecutionScore / 10.0) * 100)%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-default-50 rounded-lg">
+                            <p class="text-xs text-default-500 mb-1">Difficulty</p>
+                            <p class="text-2xl font-bold text-foreground">@_selectedResult.DifficultyScore.ToString("F2")</p>
+                            <div class="mt-2 h-2 bg-default-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-warning rounded-full" style="width: @((_selectedResult.DifficultyScore / 10.0) * 100)%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-default-50 rounded-lg">
+                            <p class="text-xs text-default-500 mb-1">Composition</p>
+                            <p class="text-2xl font-bold text-foreground">@_selectedResult.CompositionScore.ToString("F2")</p>
+                            <div class="mt-2 h-2 bg-default-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-secondary rounded-full" style="width: @((_selectedResult.CompositionScore / 10.0) * 100)%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-primary/10 rounded-lg">
+                        <p class="text-sm text-default-500 mb-1">Total Score</p>
+                        <p class="text-3xl font-bold text-primary">@_selectedResult.TotalScore.ToString("F2")</p>
+                    </div>
+                </div>
+
+                <!-- Position Info -->
+                <div class="flex items-center justify-between p-4 bg-default-50 rounded-lg">
+                    <div>
+                        <p class="text-sm text-default-500">Current Position</p>
+                        <p class="text-xl font-bold text-foreground">@GetPositionText(_selectedResult.Position)</p>
+                    </div>
+                    @if (_selectedResult.Position <= 3)
+                    {
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl @GetPositionColor(_selectedResult.Position)">
+                            @_selectedResult.Position
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end px-6 py-4 border-t border-divider bg-default-50">
+                <LumexButton Variant="Variant.Flat" OnClick="@(() => _showDetailsModal = false)">
+                    Close
+                </LumexButton>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string _searchQuery = "";
+    private string _eventFilter = "all";
+    private string _clubFilter = "all";
+    private bool _detailedView = true;
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+    private bool _showDetailsModal = false;
+    private CompetitionResult? _selectedResult;
+
+    private List<CompetitionResult> _results = new();
+
+    protected override void OnInitialized()
+    {
+        LoadSampleData();
+    }
+
+    private void LoadSampleData()
+    {
+        _results = new List<CompetitionResult>
+        {
+            new(1, "Sophie Martin", 22, "Apex Parkour", "Parkour Speed", 9.45, 8.90, 9.20),
+            new(2, "Lucas Dubois", 19, "Momentum Athletics", "Parkour Speed", 9.30, 8.75, 9.10),
+            new(3, "Emma Rousseau", 21, "Urban Flow", "Parkour Freestyle", 9.50, 9.20, 9.40),
+            new(4, "Noah Bernard", 20, "Apex Parkour", "Parkour Freestyle", 9.15, 8.95, 9.25),
+            new(5, "Léa Petit", 23, "Elite Gymnastics", "Floor Exercise", 9.25, 9.10, 9.30),
+            new(6, "Thomas Moreau", 18, "Momentum Athletics", "Floor Exercise", 9.10, 8.80, 9.05),
+            new(7, "Chloé Laurent", 21, "Urban Flow", "Vault", 9.35, 9.00, 9.15),
+            new(8, "Hugo Simon", 22, "Elite Gymnastics", "Vault", 9.05, 8.90, 9.10),
+            new(9, "Camille Leroy", 20, "Apex Parkour", "Parkour Speed", 8.95, 8.70, 8.85),
+            new(10, "Alexandre Garcia", 19, "Momentum Athletics", "Parkour Freestyle", 9.00, 8.85, 8.95),
+            new(11, "Sarah Roux", 23, "Urban Flow", "Floor Exercise", 8.85, 8.75, 8.90),
+            new(12, "Antoine Fournier", 21, "Elite Gymnastics", "Floor Exercise", 8.80, 8.65, 8.75),
+            new(13, "Julie Girard", 20, "Apex Parkour", "Vault", 8.90, 8.80, 8.85),
+            new(14, "Maxime Bonnet", 22, "Momentum Athletics", "Vault", 8.75, 8.60, 8.70),
+            new(15, "Marine Dupont", 19, "Urban Flow", "Parkour Speed", 8.70, 8.55, 8.65),
+        };
+    }
+
+    private IEnumerable<CompetitionResult> FilteredResults
+    {
+        get
+        {
+            var filtered = _results.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(_searchQuery))
+            {
+                filtered = filtered.Where(r => r.AthleteName.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (_eventFilter != "all")
+            {
+                filtered = filtered.Where(r => GetEventKey(r.Event) == _eventFilter);
+            }
+
+            if (_clubFilter != "all")
+            {
+                filtered = filtered.Where(r => GetClubKey(r.Club) == _clubFilter);
+            }
+
+            return filtered.Skip((_currentPage - 1) * _pageSize).Take(_pageSize);
+        }
+    }
+
+    private void RefreshScores()
+    {
+        // Simulate real-time score update
+        var random = new Random();
+        foreach (var result in _results)
+        {
+            var variance = (random.NextDouble() - 0.5) * 0.2; // ±0.1 variation
+            result.ExecutionScore = Math.Max(0, Math.Min(10, result.ExecutionScore + variance));
+            result.DifficultyScore = Math.Max(0, Math.Min(10, result.DifficultyScore + variance));
+            result.CompositionScore = Math.Max(0, Math.Min(10, result.CompositionScore + variance));
+        }
+        
+        // Re-sort and update positions
+        var sorted = _results.OrderByDescending(r => r.TotalScore).ToList();
+        for (int i = 0; i < sorted.Count; i++)
+        {
+            sorted[i].Position = i + 1;
+        }
+        _results = sorted;
+        
+        Toast.Success("Scores refreshed successfully!");
+        StateHasChanged();
+    }
+
+    private void ViewAthleteDetails(CompetitionResult result)
+    {
+        _selectedResult = result;
+        _showDetailsModal = true;
+    }
+
+    private void PreviousPage()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+        }
+    }
+
+    private void NextPage()
+    {
+        if (_currentPage * _pageSize < FilteredResults.Count())
+        {
+            _currentPage++;
+        }
+    }
+
+    private string GetEventLabel(string value) => value switch
+    {
+        "parkour" => "Parkour Speed",
+        "freestyle" => "Parkour Freestyle",
+        "floor" => "Floor Exercise",
+        "vault" => "Vault",
+        _ => "All Events"
+    };
+
+    private string GetClubLabel(string value) => value switch
+    {
+        "apex" => "Apex Parkour",
+        "momentum" => "Momentum Athletics",
+        "urban" => "Urban Flow",
+        "elite" => "Elite Gymnastics",
+        _ => "All Clubs"
+    };
+
+    private string GetEventKey(string eventName) => eventName switch
+    {
+        "Parkour Speed" => "parkour",
+        "Parkour Freestyle" => "freestyle",
+        "Floor Exercise" => "floor",
+        "Vault" => "vault",
+        _ => ""
+    };
+
+    private string GetClubKey(string clubName) => clubName switch
+    {
+        "Apex Parkour" => "apex",
+        "Momentum Athletics" => "momentum",
+        "Urban Flow" => "urban",
+        "Elite Gymnastics" => "elite",
+        _ => ""
+    };
+
+    private ThemeColor GetEventColor(string eventName) => eventName switch
+    {
+        "Parkour Speed" => ThemeColor.Primary,
+        "Parkour Freestyle" => ThemeColor.Secondary,
+        "Floor Exercise" => ThemeColor.Success,
+        "Vault" => ThemeColor.Warning,
+        _ => ThemeColor.Default
+    };
+
+    private string GetPositionColor(int position) => position switch
+    {
+        1 => "bg-warning text-warning-foreground",
+        2 => "bg-default-300 text-default-800",
+        3 => "bg-[#CD7F32] text-white",
+        _ => ""
+    };
+
+    private string GetClubDotClass(string club) => club switch
+    {
+        "Apex Parkour" => "bg-primary",
+        "Momentum Athletics" => "bg-secondary",
+        "Urban Flow" => "bg-success",
+        "Elite Gymnastics" => "bg-warning",
+        _ => "bg-default-400"
+    };
+
+    private string GetPositionText(int position) => position switch
+    {
+        1 => "1st Place - Gold Medal",
+        2 => "2nd Place - Silver Medal",
+        3 => "3rd Place - Bronze Medal",
+        _ => $"{position}th Place"
+    };
+
+    private record CompetitionResult
+    {
+        public int Position { get; set; }
+        public string AthleteName { get; init; }
+        public int Age { get; init; }
+        public string Club { get; init; }
+        public string Event { get; init; }
+        public double ExecutionScore { get; set; }
+        public double DifficultyScore { get; set; }
+        public double CompositionScore { get; set; }
+        public double TotalScore => ExecutionScore + DifficultyScore + CompositionScore;
+
+        public CompetitionResult(int position, string athleteName, int age, string club, string eventName, 
+            double executionScore, double difficultyScore, double compositionScore)
+        {
+            Position = position;
+            AthleteName = athleteName;
+            Age = age;
+            Club = club;
+            Event = eventName;
+            ExecutionScore = executionScore;
+            DifficultyScore = difficultyScore;
+            CompositionScore = compositionScore;
+        }
+    }
+}
