@@ -555,15 +555,21 @@
         }
 
         // Filter by beds
-        if (!string.IsNullOrWhiteSpace(_beds) && int.TryParse(_beds, out int bedsCount))
+        if (!string.IsNullOrWhiteSpace(_beds))
         {
-            filtered = filtered.Where(h => h.Beds >= bedsCount);
+            if (int.TryParse(_beds, out int bedsCount))
+            {
+                filtered = filtered.Where(h => h.Beds >= bedsCount);
+            }
         }
 
         // Filter by guests
-        if (!string.IsNullOrWhiteSpace(_guests) && int.TryParse(_guests, out int guestsCount))
+        if (!string.IsNullOrWhiteSpace(_guests))
         {
-            filtered = filtered.Where(h => h.MaxGuests >= guestsCount);
+            if (int.TryParse(_guests, out int guestsCount))
+            {
+                filtered = filtered.Where(h => h.MaxGuests >= guestsCount);
+            }
         }
 
         // Filter by property type
@@ -574,13 +580,19 @@
         }
 
         // Filter by price range
-        if (!string.IsNullOrWhiteSpace(_minPrice) && int.TryParse(_minPrice, out int minPrice))
+        if (!string.IsNullOrWhiteSpace(_minPrice))
         {
-            filtered = filtered.Where(h => h.PricePerNight >= minPrice);
+            if (int.TryParse(_minPrice, out int minPrice))
+            {
+                filtered = filtered.Where(h => h.PricePerNight >= minPrice);
+            }
         }
-        if (!string.IsNullOrWhiteSpace(_maxPrice) && int.TryParse(_maxPrice, out int maxPrice))
+        if (!string.IsNullOrWhiteSpace(_maxPrice))
         {
-            filtered = filtered.Where(h => h.PricePerNight <= maxPrice);
+            if (int.TryParse(_maxPrice, out int maxPrice))
+            {
+                filtered = filtered.Where(h => h.PricePerNight <= maxPrice);
+            }
         }
 
         // Filter by amenities
@@ -608,7 +620,11 @@
                _checkInDate.HasValue ||
                _checkOutDate.HasValue ||
                !string.IsNullOrWhiteSpace(_beds) ||
-               !string.IsNullOrWhiteSpace(_guests);
+               !string.IsNullOrWhiteSpace(_guests) ||
+               _propertyTypes.Any(t => t.Selected) ||
+               _amenities.Any(a => a.Selected) ||
+               !string.IsNullOrWhiteSpace(_minPrice) ||
+               !string.IsNullOrWhiteSpace(_maxPrice);
     }
 
     private string GetSidebarPanelClass() =>
