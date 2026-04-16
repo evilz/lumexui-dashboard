@@ -1,0 +1,124 @@
+@page "/open-projects"
+@inject ProjectService ProjectService
+
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold text-foreground">Open Projects</h1>
+        <p class="text-default-500 mt-1">Browse cultural projects seeking funding</p>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="flex items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+    }
+    else if (_error is not null)
+    {
+        <div class="p-4 rounded-xl border border-danger/30 bg-danger/10 text-danger">
+            <p>Failed to load projects: @_error</p>
+            <button class="mt-2 text-sm underline" @onclick="LoadProjectsAsync">Try again</button>
+        </div>
+    }
+    else if (_result is not null)
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var project in _result.Items)
+            {
+                <div class="p-6 rounded-xl border border-divider bg-content1 flex flex-col gap-3">
+                    <h2 class="text-lg font-semibold text-foreground">@project.Name</h2>
+                    <p class="text-sm text-default-500 line-clamp-3 flex-1">@project.Description</p>
+                    <div class="flex items-center justify-between pt-3 border-t border-divider">
+                        <span class="text-lg font-bold text-primary">€@project.AmountNeeded.ToString("N0")</span>
+                        <span class="text-xs text-default-400">@project.PublicationDate.ToString("MMM dd, yyyy")</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (_result.TotalPages > 1)
+        {
+            <div class="flex items-center justify-center gap-2 pt-4">
+                <button class="@GetPageButtonClass(_result.HasPrevious)"
+                        disabled="@(!_result.HasPrevious)"
+                        @onclick="PreviousPageAsync">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Previous
+                </button>
+
+                @for (var i = 1; i <= _result.TotalPages; i++)
+                {
+                    var pageNum = i;
+                    <button class="@GetNumberButtonClass(pageNum == _currentPage)"
+                            @onclick="() => GoToPageAsync(pageNum)">
+                        @pageNum
+                    </button>
+                }
+
+                <button class="@GetPageButtonClass(_result.HasNext)"
+                        disabled="@(!_result.HasNext)"
+                        @onclick="NextPageAsync">
+                    Next
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private PagedResult<ProjectDto>? _result;
+    private bool _loading = true;
+    private string? _error;
+    private int _currentPage = 1;
+    private const int PageSize = 6;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjectsAsync();
+    }
+
+    private async Task LoadProjectsAsync()
+    {
+        _loading = true;
+        _error = null;
+
+        try
+        {
+            _result = await ProjectService.GetOpenProjectsAsync(_currentPage, PageSize);
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task GoToPageAsync(int page)
+    {
+        _currentPage = page;
+        await LoadProjectsAsync();
+    }
+
+    private Task PreviousPageAsync() => GoToPageAsync(_currentPage - 1);
+    private Task NextPageAsync() => GoToPageAsync(_currentPage + 1);
+
+    private static string GetPageButtonClass(bool enabled) =>
+        $"flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors " +
+        (enabled
+            ? "text-foreground hover:bg-default-100 cursor-pointer"
+            : "text-default-300 cursor-not-allowed");
+
+    private static string GetNumberButtonClass(bool active) =>
+        $"w-9 h-9 rounded-lg text-sm font-medium transition-colors " +
+        (active
+            ? "bg-primary text-primary-foreground"
+            : "text-default-500 hover:bg-default-100 cursor-pointer");
+}

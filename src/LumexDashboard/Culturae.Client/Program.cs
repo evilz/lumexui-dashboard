@@ -9,7 +9,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5256") });
 
 // Add LumexUI services
 builder.Services.AddLumexServices();
@@ -19,5 +19,8 @@ builder.Services.AddSonner();
 
 // Add app state service
 builder.Services.AddScoped<AppStateService>();
+
+// Add project service
+builder.Services.AddScoped<ProjectService>();
 
 await builder.Build().RunAsync();

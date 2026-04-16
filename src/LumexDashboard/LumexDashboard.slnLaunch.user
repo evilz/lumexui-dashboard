@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Nuevo perfil",
+    "Projects": [
+      {
+        "Path": "Culturae.API\\Culturae.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Culturae.Client\\Culturae.Client.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
