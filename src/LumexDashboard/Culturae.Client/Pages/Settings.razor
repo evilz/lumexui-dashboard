@@ -1,0 +1,248 @@
+@page "/settings"
+@inject IJSRuntime JS
+@inject AppStateService AppState
+
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold text-foreground">Settings</h1>
+        <p class="text-default-500 mt-1">Customize your experience</p>
+    </div>
+
+    <!-- Appearance -->
+    <div class="p-6 rounded-xl border border-divider bg-content1 space-y-6">
+        <h2 class="text-lg font-semibold text-foreground">Appearance</h2>
+
+        <!-- Theme Mode -->
+        <div>
+            <h3 class="text-sm font-medium text-default-400 mb-3">Theme Mode</h3>
+            <div class="flex gap-3">
+                <button @onclick="@(() => SetThemeMode("light"))"
+                        class="@GetModeClass("light")">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm">Light</span>
+                </button>
+                <button @onclick="@(() => SetThemeMode("dark"))"
+                        class="@GetModeClass("dark")">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                    <span class="text-sm">Dark</span>
+                </button>
+            </div>
+        </div>
+
+        <LumexDivider />
+
+        <!-- Primary Color -->
+        <div>
+            <h3 class="text-sm font-medium text-default-400 mb-3">Primary Color</h3>
+            <div class="flex flex-wrap gap-3">
+                @foreach (var color in _themeColors)
+                {
+                    <button @onclick="@(() => SetThemeColor(color.Value))"
+                            class="@GetColorClass(color.Value)"
+                            style="background-color: @color.Hex"
+                            title="@color.Label">
+                        @if (AppState.ThemeColor == color.Value)
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+
+        <LumexDivider />
+
+        <!-- Border Radius -->
+        <div>
+            <h3 class="text-sm font-medium text-default-400 mb-3">Border Radius</h3>
+            <div class="flex gap-3">
+                @foreach (var radius in _radiusOptions)
+                {
+                    <button @onclick="@(() => SetRadius(radius.Value))"
+                            class="@GetRadiusClass(radius.Value)">
+                        <div class="w-5 h-5 border-2 border-current @radius.Preview"></div>
+                        <span class="text-sm">@radius.Label</span>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="p-6 rounded-xl border border-divider bg-content1 space-y-4">
+        <h2 class="text-lg font-semibold text-foreground">Profile</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="text-sm font-medium text-default-400 block mb-1">Display Name</label>
+                <input type="text" value="User" disabled
+                       class="w-full px-3 py-2 rounded-lg border border-divider bg-default-100 text-foreground text-sm" />
+            </div>
+            <div>
+                <label class="text-sm font-medium text-default-400 block mb-1">Email</label>
+                <input type="email" value="user@culturae.com" disabled
+                       class="w-full px-3 py-2 rounded-lg border border-divider bg-default-100 text-foreground text-sm" />
+            </div>
+        </div>
+        <p class="text-xs text-default-400">Profile editing will be available once authentication is configured.</p>
+    </div>
+
+    <!-- Notifications -->
+    <div class="p-6 rounded-xl border border-divider bg-content1 space-y-4">
+        <h2 class="text-lg font-semibold text-foreground">Notifications</h2>
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-foreground">Investment Updates</p>
+                    <p class="text-xs text-default-400">Get notified about your investment status changes</p>
+                </div>
+                <LumexSwitch @bind-Value="_investmentNotifications" Color="ThemeColor.Primary" />
+            </div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-foreground">New Projects</p>
+                    <p class="text-xs text-default-400">Be alerted when new cultural projects are published</p>
+                </div>
+                <LumexSwitch @bind-Value="_newProjectNotifications" Color="ThemeColor.Primary" />
+            </div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-foreground">Payout Alerts</p>
+                    <p class="text-xs text-default-400">Receive notifications when payouts are processed</p>
+                </div>
+                <LumexSwitch @bind-Value="_payoutNotifications" Color="ThemeColor.Primary" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@implements IDisposable
+
+@code {
+    private bool _investmentNotifications = true;
+    private bool _newProjectNotifications = true;
+    private bool _payoutNotifications = false;
+    private string _currentRadius = "md";
+
+    private record ColorOption(string Value, string Label, string Hex);
+    private record RadiusOption(string Value, string Label, string Preview);
+
+    private readonly List<ColorOption> _themeColors = new()
+    {
+        new("blue", "Blue", "#006FEE"),
+        new("purple", "Purple", "#9353D3"),
+        new("green", "Green", "#17C964"),
+        new("red", "Red", "#F31260"),
+        new("pink", "Pink", "#FF4ECD"),
+        new("yellow", "Yellow", "#F5A524"),
+        new("cyan", "Cyan", "#06B7DB"),
+        new("zinc", "Zinc", "#71717A"),
+        new("orange", "Orange", "#F97316"),
+        new("teal", "Teal", "#14B8A6")
+    };
+
+    private readonly List<RadiusOption> _radiusOptions = new()
+    {
+        new("none", "None", "rounded-none"),
+        new("sm", "Small", "rounded-sm"),
+        new("md", "Medium", "rounded-md"),
+        new("lg", "Large", "rounded-lg")
+    };
+
+    private static readonly HashSet<string> ValidThemeModes = new() { "light", "dark" };
+    private static readonly HashSet<string> ValidThemeColors = new() { "blue", "purple", "green", "red", "pink", "yellow", "cyan", "zinc", "orange", "teal" };
+    private static readonly HashSet<string> ValidRadiusOptions = new() { "none", "sm", "md", "lg" };
+
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var radius = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeRadius') || 'md'");
+            _currentRadius = ValidRadiusOptions.Contains(radius) ? radius : "md";
+            StateHasChanged();
+        }
+    }
+
+    private async Task SetThemeMode(string mode)
+    {
+        if (!ValidThemeModes.Contains(mode)) return;
+        AppState.ThemeMode = mode;
+        await JS.InvokeVoidAsync("eval", $@"
+            localStorage.setItem('themeMode', '{mode}');
+            const html = document.documentElement;
+            html.classList.remove('light', 'dark');
+            html.classList.add('{mode}');
+        ");
+    }
+
+    private async Task SetThemeColor(string color)
+    {
+        if (!ValidThemeColors.Contains(color)) return;
+        AppState.ThemeColor = color;
+        var colorData = _themeColors.First(c => c.Value == color);
+        await JS.InvokeVoidAsync("eval", $@"
+            localStorage.setItem('themeColor', '{color}');
+            document.documentElement.style.setProperty('--lumex-primary', '{colorData.Hex}');
+            document.documentElement.style.setProperty('--lumex-primary-foreground', '#ffffff');
+        ");
+    }
+
+    private async Task SetRadius(string radius)
+    {
+        if (!ValidRadiusOptions.Contains(radius)) return;
+        _currentRadius = radius;
+        var (small, medium, large) = radius switch
+        {
+            "none" => ("0px", "0px", "0px"),
+            "sm" => ("0.125rem", "0.25rem", "0.375rem"),
+            "md" => ("0.25rem", "0.5rem", "0.75rem"),
+            "lg" => ("0.5rem", "0.75rem", "1rem"),
+            _ => ("0.25rem", "0.5rem", "0.75rem")
+        };
+        await JS.InvokeVoidAsync("eval", $@"
+            localStorage.setItem('themeRadius', '{radius}');
+            document.documentElement.style.setProperty('--lumex-radius-small', '{small}');
+            document.documentElement.style.setProperty('--lumex-radius-medium', '{medium}');
+            document.documentElement.style.setProperty('--lumex-radius-large', '{large}');
+        ");
+    }
+
+    private string GetModeClass(string mode)
+    {
+        var baseClass = "flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200";
+        return AppState.ThemeMode == mode
+            ? $"{baseClass} bg-primary text-primary-foreground"
+            : $"{baseClass} bg-default-100 hover:bg-default-200 text-default-600";
+    }
+
+    private string GetColorClass(string color)
+    {
+        var baseClass = "w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110";
+        return AppState.ThemeColor == color
+            ? $"{baseClass} ring-2 ring-offset-2 ring-offset-background ring-primary"
+            : baseClass;
+    }
+
+    private string GetRadiusClass(string radius)
+    {
+        var baseClass = "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200";
+        return _currentRadius == radius
+            ? $"{baseClass} bg-primary text-primary-foreground"
+            : $"{baseClass} bg-default-100 hover:bg-default-200 text-default-600";
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+}

@@ -1,0 +1,122 @@
+@page "/promoter-panel"
+
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold text-foreground">Promoter Panel</h1>
+        <p class="text-default-500 mt-1">Manage your cultural projects and funding</p>
+    </div>
+
+    <!-- Promoter Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-5 rounded-xl border border-divider bg-content1">
+            <p class="text-sm text-default-400">My Projects</p>
+            <p class="text-2xl font-bold text-foreground mt-1">5</p>
+            <p class="text-xs text-primary mt-2">3 active, 2 completed</p>
+        </div>
+        <div class="p-5 rounded-xl border border-divider bg-content1">
+            <p class="text-sm text-default-400">Total Raised</p>
+            <p class="text-2xl font-bold text-foreground mt-1">€320,000</p>
+            <p class="text-xs text-success mt-2">+€45K this quarter</p>
+        </div>
+        <div class="p-5 rounded-xl border border-divider bg-content1">
+            <p class="text-sm text-default-400">Total Investors</p>
+            <p class="text-2xl font-bold text-foreground mt-1">89</p>
+            <p class="text-xs text-default-400 mt-2">Across all projects</p>
+        </div>
+        <div class="p-5 rounded-xl border border-divider bg-content1">
+            <p class="text-sm text-default-400">Avg. Funding Rate</p>
+            <p class="text-2xl font-bold text-foreground mt-1">78%</p>
+            <p class="text-xs text-success mt-2">Above platform average</p>
+        </div>
+    </div>
+
+    <!-- My Projects -->
+    <div class="p-6 rounded-xl border border-divider bg-content1">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-foreground">My Projects</h2>
+        </div>
+        <div class="space-y-4">
+            @foreach (var project in _projects)
+            {
+                <div class="p-4 rounded-lg border border-divider">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-semibold text-foreground">@project.Name</h3>
+                                <span class="px-2 py-0.5 text-xs font-medium rounded-full @GetStatusClass(project.Status)">
+                                    @project.Status
+                                </span>
+                            </div>
+                            <p class="text-sm text-default-400 mt-1">@project.Category · @project.InvestorCount investors</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-foreground">€@project.Raised.ToString("N0") <span class="text-default-400 font-normal">/ €@project.Goal.ToString("N0")</span></p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-default-100 rounded-full h-2 mt-3">
+                        <div class="bg-primary h-2 rounded-full" style="width: @(project.Goal > 0 ? (int)(project.Raised * 100 / project.Goal) : 0)%"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Recent Investors -->
+    <div class="p-6 rounded-xl border border-divider bg-content1">
+        <h2 class="text-lg font-semibold text-foreground mb-4">Recent Investors</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-divider text-left">
+                        <th class="pb-3 font-medium text-default-400">Investor</th>
+                        <th class="pb-3 font-medium text-default-400">Project</th>
+                        <th class="pb-3 font-medium text-default-400">Amount</th>
+                        <th class="pb-3 font-medium text-default-400">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-divider">
+                    @foreach (var inv in _recentInvestors)
+                    {
+                        <tr>
+                            <td class="py-3 font-medium text-foreground">@inv.Name</td>
+                            <td class="py-3 text-default-500">@inv.Project</td>
+                            <td class="py-3 text-foreground">€@inv.Amount.ToString("N0")</td>
+                            <td class="py-3 text-default-400">@inv.Date</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<PromoterProject> _projects = new()
+    {
+        new("Teatro Real Season 2025", "Performing Arts", 150000, 120000, 34, "Active"),
+        new("Flamenco World Tour", "Music", 200000, 185000, 28, "Active"),
+        new("Madrid Art Week", "Visual Arts", 80000, 80000, 15, "Completed"),
+        new("Classical Guitar Festival", "Music", 60000, 42000, 12, "Active"),
+        new("Spanish Cinema Showcase", "Cinema", 100000, 100000, 20, "Completed"),
+    };
+
+    private List<RecentInvestor> _recentInvestors = new()
+    {
+        new("María García", "Flamenco World Tour", 5000, "Today"),
+        new("James Wilson", "Teatro Real Season 2025", 10000, "Yesterday"),
+        new("Ana López", "Classical Guitar Festival", 2500, "2 days ago"),
+        new("Pierre Dupont", "Flamenco World Tour", 15000, "3 days ago"),
+        new("Sofia Martín", "Teatro Real Season 2025", 3000, "1 week ago"),
+    };
+
+    private string GetStatusClass(string status) => status switch
+    {
+        "Active" => "bg-success/10 text-success",
+        "Completed" => "bg-primary/10 text-primary",
+        "Draft" => "bg-default-100 text-default-500",
+        _ => "bg-default-100 text-default-500"
+    };
+
+    private record PromoterProject(string Name, string Category, decimal Goal, decimal Raised, int InvestorCount, string Status);
+    private record RecentInvestor(string Name, string Project, decimal Amount, string Date);
+}

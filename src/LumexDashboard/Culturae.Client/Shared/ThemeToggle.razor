@@ -27,12 +27,17 @@
         if (firstRender)
         {
             AppState.OnChange += StateHasChanged;
-            var storedMode = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeMode') || 'light'");
-            if (AppState.ThemeMode != storedMode)
+            var storedMode = await JS.InvokeAsync<string>("eval", "localStorage.getItem('themeMode')");
+            if (string.IsNullOrEmpty(storedMode) || storedMode == "system")
+            {
+                var prefersDark = await JS.InvokeAsync<bool>("eval", "window.matchMedia('(prefers-color-scheme: dark)').matches");
+                AppState.ThemeMode = prefersDark ? "dark" : "light";
+            }
+            else if (AppState.ThemeMode != storedMode)
             {
                 AppState.ThemeMode = storedMode;
-                await ApplyTheme();
             }
+            await ApplyTheme();
         }
     }
 
