@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.5.11709.299 stable
+VisualStudioVersion = 18.5.11709.299
 MinimumVisualStudioVersion = 16.0.0.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LumexDashboard", "LumexDashboard\LumexDashboard.csproj", "{86789FFF-B8E7-4553-8DB4-61BE125AC474}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LumexDashboard.Client", "LumexDashboard.Client\LumexDashboard.Client.csproj", "{A23CD39B-B1B8-443B-B4D3-EC70FEB5F070}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Culturae.Client", "Culturae.Client\Culturae.Client.csproj", "{E1FDD750-3D27-4E99-9294-E2DBBAD7385C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Culturae.API", "Culturae.API\Culturae.API.csproj", "{D321527D-0E10-4467-BE48-2CA21E1D4B86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,18 @@ Global
 		{E1FDD750-3D27-4E99-9294-E2DBBAD7385C}.Release|x64.Build.0 = Release|Any CPU
 		{E1FDD750-3D27-4E99-9294-E2DBBAD7385C}.Release|x86.ActiveCfg = Release|Any CPU
 		{E1FDD750-3D27-4E99-9294-E2DBBAD7385C}.Release|x86.Build.0 = Release|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Debug|x64.Build.0 = Debug|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Debug|x86.Build.0 = Debug|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Release|x64.ActiveCfg = Release|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Release|x64.Build.0 = Release|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Release|x86.ActiveCfg = Release|Any CPU
+		{D321527D-0E10-4467-BE48-2CA21E1D4B86}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
