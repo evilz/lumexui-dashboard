@@ -25,12 +25,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach (var project in _result.Items)
             {
-                <div class="p-6 rounded-xl border border-divider bg-content1 flex flex-col gap-3">
-                    <h2 class="text-lg font-semibold text-foreground">@project.Name</h2>
-                    <p class="text-sm text-default-500 line-clamp-3 flex-1">@project.Description</p>
-                    <div class="flex items-center justify-between pt-3 border-t border-divider">
-                        <span class="text-lg font-bold text-primary">€@project.AmountNeeded.ToString("N0")</span>
-                        <span class="text-xs text-default-400">@project.PublicationDate.ToString("MMM dd, yyyy")</span>
+                <div class="rounded-xl border border-divider bg-content1 flex flex-col overflow-hidden">
+                    <div class="h-36 w-full" style="@GetGradientStyle(project.Id)"></div>
+                    <div class="p-6 flex flex-col gap-3 flex-1">
+                        <h2 class="text-lg font-semibold text-foreground">@project.Name</h2>
+                        <p class="text-sm text-default-500 line-clamp-3 flex-1">@project.Description</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-divider">
+                            <span class="text-lg font-bold text-primary">€@project.AmountNeeded.ToString("N0")</span>
+                            <span class="text-xs text-default-400">@project.PublicationDate.ToString("MMM dd, yyyy")</span>
+                        </div>
                     </div>
                 </div>
             }
@@ -121,4 +124,12 @@
         (active
             ? "bg-primary text-primary-foreground"
             : "text-default-500 hover:bg-default-100 cursor-pointer");
+
+    private static string GetGradientStyle(Guid id)
+    {
+        var hash = id.GetHashCode();
+        var hue1 = (uint)hash % 360;
+        var hue2 = (hue1 + 40 + ((uint)hash >> 8) % 80) % 360;
+        return $"background: linear-gradient(135deg, hsl({hue1}, 70%, 60%), hsl({hue2}, 80%, 50%))";
+    }
 }

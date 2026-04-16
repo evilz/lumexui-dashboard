@@ -1,0 +1,19 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Culturae.API/Dockerfile
+    ports:
+      - "5256:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+
+  client:
+    build:
+      context: .
+      dockerfile: Culturae.Client/Dockerfile
+    ports:
+      - "5160:80"
+    depends_on:
+      - api

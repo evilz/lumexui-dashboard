@@ -8,6 +8,7 @@ This is a **Blazor** dashboard application using **.NET 10** with **C# preview**
 - **LumexDashboard.Client** — Blazor WebAssembly client for the server-hosted app
 - **Culturae.UI.Shared** — Razor class library for reusable UI components shared across projects
 - **Culturae.Client** — Standalone Blazor WASM SPA (pages, layout, and services only)
+- **Culturae.API** — ASP.NET Core REST API backend (data layer, business logic, and HTTP endpoints)
 
 ## Tech Stack
 
@@ -67,6 +68,34 @@ npx @tailwindcss/cli -i wwwroot/app.css -o wwwroot/app.build.css --minify
 3. **Keep `Culturae.Client` minimal** — It should only contain pages (`Pages/`), layout scaffolding (`Layout/`), and app-specific services (`Services/`). No general-purpose UI components.
 4. **Eliminate duplicates** — If a component is duplicated across projects, remove the duplicate and consolidate it into `Culturae.UI.Shared` (or use the LumexUI built-in if one exists).
 5. **Component lookup order**: LumexUI (NuGet) → Culturae.UI.Shared → LumexDashboard → create new in Culturae.UI.Shared.
+
+## Backend (Culturae.API)
+
+### Architecture
+
+The API follows a layered architecture: **Controller → Service → Repository (Unit of Work) → EF Core DbContext**.
+
+- **Controllers** (`Controllers/`) — Thin HTTP layer; validate input and delegate to services
+- **Services** (`Services/`) — Business logic; each service has a corresponding interface (e.g., `IProjectService` / `ProjectService`)
+- **Repositories** (`Repositories/`) — Data access via EF Core; each repository has a corresponding interface (e.g., `IProjectRepository` / `ProjectRepository`)
+- **Unit of Work** (`Repositories/IUnitOfWork.cs` / `UnitOfWork.cs`) — Coordinates repository access and `SaveChangesAsync()`
+- **Entities** (`Entities/`) — EF Core domain models
+- **DTOs** (`DTOs/`) — Record types used for API responses (no direct entity exposure)
+- **Data** (`Data/AppDbContext.cs`) — EF Core DbContext (currently uses in-memory database with seed data)
+
+### Conventions
+
+- **Every service and repository must have an interface** (e.g., `IMyService` / `MyService`) to enable unit testing and DI
+- Register services as `Scoped` in `Program.cs`
+- Use record types for DTOs
+- Pagination uses a generic `PagedResult<T>` record
+- CORS is configured to allow the Culturae.Client origins (`http://localhost:5160`, `https://localhost:7165`)
+- The API exposes OpenAPI/Swagger in development
+
+### Running
+
+- Default URL: `http://localhost:5256`
+- Docker support via `Dockerfile` (multi-stage build, ports 8080/8081)
 
 ## Key Patterns
 
