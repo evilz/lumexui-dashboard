@@ -1,0 +1,83 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JS
+@inject AppStateService AppState
+@inject ToastService Toast
+@using Culturae.Client.Styles
+
+<div class="@MainLayoutStyles.GetContainerStyles()">
+    <!-- Sidebar -->
+    <Sidebar />
+
+    <!-- Overlay for mobile -->
+    <MobileOverlay Visible="AppState.SidebarOpen" OnClick="AppState.ToggleSidebar" ZIndex="20" />
+
+    <!-- Main Content Area -->
+    <div class="@MainLayoutStyles.GetContentAreaStyles()">
+        <!-- Top Bar -->
+        <TopBar />
+
+        <!-- Page Content -->
+        <main class="@MainLayoutStyles.GetMainStyles()">
+            @Body
+        </main>
+    </div>
+</div>
+
+<!-- Toaster -->
+<Toaster Position="ToastPosition.BottomRight" RichColors="true" CloseButton="true" />
+
+<!-- Command Palette -->
+<CommandPalette @ref="_commandPalette" />
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@implements IDisposable
+@code {
+    private CommandPalette? _commandPalette;
+
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
+    // Public method to show toasts from anywhere
+    public void ShowToast(string title, string message, string? type = "info")
+    {
+        switch ((type ?? "info").Trim().ToLowerInvariant())
+        {
+            case "success":
+                Toast.Success(title, t =>
+                {
+                    t.Description = message;
+                });
+                break;
+            case "error":
+                Toast.Error(title, t =>
+                {
+                    t.Description = message;
+                });
+                break;
+            case "warning":
+                Toast.Warning(title, t =>
+                {
+                    t.Description = message;
+                });
+                break;
+            default:
+                Toast.Info(title, t =>
+                {
+                    t.Description = message;
+                });
+                break;
+        }
+    }
+}

@@ -1,0 +1,60 @@
+@using Culturae.Client.Styles
+
+@* Sidebar component extracted from MainLayout *@
+<aside class="@SidebarStyles.GetStyles(AppState.SidebarOpen, AppState.SidebarCollapsed, Class)">
+    <div class="@SidebarStyles.GetContentStyles()">
+        <!-- Logo -->
+        <div class="@SidebarStyles.GetHeaderStyles()">
+            <div class="@SidebarStyles.GetLogoContainerStyles()">
+                <svg class="@SidebarStyles.GetLogoIconStyles()" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+            </div>
+            @if (!AppState.SidebarCollapsed || AppState.SidebarOpen)
+            {
+                <span class="@SidebarStyles.GetTitleStyles()">LumexDashboard</span>
+            }
+        </div>
+
+        <!-- Navigation -->
+        <nav class="@SidebarStyles.GetNavStyles()">
+            <NavMenu Collapsed="@(AppState.SidebarCollapsed && !AppState.SidebarOpen)" />
+        </nav>
+
+        <!-- User Profile -->
+        <div class="@SidebarStyles.GetUserSectionStyles()">
+            <div class="@SidebarStyles.GetUserContainerStyles()">
+                <LumexAvatar Name="John Doe" Size="@Size.Small" />
+                @if (!AppState.SidebarCollapsed || AppState.SidebarOpen)
+                {
+                    <div class="@SidebarStyles.GetUserInfoStyles()">
+                        <p class="@SidebarStyles.GetUserNameStyles()">John Doe</p>
+                        <p class="@SidebarStyles.GetUserEmailStyles()">admin@example.com</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</aside>
+
+@inject AppStateService AppState
+
+@implements IDisposable
+
+@code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
+    /// <summary>
+    /// Additional CSS class to apply to the sidebar.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+}
