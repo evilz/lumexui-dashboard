@@ -22,7 +22,7 @@
             </button>
         </DesktopOnly>
         
-        <!-- Command Palette Trigger -->
+        @* <!-- Command Palette Trigger -->
         <SmallUp Display="flex">
             <button class="@TopBarStyles.GetSearchButtonStyles()" @onclick="AppState.OpenCommandPalette">
                 <svg class="@TopBarStyles.GetSearchIconStyles()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,11 +33,12 @@
                     <span>⌘</span>K
                 </kbd>
             </button>
-        </SmallUp>
+        </SmallUp> *@
     </div>
 
-    <!-- Right Section: Notifications, Theme Toggle, Settings -->
+    <!-- Right Section: Language, Notifications, Theme Toggle, Settings -->
     <div class="@TopBarStyles.GetRightSectionStyles()">
+        <LanguageSelector />
         <NotificationBell />
         <ThemeToggle />
         <ThemeSettings />

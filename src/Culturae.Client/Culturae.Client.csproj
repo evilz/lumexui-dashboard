@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+	<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
 	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
@@ -13,6 +14,7 @@
 	<PackageReference Include="LumexUI" Version="2.3.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.6" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.6" />
   </ItemGroup>
 
 	<Target Name="BuildTailwindCSS" BeforeTargets="Build">

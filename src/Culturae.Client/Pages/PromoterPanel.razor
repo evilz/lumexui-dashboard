@@ -1,39 +1,40 @@
 @page "/promoter-panel"
+@inject IStringLocalizer<SharedResource> L
 
 <div class="space-y-6">
     <div>
-        <h1 class="text-2xl font-bold text-foreground">Promoter Panel</h1>
-        <p class="text-default-500 mt-1">Manage your cultural projects and funding</p>
+        <h1 class="text-2xl font-bold text-foreground">@L["Promoter_Title"]</h1>
+        <p class="text-default-500 mt-1">@L["Promoter_Subtitle"]</p>
     </div>
 
     <!-- Promoter Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="p-5 rounded-xl border border-divider bg-content1">
-            <p class="text-sm text-default-400">My Projects</p>
+            <p class="text-sm text-default-400">@L["Promoter_MyProjects"]</p>
             <p class="text-2xl font-bold text-foreground mt-1">5</p>
-            <p class="text-xs text-primary mt-2">3 active, 2 completed</p>
+            <p class="text-xs text-primary mt-2">@L["Promoter_ActiveCompleted"]</p>
         </div>
         <div class="p-5 rounded-xl border border-divider bg-content1">
-            <p class="text-sm text-default-400">Total Raised</p>
+            <p class="text-sm text-default-400">@L["Promoter_TotalRaised"]</p>
             <p class="text-2xl font-bold text-foreground mt-1">€320,000</p>
-            <p class="text-xs text-success mt-2">+€45K this quarter</p>
+            <p class="text-xs text-success mt-2">@L["Promoter_ThisQuarter"]</p>
         </div>
         <div class="p-5 rounded-xl border border-divider bg-content1">
-            <p class="text-sm text-default-400">Total Investors</p>
+            <p class="text-sm text-default-400">@L["Promoter_TotalInvestors"]</p>
             <p class="text-2xl font-bold text-foreground mt-1">89</p>
-            <p class="text-xs text-default-400 mt-2">Across all projects</p>
+            <p class="text-xs text-default-400 mt-2">@L["Promoter_AcrossAllProjects"]</p>
         </div>
         <div class="p-5 rounded-xl border border-divider bg-content1">
-            <p class="text-sm text-default-400">Avg. Funding Rate</p>
+            <p class="text-sm text-default-400">@L["Promoter_AvgFundingRate"]</p>
             <p class="text-2xl font-bold text-foreground mt-1">78%</p>
-            <p class="text-xs text-success mt-2">Above platform average</p>
+            <p class="text-xs text-success mt-2">@L["Promoter_AbovePlatformAvg"]</p>
         </div>
     </div>
 
     <!-- My Projects -->
     <div class="p-6 rounded-xl border border-divider bg-content1">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-foreground">My Projects</h2>
+            <h2 class="text-lg font-semibold text-foreground">@L["Promoter_MyProjects"]</h2>
         </div>
         <div class="space-y-4">
             @foreach (var project in _projects)
@@ -47,7 +48,7 @@
                                     @project.Status
                                 </span>
                             </div>
-                            <p class="text-sm text-default-400 mt-1">@project.Category · @project.InvestorCount investors</p>
+                            <p class="text-sm text-default-400 mt-1">@project.Category · @project.InvestorCount @L["Promoter_Investors"]</p>
                         </div>
                         <div class="text-right">
                             <p class="font-semibold text-foreground">€@project.Raised.ToString("N0") <span class="text-default-400 font-normal">/ €@project.Goal.ToString("N0")</span></p>
@@ -63,15 +64,15 @@
 
     <!-- Recent Investors -->
     <div class="p-6 rounded-xl border border-divider bg-content1">
-        <h2 class="text-lg font-semibold text-foreground mb-4">Recent Investors</h2>
+        <h2 class="text-lg font-semibold text-foreground mb-4">@L["Promoter_RecentInvestors"]</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-divider text-left">
-                        <th class="pb-3 font-medium text-default-400">Investor</th>
-                        <th class="pb-3 font-medium text-default-400">Project</th>
-                        <th class="pb-3 font-medium text-default-400">Amount</th>
-                        <th class="pb-3 font-medium text-default-400">Date</th>
+                        <th class="pb-3 font-medium text-default-400">@L["Promoter_Investor"]</th>
+                        <th class="pb-3 font-medium text-default-400">@L["Promoter_Project"]</th>
+                        <th class="pb-3 font-medium text-default-400">@L["Promoter_Amount"]</th>
+                        <th class="pb-3 font-medium text-default-400">@L["Promoter_Date"]</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-divider">

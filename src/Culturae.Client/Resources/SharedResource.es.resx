@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Navigation -->
+  <data name="Nav_Home" xml:space="preserve"><value>Inicio</value></data>
+  <data name="Nav_InvestorPanel" xml:space="preserve"><value>Panel de Inversor</value></data>
+  <data name="Nav_OpenProjects" xml:space="preserve"><value>Proyectos Abiertos</value></data>
+  <data name="Nav_PromoterPanel" xml:space="preserve"><value>Panel de Promotor</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Configuración</value></data>
+
+  <!-- TopBar -->
+  <data name="TopBar_Search" xml:space="preserve"><value>Buscar...</value></data>
+  <data name="TopBar_ExpandSidebar" xml:space="preserve"><value>Expandir barra lateral</value></data>
+  <data name="TopBar_CollapseSidebar" xml:space="preserve"><value>Contraer barra lateral</value></data>
+
+  <!-- Language -->
+  <data name="Language_English" xml:space="preserve"><value>Inglés</value></data>
+  <data name="Language_Spanish" xml:space="preserve"><value>Español</value></data>
+
+  <!-- Home Page -->
+  <data name="Home_Welcome" xml:space="preserve"><value>Bienvenido a Culturae</value></data>
+  <data name="Home_Subtitle" xml:space="preserve"><value>Tu plataforma de inversión cultural</value></data>
+  <data name="Home_ActiveProjects" xml:space="preserve"><value>Proyectos Activos</value></data>
+  <data name="Home_TotalInvested" xml:space="preserve"><value>Total Invertido</value></data>
+  <data name="Home_Participants" xml:space="preserve"><value>Participantes</value></data>
+  <data name="Home_InvestorsPromoters" xml:space="preserve"><value>Inversores y Promotores</value></data>
+  <data name="Home_ThisMonth" xml:space="preserve"><value>+3 este mes</value></data>
+  <data name="Home_VsLastQuarter" xml:space="preserve"><value>+15% vs último trimestre</value></data>
+  <data name="Home_RecentActivity" xml:space="preserve"><value>Actividad Reciente</value></data>
+  <data name="Home_NewInvestment" xml:space="preserve"><value>Nueva inversión en "Teatro Real Season"</value></data>
+  <data name="Home_TwoHoursAgo" xml:space="preserve"><value>Hace 2 horas</value></data>
+  <data name="Home_Investment" xml:space="preserve"><value>Inversión</value></data>
+  <data name="Home_ProjectPublished" xml:space="preserve"><value>Proyecto "Flamenco Festival" publicado</value></data>
+  <data name="Home_FiveHoursAgo" xml:space="preserve"><value>Hace 5 horas</value></data>
+  <data name="Home_Project" xml:space="preserve"><value>Proyecto</value></data>
+  <data name="Home_PayoutCompleted" xml:space="preserve"><value>Pago completado para "Art Exhibition Madrid"</value></data>
+  <data name="Home_OneDayAgo" xml:space="preserve"><value>Hace 1 día</value></data>
+  <data name="Home_Payout" xml:space="preserve"><value>Pago</value></data>
+
+  <!-- Open Projects Page -->
+  <data name="OpenProjects_Title" xml:space="preserve"><value>Proyectos Abiertos</value></data>
+  <data name="OpenProjects_Subtitle" xml:space="preserve"><value>Explora proyectos culturales en busca de financiación</value></data>
+  <data name="OpenProjects_FailedToLoad" xml:space="preserve"><value>Error al cargar proyectos:</value></data>
+  <data name="OpenProjects_TryAgain" xml:space="preserve"><value>Intentar de nuevo</value></data>
+  <data name="OpenProjects_Previous" xml:space="preserve"><value>Anterior</value></data>
+  <data name="OpenProjects_Next" xml:space="preserve"><value>Siguiente</value></data>
+
+  <!-- Investor Panel -->
+  <data name="Investor_Title" xml:space="preserve"><value>Panel de Inversor</value></data>
+  <data name="Investor_Subtitle" xml:space="preserve"><value>Gestiona tus inversiones y portafolio</value></data>
+  <data name="Investor_TotalInvested" xml:space="preserve"><value>Total Invertido</value></data>
+  <data name="Investor_ActiveInvestments" xml:space="preserve"><value>Inversiones Activas</value></data>
+  <data name="Investor_AcrossCategories" xml:space="preserve"><value>En 4 categorías</value></data>
+  <data name="Investor_PendingReturns" xml:space="preserve"><value>Retornos Pendientes</value></data>
+  <data name="Investor_NextPayout" xml:space="preserve"><value>Próximo pago en 15 días</value></data>
+  <data name="Investor_Completed" xml:space="preserve"><value>Completados</value></data>
+  <data name="Investor_AllSettled" xml:space="preserve"><value>Todos liquidados</value></data>
+  <data name="Investor_Return" xml:space="preserve"><value>retorno</value></data>
+  <data name="Investor_YourInvestments" xml:space="preserve"><value>Tus Inversiones</value></data>
+  <data name="Investor_Project" xml:space="preserve"><value>Proyecto</value></data>
+  <data name="Investor_Category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="Investor_Amount" xml:space="preserve"><value>Monto</value></data>
+  <data name="Investor_ReturnCol" xml:space="preserve"><value>Retorno</value></data>
+  <data name="Investor_Status" xml:space="preserve"><value>Estado</value></data>
+  <data name="Investor_AvailableProjects" xml:space="preserve"><value>Proyectos Disponibles</value></data>
+  <data name="Investor_Goal" xml:space="preserve"><value>objetivo</value></data>
+  <data name="Investor_Funded" xml:space="preserve"><value>financiado</value></data>
+
+  <!-- Promoter Panel -->
+  <data name="Promoter_Title" xml:space="preserve"><value>Panel de Promotor</value></data>
+  <data name="Promoter_Subtitle" xml:space="preserve"><value>Gestiona tus proyectos culturales y financiación</value></data>
+  <data name="Promoter_MyProjects" xml:space="preserve"><value>Mis Proyectos</value></data>
+  <data name="Promoter_TotalRaised" xml:space="preserve"><value>Total Recaudado</value></data>
+  <data name="Promoter_ThisQuarter" xml:space="preserve"><value>+€45K este trimestre</value></data>
+  <data name="Promoter_TotalInvestors" xml:space="preserve"><value>Total Inversores</value></data>
+  <data name="Promoter_AcrossAllProjects" xml:space="preserve"><value>En todos los proyectos</value></data>
+  <data name="Promoter_AvgFundingRate" xml:space="preserve"><value>Tasa Media de Financiación</value></data>
+  <data name="Promoter_AbovePlatformAvg" xml:space="preserve"><value>Por encima del promedio</value></data>
+  <data name="Promoter_ActiveCompleted" xml:space="preserve"><value>3 activos, 2 completados</value></data>
+  <data name="Promoter_Investors" xml:space="preserve"><value>inversores</value></data>
+  <data name="Promoter_RecentInvestors" xml:space="preserve"><value>Inversores Recientes</value></data>
+  <data name="Promoter_Investor" xml:space="preserve"><value>Inversor</value></data>
+  <data name="Promoter_Project" xml:space="preserve"><value>Proyecto</value></data>
+  <data name="Promoter_Amount" xml:space="preserve"><value>Monto</value></data>
+  <data name="Promoter_Date" xml:space="preserve"><value>Fecha</value></data>
+
+  <!-- Settings Page -->
+  <data name="Settings_Title" xml:space="preserve"><value>Configuración</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Personaliza tu experiencia</value></data>
+  <data name="Settings_Appearance" xml:space="preserve"><value>Apariencia</value></data>
+  <data name="Settings_ThemeMode" xml:space="preserve"><value>Modo de Tema</value></data>
+  <data name="Settings_Light" xml:space="preserve"><value>Claro</value></data>
+  <data name="Settings_Dark" xml:space="preserve"><value>Oscuro</value></data>
+  <data name="Settings_PrimaryColor" xml:space="preserve"><value>Color Principal</value></data>
+  <data name="Settings_BorderRadius" xml:space="preserve"><value>Radio de Borde</value></data>
+  <data name="Settings_Profile" xml:space="preserve"><value>Perfil</value></data>
+  <data name="Settings_DisplayName" xml:space="preserve"><value>Nombre</value></data>
+  <data name="Settings_Email" xml:space="preserve"><value>Correo Electrónico</value></data>
+  <data name="Settings_ProfileNote" xml:space="preserve"><value>La edición del perfil estará disponible una vez configurada la autenticación.</value></data>
+  <data name="Settings_Notifications" xml:space="preserve"><value>Notificaciones</value></data>
+  <data name="Settings_InvestmentUpdates" xml:space="preserve"><value>Actualizaciones de Inversiones</value></data>
+  <data name="Settings_InvestmentUpdatesDesc" xml:space="preserve"><value>Recibe notificaciones sobre cambios en el estado de tus inversiones</value></data>
+  <data name="Settings_NewProjects" xml:space="preserve"><value>Nuevos Proyectos</value></data>
+  <data name="Settings_NewProjectsDesc" xml:space="preserve"><value>Recibe alertas cuando se publiquen nuevos proyectos culturales</value></data>
+  <data name="Settings_PayoutAlerts" xml:space="preserve"><value>Alertas de Pago</value></data>
+  <data name="Settings_PayoutAlertsDesc" xml:space="preserve"><value>Recibe notificaciones cuando se procesen los pagos</value></data>
+  <data name="Settings_None" xml:space="preserve"><value>Ninguno</value></data>
+  <data name="Settings_Small" xml:space="preserve"><value>Pequeño</value></data>
+  <data name="Settings_Medium" xml:space="preserve"><value>Mediano</value></data>
+  <data name="Settings_Large" xml:space="preserve"><value>Grande</value></data>
+
+  <!-- Notifications -->
+  <data name="Notifications_Title" xml:space="preserve"><value>Notificaciones</value></data>
+
+  <!-- Not Found -->
+  <data name="NotFound_Title" xml:space="preserve"><value>404 - Página No Encontrada</value></data>
+  <data name="NotFound_Message" xml:space="preserve"><value>La página que buscas no existe.</value></data>
+</root>

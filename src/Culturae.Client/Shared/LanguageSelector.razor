@@ -1,0 +1,68 @@
+@using System.Globalization
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<div class="relative">
+    <button class="p-2 rounded-lg hover:bg-default-100 transition-colors flex items-center gap-1 text-sm text-default-600"
+            @onclick="ToggleDropdown"
+            title="Change language">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="hidden sm:inline uppercase">@_currentCulture</span>
+    </button>
+
+    @if (_isOpen)
+    {
+        <div class="absolute right-0 top-full mt-1 w-40 rounded-lg border border-divider bg-content1 shadow-lg z-50">
+            @foreach (var lang in _languages)
+            {
+                <button class="@GetItemStyles(lang.Code)"
+                        @onclick="() => SelectLanguage(lang.Code)">
+                    <span>@lang.Flag</span>
+                    <span>@lang.Name</span>
+                </button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private bool _isOpen;
+    private string _currentCulture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    private readonly record struct LanguageOption(string Code, string Name, string Flag);
+
+    private static readonly LanguageOption[] _languages =
+    [
+        new("en", "English", "🇬🇧"),
+        new("es", "Español", "🇪🇸")
+    ];
+
+    private void ToggleDropdown() => _isOpen = !_isOpen;
+
+    private async Task SelectLanguage(string cultureCode)
+    {
+        _isOpen = false;
+
+        if (_currentCulture == cultureCode)
+            return;
+
+        var culture = new CultureInfo(cultureCode);
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        _currentCulture = cultureCode;
+
+        await JS.InvokeVoidAsync("eval", $"localStorage.setItem('culture', '{cultureCode}')");
+
+        Nav.NavigateTo(Nav.Uri, forceLoad: true);
+    }
+
+    private static string GetItemStyles(string code)
+    {
+        var isSelected = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == code;
+        return $"w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors " +
+               $"hover:bg-default-100 text-foreground " +
+               (isSelected ? "bg-default-100 font-medium" : "");
+    }
+}

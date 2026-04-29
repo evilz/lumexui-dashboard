@@ -1,3 +1,5 @@
+@inject IStringLocalizer<SharedResource> L
+
 <div class="relative">
     <button class="p-2 rounded-lg hover:bg-default-100 transition-colors"
             @onclick="ToggleDropdown"
@@ -17,7 +19,7 @@
     {
         <div class="absolute right-0 mt-2 w-80 bg-background rounded-xl shadow-lg border border-divider z-50">
             <div class="border-b border-divider px-4 py-3">
-                <h3 class="font-semibold text-foreground">Notifications</h3>
+                <h3 class="font-semibold text-foreground">@L["Notifications_Title"]</h3>
             </div>
             <div class="max-h-80 overflow-y-auto">
                 @foreach (var notification in _notifications)

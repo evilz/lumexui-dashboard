@@ -1,10 +1,11 @@
 @page "/open-projects"
 @inject ProjectService ProjectService
+@inject IStringLocalizer<SharedResource> L
 
 <div class="space-y-6">
     <div>
-        <h1 class="text-2xl font-bold text-foreground">Open Projects</h1>
-        <p class="text-default-500 mt-1">Browse cultural projects seeking funding</p>
+        <h1 class="text-2xl font-bold text-foreground">@L["OpenProjects_Title"]</h1>
+        <p class="text-default-500 mt-1">@L["OpenProjects_Subtitle"]</p>
     </div>
 
     @if (_loading)
@@ -16,8 +17,8 @@
     else if (_error is not null)
     {
         <div class="p-4 rounded-xl border border-danger/30 bg-danger/10 text-danger">
-            <p>Failed to load projects: @_error</p>
-            <button class="mt-2 text-sm underline" @onclick="LoadProjectsAsync">Try again</button>
+            <p>@L["OpenProjects_FailedToLoad"] @_error</p>
+            <button class="mt-2 text-sm underline" @onclick="LoadProjectsAsync">@L["OpenProjects_TryAgain"]</button>
         </div>
     }
     else if (_result is not null)
@@ -48,7 +49,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
-                    Previous
+                    @L["OpenProjects_Previous"]
                 </button>
 
                 @for (var i = 1; i <= _result.TotalPages; i++)
@@ -63,7 +64,7 @@
                 <button class="@GetPageButtonClass(_result.HasNext)"
                         disabled="@(!_result.HasNext)"
                         @onclick="NextPageAsync">
-                    Next
+                    @L["OpenProjects_Next"]
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
