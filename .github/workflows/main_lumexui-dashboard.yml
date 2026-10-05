@@ -48,6 +48,7 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 1
           name: webapp-package
           path: ${{ github.workspace }}/publish/
 
